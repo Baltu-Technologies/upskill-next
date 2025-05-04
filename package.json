@@ -2,6 +2,9 @@
   "name": "aws-amplify-gen2",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": ">=20.0.0"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -22,8 +25,8 @@
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
-    "aws-cdk": "^2",
-    "aws-cdk-lib": "^2",
+    "aws-cdk": "^2.130.0",
+    "aws-cdk-lib": "^2.130.0",
     "constructs": "^10.3.0",
     "esbuild": "^0.25.3",
     "tsx": "^4.19.0",
