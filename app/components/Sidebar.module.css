@@ -1,0 +1,128 @@
+.sidebar {
+  width: 250px;
+  height: 100vh;
+  background: #1a1a1a;
+  color: white;
+  position: fixed;
+  left: 0;
+  top: 0;
+  transition: width 0.3s ease;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar.collapsed {
+  width: 80px;
+}
+
+.sidebarHeader {
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.logo {
+  color: white;
+  text-decoration: none;
+  font-size: 1.5rem;
+  font-weight: bold;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.collapseButton {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  padding: 0.5rem;
+  font-size: 1.2rem;
+  transition: transform 0.2s ease;
+}
+
+.collapseButton:hover {
+  transform: scale(1.1);
+}
+
+.nav {
+  flex: 1;
+  padding: 1.5rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.navItem {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 1.5rem;
+  color: white;
+  text-decoration: none;
+  transition: background-color 0.2s ease;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.navItem:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.navItem.active {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.sidebarFooter {
+  padding: 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.signOutButton,
+.signInButton {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+  padding: 0.75rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  text-decoration: none;
+  color: white;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.signOutButton:hover,
+.signInButton:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    width: 100%;
+    height: auto;
+    position: relative;
+  }
+
+  .sidebar.collapsed {
+    width: 100%;
+  }
+
+  .nav {
+    flex-direction: row;
+    padding: 1rem;
+    overflow-x: auto;
+  }
+
+  .navItem {
+    padding: 0.5rem 1rem;
+  }
+
+  .sidebarFooter {
+    display: none;
+  }
+} 

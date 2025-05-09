@@ -1,63 +1,53 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { generateClient } from "aws-amplify/data";
-import type { Schema } from "@/amplify/data/resource";
-import "./../app/app.css";
-import { Amplify } from "aws-amplify";
-import outputs from "@/amplify_outputs.json";
-import "@aws-amplify/ui-react/styles.css";
-import { Authenticator } from "@aws-amplify/ui-react";
-
-Amplify.configure(outputs);
-
-const client = generateClient<Schema>();
+import { useState } from 'react';
+import { useAuth } from "./contexts/AuthContext";
+import Sidebar from "./components/Sidebar";
+import CourseCarousel from "./components/CourseCarousel";
+import styles from "./page.module.css";
 
 export default function App() {
-  const [todos, setTodos] = useState<Array<Schema["Todo"]["type"]>>([]);
+  const { user, isLoading: authLoading, signOut } = useAuth();
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
-  function listTodos() {
-    client.models.Todo.observeQuery().subscribe({
-      next: (data) => setTodos([...data.items]),
-    });
-  }
-
-  useEffect(() => {
-    listTodos();
-  }, []);
-
-  function createTodo() {
-    client.models.Todo.create({
-      content: window.prompt("Todo content"),
-    });
-  }
-
-  function deleteTodo(id: string)
-  {
-    client.models.Todo.delete({id})
+  if (authLoading) {
+    return (
+      <div className={styles.loading}>
+        <div className={styles.spinner}></div>
+        <p>Loading...</p>
+      </div>
+    );
   }
 
   return (
-    <Authenticator>
-      {({signOut, user}) => (
-        <main>
-        <h1>Todos of {user?.signInDetails?.loginId}</h1>
-        <button onClick={createTodo}>+ new</button>
-        <ul>
-          {todos.map((todo) => (
-            <li onClick={() => deleteTodo(todo.id)} key={todo.id}>{todo.content}</li>
-          ))}
-        </ul>
-        <button onClick={signOut}>Cerrar Sesion</button>
-        <div>
-          🥳 App successfully hosted. Try creating a new todo.
-          <br />
-          <a href="https://docs.amplify.aws/nextjs/start/quickstart/nextjs-app-router-client-components/">
-            Review next steps of this tutorial.
-          </a>
-        </div>
+    <div className={styles.layout}>
+      <Sidebar 
+        isCollapsed={isSidebarCollapsed} 
+        onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)} 
+      />
+      <main className={`${styles.main} ${isSidebarCollapsed ? styles.sidebarCollapsed : ''}`}>
+        <header className={styles.header}>
+          <h1>Welcome to Upskill</h1>
+          {user && (
+            <div className={styles.userInfo}>
+              <span>👤 {user.signInDetails?.loginId}</span>
+              <button onClick={signOut} className={styles.signOutButton}>
+                Sign Out
+              </button>
+            </div>
+          )}
+        </header>
+
+        <section className={styles.hero}>
+          <h1>Discover Your Next Course</h1>
+          <p>Expand your skills with our expert-led courses</p>
+        </section>
+
+        <section className={styles.featuredCourses}>
+          <h2>Featured Courses</h2>
+          <CourseCarousel />
+        </section>
       </main>
-      )}
-    </Authenticator>
+    </div>
   );
 }
