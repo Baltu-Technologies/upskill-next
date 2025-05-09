@@ -1,71 +1,279 @@
-.dashboard {
+.layout {
+  display: flex;
   min-height: 100vh;
+  width: 100%;
+}
+
+.dashboard {
+  flex: 1;
   padding: 2rem;
-  background-color: #f5f5f5;
+  background-color: #0f172a;
+  color: #e2e8f0;
+  margin-left: 250px;
+  transition: margin-left 0.3s ease;
+}
+
+.dashboard.sidebarCollapsed {
+  margin-left: 80px;
 }
 
 .header {
   margin-bottom: 2rem;
-  padding: 1rem;
-  background-color: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 2rem;
+  background: linear-gradient(to right, #1e293b, #0f172a);
+  border-radius: 1rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
 }
 
-.header h1 {
+.welcomeSection h1 {
   margin: 0;
-  color: #333;
+  color: #f8fafc;
   font-size: 1.8rem;
+  font-weight: 600;
 }
 
-.header p {
+.date {
   margin: 0.5rem 0 0;
-  color: #666;
+  color: #94a3b8;
+  font-size: 0.9rem;
+}
+
+.quickActions {
+  display: flex;
+  gap: 1rem;
+}
+
+.actionButton {
+  padding: 0.75rem 1.5rem;
+  background: rgba(59, 130, 246, 0.1);
+  color: #60a5fa;
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  border-radius: 0.5rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.actionButton:hover {
+  background: rgba(59, 130, 246, 0.2);
+  transform: translateY(-1px);
 }
 
 .main {
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
 }
 
+.grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 2rem;
+}
+
 .stats {
+  grid-column: span 12;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 1.5rem;
-  margin-top: 2rem;
 }
 
 .statCard {
-  background-color: white;
+  background: #1e293b;
   padding: 1.5rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s ease-in-out;
+  border-radius: 1rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
 }
 
 .statCard:hover {
   transform: translateY(-4px);
 }
 
-.statCard h3 {
-  margin: 0 0 0.5rem;
-  color: #333;
-  font-size: 1.2rem;
+.statIcon {
+  font-size: 2rem;
+  background: rgba(59, 130, 246, 0.1);
+  padding: 1rem;
+  border-radius: 0.75rem;
 }
 
-.statCard p {
+.statContent {
+  flex: 1;
+}
+
+.statContent h3 {
+  margin: 0 0 0.5rem;
+  color: #f8fafc;
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+.statNumber {
   margin: 0;
-  color: #666;
+  color: #60a5fa;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.statDescription {
+  margin: 0.25rem 0 0;
+  color: #94a3b8;
   font-size: 0.9rem;
+}
+
+.recentActivity {
+  grid-column: span 8;
+  background: #1e293b;
+  padding: 1.5rem;
+  border-radius: 1rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.recentActivity h2 {
+  margin: 0 0 1.5rem;
+  color: #f8fafc;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.activityList {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.activityItem {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 0.75rem;
+  transition: background 0.2s ease;
+}
+
+.activityItem:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.activityIcon {
+  font-size: 1.5rem;
+  background: rgba(59, 130, 246, 0.1);
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+}
+
+.activityContent h4 {
+  margin: 0;
+  color: #f8fafc;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.activityContent p {
+  margin: 0.25rem 0 0;
+  color: #94a3b8;
+  font-size: 0.9rem;
+}
+
+.recommendedCourses {
+  grid-column: span 4;
+  background: #1e293b;
+  padding: 1.5rem;
+  border-radius: 1rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.recommendedCourses h2 {
+  margin: 0 0 1.5rem;
+  color: #f8fafc;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.courseGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.courseCard {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 0.75rem;
+  overflow: hidden;
+  transition: transform 0.2s ease;
+}
+
+.courseCard:hover {
+  transform: translateY(-4px);
+}
+
+.courseImage {
+  height: 120px;
+  background: linear-gradient(to right, #3b82f6, #60a5fa);
+}
+
+.courseContent {
+  padding: 1rem;
+}
+
+.courseContent h4 {
+  margin: 0;
+  color: #f8fafc;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.courseContent p {
+  margin: 0.5rem 0;
+  color: #94a3b8;
+  font-size: 0.9rem;
+}
+
+.enrollButton {
+  width: 100%;
+  padding: 0.75rem;
+  background: rgba(59, 130, 246, 0.1);
+  color: #60a5fa;
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  border-radius: 0.5rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.enrollButton:hover {
+  background: rgba(59, 130, 246, 0.2);
 }
 
 .loading {
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  font-size: 1.2rem;
-  color: #666;
+  background-color: #0f172a;
+  color: #e2e8f0;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #334155;
+  border-top: 4px solid #3b82f6;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
 }
 
 .error {
@@ -76,25 +284,74 @@
   min-height: 100vh;
   padding: 2rem;
   text-align: center;
+  background-color: #0f172a;
 }
 
 .error p {
-  color: #dc2626;
+  color: #ef4444;
   font-size: 1.2rem;
   margin-bottom: 1rem;
 }
 
 .retryButton {
   padding: 0.75rem 1.5rem;
-  background-color: #2563eb;
-  color: white;
-  border: none;
-  border-radius: 6px;
+  background: rgba(59, 130, 246, 0.1);
+  color: #60a5fa;
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  border-radius: 0.5rem;
   font-size: 1rem;
   cursor: pointer;
-  transition: background-color 0.2s ease-in-out;
+  transition: all 0.2s ease;
 }
 
 .retryButton:hover {
-  background-color: #1d4ed8;
+  background: rgba(59, 130, 246, 0.2);
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Responsive styles */
+@media (max-width: 1200px) {
+  .grid {
+    gap: 1.5rem;
+  }
+  
+  .recentActivity,
+  .recommendedCourses {
+    grid-column: span 12;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard {
+    padding: 1rem;
+    margin-left: 0;
+  }
+
+  .dashboard.sidebarCollapsed {
+    margin-left: 0;
+  }
+
+  .header {
+    padding: 1.5rem;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .quickActions {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .actionButton {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .stats {
+    grid-template-columns: 1fr;
+  }
 } 
