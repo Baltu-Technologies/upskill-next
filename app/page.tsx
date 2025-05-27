@@ -1,53 +1,31 @@
 "use client";
 
-import { useState } from 'react';
+
 import { useAuth } from "./contexts/AuthContext";
-import Sidebar from "./components/Sidebar";
-import CourseCarousel from "./components/CourseCarousel";
-import styles from "./page.module.css";
+import AuthFormShadcn from "./components/AuthFormShadcn";
+import Dashboard from "./components/Dashboard";
 
 export default function App() {
-  const { user, isLoading: authLoading, signOut } = useAuth();
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const { user, isLoading: authLoading, refreshUser } = useAuth();
+
+  const handleAuthSuccess = async () => {
+    // Refresh user state after successful authentication
+    await refreshUser();
+  };
 
   if (authLoading) {
     return (
-      <div className={styles.loading}>
-        <div className={styles.spinner}></div>
-        <p>Loading...</p>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
       </div>
     );
   }
 
-  return (
-    <div className={styles.layout}>
-      <Sidebar 
-        isCollapsed={isSidebarCollapsed} 
-        onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)} 
-      />
-      <main className={`${styles.main} ${isSidebarCollapsed ? styles.sidebarCollapsed : ''}`}>
-        <header className={styles.header}>
-          <h1>Welcome to Upskill</h1>
-          {user && (
-            <div className={styles.userInfo}>
-              <span>👤 {user.signInDetails?.loginId}</span>
-              <button onClick={signOut} className={styles.signOutButton}>
-                Sign Out
-              </button>
-            </div>
-          )}
-        </header>
+  // Login form for unauthenticated users
+  if (!user) {
+    return <AuthFormShadcn onSuccess={handleAuthSuccess} />;
+  }
 
-        <section className={styles.hero}>
-          <h1>Discover Your Next Course</h1>
-          <p>Expand your skills with our expert-led courses</p>
-        </section>
-
-        <section className={styles.featuredCourses}>
-          <h2>Featured Courses</h2>
-          <CourseCarousel />
-        </section>
-      </main>
-    </div>
-  );
+  // Authenticated user dashboard
+  return <Dashboard />;
 }

@@ -1,8 +1,8 @@
 .carousel {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  padding: 2rem 0;
+  gap: var(--space-4);
+  padding: var(--space-8) 0;
   width: 100%;
   max-width: 1400px;
   margin: 0 auto;
@@ -11,25 +11,27 @@
 
 .carouselContent {
   display: flex;
-  gap: 2rem;
+  gap: var(--space-8);
   overflow: hidden;
   width: 100%;
-  padding: 0 1rem;
+  padding: 0 var(--space-4);
 }
 
 .courseCard {
   flex: 1;
   min-width: 300px;
-  background: white;
-  border-radius: 12px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
   overflow: hidden;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: var(--shadow-md);
+  transition: all var(--duration-normal) var(--ease-out);
 }
 
 .courseCard:hover {
   transform: translateY(-5px);
-  box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--shadow-xl);
+  border-color: rgba(255, 255, 255, 0.3);
 }
 
 .courseCard img {
@@ -39,49 +41,59 @@
 }
 
 .courseInfo {
-  padding: 1.5rem;
+  padding: var(--space-6);
 }
 
 .courseInfo h3 {
-  margin: 0 0 0.5rem 0;
-  font-size: 1.25rem;
-  color: #333;
+  margin: 0 0 var(--space-2) 0;
+  font-size: var(--text-xl);
+  font-weight: var(--font-semibold);
+  color: var(--foreground);
 }
 
 .courseInfo p {
-  margin: 0 0 1rem 0;
-  color: #666;
-  font-size: 0.9rem;
-  line-height: 1.5;
+  margin: 0 0 var(--space-4) 0;
+  color: var(--muted);
+  font-size: var(--text-sm);
+  line-height: var(--leading-relaxed);
 }
 
 .courseMeta {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 1rem;
-  font-size: 0.85rem;
-  color: #666;
+  margin-bottom: var(--space-4);
+  font-size: var(--text-xs);
+  color: var(--muted);
 }
 
 .enrollButton {
   width: 100%;
-  padding: 0.75rem;
-  background: #007bff;
-  color: white;
+  padding: var(--space-3);
+  background: var(--primary);
+  color: var(--primary-foreground);
   border: none;
-  border-radius: 6px;
+  border-radius: var(--radius-md);
   cursor: pointer;
-  font-weight: 600;
-  transition: background-color 0.2s ease;
+  font-weight: var(--font-semibold);
+  font-size: var(--text-sm);
+  transition: all var(--duration-fast) var(--ease-out);
 }
 
 .enrollButton:hover {
-  background: #0056b3;
+  background: hsl(217, 91%, 65%);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-lg);
+}
+
+.enrollButton:focus {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
 }
 
 .arrowButton {
-  background: white;
-  border: none;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   width: 40px;
   height: 40px;
   border-radius: 50%;
@@ -89,16 +101,21 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  font-size: 1.5rem;
-  color: #333;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  transition: all 0.2s ease;
+  font-size: var(--text-xl);
+  color: var(--foreground);
+  box-shadow: var(--shadow-md);
+  transition: all var(--duration-fast) var(--ease-out);
   flex-shrink: 0;
 }
 
 .arrowButton:hover {
-  background: #f0f0f0;
+  background: rgba(255, 255, 255, 0.2);
   transform: scale(1.1);
+}
+
+.arrowButton:focus {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
 }
 
 .loading {
@@ -108,16 +125,17 @@
   justify-content: center;
   min-height: 300px;
   width: 100%;
+  color: var(--muted);
 }
 
 .spinner {
   width: 40px;
   height: 40px;
-  border: 4px solid #f3f3f3;
-  border-top: 4px solid #007bff;
+  border: 4px solid rgba(255, 255, 255, 0.1);
+  border-top: 4px solid var(--primary);
   border-radius: 50%;
   animation: spin 1s linear infinite;
-  margin-bottom: 1rem;
+  margin-bottom: var(--space-4);
 }
 
 .error {
@@ -125,11 +143,12 @@
   top: 0;
   left: 50%;
   transform: translateX(-50%);
-  background-color: #fff3cd;
-  color: #856404;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
-  font-size: 0.9rem;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #FCA5A5;
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
   z-index: 1;
 }
 
@@ -140,7 +159,7 @@
 
 @media (max-width: 1200px) {
   .carousel {
-    padding: 1.5rem 0;
+    padding: var(--space-6) 0;
   }
 
   .courseCard {
@@ -154,11 +173,11 @@
 
 @media (max-width: 768px) {
   .carousel {
-    padding: 1rem 0;
+    padding: var(--space-4) 0;
   }
 
   .carouselContent {
-    gap: 1rem;
+    gap: var(--space-4);
   }
 
   .courseCard {
@@ -170,29 +189,29 @@
   }
 
   .courseInfo {
-    padding: 1rem;
+    padding: var(--space-4);
   }
 
   .courseInfo h3 {
-    font-size: 1.1rem;
+    font-size: var(--text-lg);
   }
 
   .courseInfo p {
-    font-size: 0.85rem;
+    font-size: var(--text-xs);
   }
 
   .courseMeta {
-    font-size: 0.8rem;
+    font-size: var(--text-xs);
   }
 
   .enrollButton {
-    padding: 0.6rem;
-    font-size: 0.9rem;
+    padding: var(--space-2);
+    font-size: var(--text-sm);
   }
 
   .arrowButton {
     width: 35px;
     height: 35px;
-    font-size: 1.2rem;
+    font-size: var(--text-lg);
   }
 } 

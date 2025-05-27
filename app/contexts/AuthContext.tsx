@@ -2,8 +2,6 @@
 
 import { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { getCurrentUser, fetchUserAttributes, signOut as amplifySignOut } from 'aws-amplify/auth';
-import { Authenticator } from '@aws-amplify/ui-react';
-import '@aws-amplify/ui-react/styles.css';
 import '../config/amplify';
 
 interface AuthContextType {
@@ -11,6 +9,9 @@ interface AuthContextType {
   isLoading: boolean;
   error: string | null;
   signOut: () => Promise<void>;
+  refreshUser: () => Promise<void>;
+  showAuthModal: () => void;
+  hideAuthModal: () => void;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -18,15 +19,20 @@ const AuthContext = createContext<AuthContextType>({
   isLoading: true,
   error: null,
   signOut: async () => {},
+  refreshUser: async () => {},
+  showAuthModal: () => {},
+  hideAuthModal: () => {},
 });
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
   const checkUser = useCallback(async () => {
     try {
+      setIsLoading(true);
       const currentUser = await getCurrentUser();
       const userAttributes = await fetchUserAttributes();
       setUser({
@@ -36,8 +42,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setError(null);
     } catch (error) {
       console.error('Auth error:', error);
-      setError('Authentication failed');
       setUser(null);
+      // Don't show modal automatically - let components decide
     } finally {
       setIsLoading(false);
     }
@@ -58,11 +64,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
+  const showAuthModal = useCallback(() => {
+    setIsAuthModalOpen(true);
+  }, []);
+
+  const hideAuthModal = useCallback(() => {
+    setIsAuthModalOpen(false);
+  }, []);
+
+  const handleAuthSuccess = useCallback(() => {
+    setIsAuthModalOpen(false);
+    checkUser(); // Refresh user data after successful auth
+  }, [checkUser]);
+
   return (
-    <AuthContext.Provider value={{ user, isLoading, error, signOut: handleSignOut }}>
-      <Authenticator>
-        {() => <>{children}</>}
-      </Authenticator>
+    <AuthContext.Provider value={{ 
+      user, 
+      isLoading, 
+      error, 
+      signOut: handleSignOut,
+      refreshUser: checkUser,
+      showAuthModal,
+      hideAuthModal
+    }}>
+      {children}
     </AuthContext.Provider>
   );
 }

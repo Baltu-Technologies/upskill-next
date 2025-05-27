@@ -10,22 +10,36 @@
   },
   "dependencies": {
     "@aws-amplify/ui-react": "^6.11.1",
+    "@radix-ui/react-dialog": "^1.1.14",
+    "@radix-ui/react-dropdown-menu": "^2.1.15",
+    "@radix-ui/react-label": "^2.1.7",
+    "@radix-ui/react-separator": "^1.1.7",
+    "@radix-ui/react-slot": "^1.2.3",
     "aws-amplify": "^6.6.6",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "framer-motion": "^12.14.0",
+    "lucide-react": "^0.511.0",
     "next": "14.2.10",
     "react": "^18",
-    "react-dom": "^18"
+    "react-dom": "^18",
+    "tailwind-merge": "^3.3.0",
+    "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
     "@aws-amplify/backend": "^1.5.1",
     "@aws-amplify/backend-cli": "^1.3.0",
-    "@types/node": "^20",
-    "@types/react": "^18",
+    "@types/node": "20.17.50",
+    "@types/react": "18.3.22",
     "@types/react-dom": "^18",
+    "autoprefixer": "^10.4.21",
     "aws-cdk": "^2",
     "aws-cdk-lib": "^2",
     "constructs": "^10.3.0",
     "esbuild": "^0.23.1",
+    "postcss": "^8.5.3",
+    "tailwindcss": "^3.4.17",
     "tsx": "^4.19.0",
-    "typescript": "^5.6.2"
+    "typescript": "5.8.3"
   }
 }
