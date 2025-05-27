@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input';
@@ -32,7 +33,9 @@ import {
   Sun,
   Moon,
   Monitor,
-  LogOut
+  LogOut,
+  HelpCircle,
+  Menu
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTheme } from '../contexts/ThemeContext';
@@ -61,44 +64,54 @@ interface SubMenuItem {
   badge?: string;
 }
 
+// Career Profile item (separate from main nav)
+const careerProfileItem: NavItem = {
+  title: 'My Career Profile',
+  icon: User,
+  color: 'text-cyan-500',
+  isProfile: true,
+  href: '/profile',
+  submenu: [
+    {
+      title: 'My Profile',
+      href: '/profile',
+      active: false
+    },
+    {
+      title: 'Skills Profile',
+      href: '/profile?tab=skills',
+      active: false
+    },
+    {
+      title: 'My Pathways',
+      href: '/profile?tab=pathways',
+      active: false
+    },
+    {
+      title: 'Project Showcase',
+      href: '/profile?tab=projects',
+      badge: '3',
+      active: false
+    },
+    {
+      title: 'Certifications',
+      href: '/profile?tab=certifications',
+      badge: '8',
+      active: false
+    },
+    {
+      title: 'My Stats and Goals',
+      href: '/profile?tab=stats',
+      active: false
+    }
+  ]
+};
+
 const mainNavItems: NavItem[] = [
-  {
-    title: 'My Career Profile',
-    icon: User,
-    color: 'text-cyan-500',
-    isProfile: true,
-    submenu: [
-      {
-        title: 'Contact Info',
-        active: false
-      },
-      {
-        title: 'Skills Profile',
-        active: false
-      },
-      {
-        title: 'My Pathways',
-        active: false
-      },
-      {
-        title: 'Project Showcase',
-        badge: '3',
-        active: false
-      },
-      {
-        title: 'Certifications',
-        badge: '8',
-        active: false
-      },
-      {
-        title: 'My Stats and Goals',
-        active: false
-      }
-    ]
-  },
   {
     title: 'Home',
     icon: Home,
+    href: '/',
     active: true,
     color: 'text-blue-500'
   },
@@ -107,14 +120,22 @@ const mainNavItems: NavItem[] = [
     icon: BookOpen,
     badge: '12',
     color: 'text-green-500',
+    href: '/courses/search',
     submenu: [
       {
+        title: 'Search Courses',
+        href: '/courses/search',
+        active: false
+      },
+      {
         title: 'In Progress',
-        badge: '8',
+        href: '/courses/search?tab=in-progress',
+        badge: '3',
         active: false
       },
       {
         title: 'Completed',
+        href: '/courses/search?tab=completed',
         badge: '4',
         active: false
       }
@@ -125,18 +146,22 @@ const mainNavItems: NavItem[] = [
     icon: Briefcase,
     badge: '5',
     color: 'text-purple-500',
+    href: '/employers/search',
     submenu: [
       {
         title: 'Search Employers',
+        href: '/employers/search',
         active: false
       },
       {
         title: 'Saved Employers',
+        href: '/employers/saved',
         badge: '3',
         active: false
       },
       {
         title: 'My Employer Connections',
+        href: '/employers/connections',
         badge: '2',
         active: false
       }
@@ -146,21 +171,21 @@ const mainNavItems: NavItem[] = [
     title: 'Study Hub',
     icon: GraduationCap,
     color: 'text-indigo-500',
+    href: '/study-hub/study-list',
     submenu: [
       {
-        title: 'Study List',
+        title: 'My Study List',
+        href: '/study-hub/study-list',
         active: false
       },
       {
         title: 'My Notes',
+        href: '/study-hub/notes',
         active: false
       },
       {
-        title: 'Ask AI',
-        active: false
-      },
-      {
-        title: 'Dojo (Practice)',
+        title: 'Dojo',
+        href: '/study-hub/dojo',
         active: false
       }
     ]
@@ -179,14 +204,25 @@ const SubMenuItem = ({
   item: SubMenuItem; 
   isCollapsed: boolean;
 }) => {
+  const router = useRouter();
+  
+  const handleClick = () => {
+    if (item.href) {
+      router.push(item.href);
+      // Note: We don't change sidebar state here - it stays as it was
+    }
+  };
+
   return (
     <div className="relative group/submenu w-full overflow-hidden">
       <Button
         variant="ghost"
+        onClick={handleClick}
         className={cn(
           "justify-start relative overflow-hidden group transition-all duration-300 ease-out",
           "ml-4 mr-1 px-2 py-2.5 text-sm rounded-lg w-[calc(100%-1.25rem)]",
           "hover:scale-105 backdrop-blur-sm border-none shadow-sm",
+          item.href ? "cursor-pointer" : "cursor-default",
           item.active 
             ? "bg-slate-200/70 text-[hsl(217,91%,60%)]" 
             : "bg-slate-200/50 text-slate-600 hover:bg-slate-300/70 hover:text-[hsl(217,91%,60%)]",
@@ -204,6 +240,10 @@ const SubMenuItem = ({
         <span className="flex-1 text-left transition-all duration-300 group-hover:translate-x-1 leading-tight truncate min-w-0">
           {item.title}
         </span>
+        
+        {item.href && (
+          <ChevronRight className="h-3 w-3 text-slate-400 opacity-0 group-hover:opacity-100 group-hover:text-[hsl(217,91%,60%)] transition-all duration-300" />
+        )}
         
         {item.badge && (
           <span className="ml-1 text-xs px-1 py-0.5 rounded-full font-medium
@@ -244,15 +284,30 @@ const InteractiveNavButton = ({
   expandedMenus: Set<string>;
   onToggleSubmenu: (title: string) => void;
 }) => {
+  const router = useRouter();
   const Icon = item.icon;
   const hasSubmenu = item.submenu && item.submenu.length > 0;
   const isExpanded = expandedMenus.has(item.title);
+  
+  const handleClick = () => {
+    if (isCollapsed && item.href && !item.isProfile) {
+      // When collapsed, clicking non-profile icons navigates to default page and keeps sidebar collapsed
+      router.push(item.href);
+      return; // Important: prevent any further submenu toggling
+    } else if (item.submenu && item.submenu.length > 0) {
+      // When expanded, or for profile menu even when collapsed, toggle submenu
+      onToggleSubmenu(item.title);
+    } else if (item.href) {
+      // Navigate to single page
+      router.push(item.href);
+    }
+  };
   
   return (
     <div>
       <Button
         variant={isActive ? "secondary" : variant}
-        onClick={() => hasSubmenu && onToggleSubmenu(item.title)}
+        onClick={handleClick}
         className={cn(
           "w-full justify-start relative overflow-hidden group transition-all duration-300 ease-out",
           isCollapsed ? "px-2 py-3" : "px-4 py-3 mx-1",
@@ -422,6 +477,7 @@ const QuickActionButton = ({
 };
 
 export default function CollapsibleSidebar({ isCollapsed, onToggle }: SidebarProps) {
+  const router = useRouter();
   const { theme, setTheme } = useTheme();
   const { signOut } = useAuth();
 
@@ -431,12 +487,10 @@ export default function CollapsibleSidebar({ isCollapsed, onToggle }: SidebarPro
   // Bottom navigation states
   const [showSearch, setShowSearch] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [showNotifications, setShowNotifications] = useState(false);
   const [language, setLanguage] = useState('English');
   
   // Refs for click outside detection
   const searchRef = useRef<HTMLDivElement>(null);
-  const notificationsRef = useRef<HTMLDivElement>(null);
 
   // Auto-collapse submenus when sidebar is collapsed
   useEffect(() => {
@@ -498,16 +552,11 @@ export default function CollapsibleSidebar({ isCollapsed, onToggle }: SidebarPro
     }
   };
 
-
-
   // Close popups when clicking outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
         setShowSearch(false);
-      }
-      if (notificationsRef.current && !notificationsRef.current.contains(event.target as Node)) {
-        setShowNotifications(false);
       }
     }
 
@@ -522,7 +571,6 @@ export default function CollapsibleSidebar({ isCollapsed, onToggle }: SidebarPro
     function handleEscape(event: KeyboardEvent) {
       if (event.key === 'Escape') {
         setShowSearch(false);
-        setShowNotifications(false);
       }
     }
 
@@ -560,39 +608,53 @@ export default function CollapsibleSidebar({ isCollapsed, onToggle }: SidebarPro
           zIndex: 40 
         }}
       >
-      {/* Sidebar Header with Stats */}
+      {/* Sidebar Header with Career Profile */}
       <div className="bg-gradient-to-r from-slate-300/80 to-slate-200/80 dark:from-[hsl(222,84%,10%)] dark:to-[hsl(222,84%,12%)] backdrop-blur-sm border-b border-slate-300/70 dark:border-[hsl(217,33%,17%)]/20">
-        {/* Logo and Toggle */}
-        <div className="flex items-center justify-between p-4">
-          {!isCollapsed && (
-            <div className="flex items-center gap-2 group">
-              <h2 className="text-lg font-semibold bg-gradient-to-r from-[hsl(217,91%,60%)] via-[hsl(142,71%,45%)] to-[hsl(217,91%,60%)] bg-clip-text text-transparent 
-                            transition-all duration-300 group-hover:scale-105">
-                🚀 Upskill
-              </h2>
-            </div>
-          )}
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onToggle}
-            className="h-8 w-8 bg-slate-300/80 hover:bg-slate-400/80 text-slate-600 hover:text-[hsl(217,91%,60%)]
-                      dark:bg-[hsl(222,84%,12%)] dark:hover:bg-[hsl(222,84%,15%)] dark:text-[hsl(210,40%,98%)] dark:hover:text-[hsl(217,91%,60%)]
-                      hover:scale-110 transition-all duration-300 hover:rotate-180 rounded-full border-none"
-          >
-            {isCollapsed ? (
+        {isCollapsed ? (
+          /* Collapsed State - Show only toggle button centered */
+          <div className="flex items-center justify-center p-4">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onToggle}
+              className="h-8 w-8 bg-slate-300/80 hover:bg-slate-400/80 text-slate-600 hover:text-[hsl(217,91%,60%)]
+                        dark:bg-[hsl(222,84%,12%)] dark:hover:bg-[hsl(222,84%,15%)] dark:text-[hsl(210,40%,98%)] dark:hover:text-[hsl(217,91%,60%)]
+                        hover:scale-110 transition-all duration-300 hover:rotate-180 rounded-full border-none"
+            >
               <ChevronRight className="h-4 w-4 transition-transform duration-300" />
-            ) : (
+            </Button>
+          </div>
+        ) : (
+          /* Expanded State - Show both profile and toggle */
+          <div className="flex items-center justify-between p-4">
+            {/* Career Profile Section */}
+            <div className="flex-1 mr-4">
+              <InteractiveNavButton
+                item={careerProfileItem}
+                isCollapsed={isCollapsed}
+                isActive={false}
+                expandedMenus={expandedMenus}
+                onToggleSubmenu={handleToggleSubmenu}
+              />
+            </div>
+            
+            {/* Toggle Button */}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onToggle}
+              className="h-8 w-8 bg-slate-300/80 hover:bg-slate-400/80 text-slate-600 hover:text-[hsl(217,91%,60%)]
+                        dark:bg-[hsl(222,84%,12%)] dark:hover:bg-[hsl(222,84%,15%)] dark:text-[hsl(210,40%,98%)] dark:hover:text-[hsl(217,91%,60%)]
+                        hover:scale-110 transition-all duration-300 hover:rotate-180 rounded-full border-none flex-shrink-0"
+            >
               <ChevronLeft className="h-4 w-4 transition-transform duration-300" />
-            )}
-          </Button>
-        </div>
-
-
+            </Button>
+          </div>
+        )}
       </div>
 
       {/* Main Navigation */}
-      <nav className="flex-1 p-3 overflow-y-auto 
+      <nav className="flex-1 px-3 pt-6 pb-3 overflow-y-auto 
                       scrollbar-thin scrollbar-track-slate-200/30 scrollbar-thumb-blue-500/80 
                       dark:scrollbar-track-slate-800/50 dark:scrollbar-thumb-blue-400/60
                       hover:scrollbar-thumb-blue-600/90 dark:hover:scrollbar-thumb-blue-300/80">
@@ -618,7 +680,32 @@ export default function CollapsibleSidebar({ isCollapsed, onToggle }: SidebarPro
           </div>
         )}
         
-        <div className="space-y-2">
+                  <div className="space-y-2">
+          {/* Help Button */}
+          <Button 
+            variant="ghost" 
+            size={isCollapsed ? "icon" : "default"}
+            className={cn(
+              "transition-all duration-300 hover:scale-105",
+              isCollapsed 
+                ? "w-10 h-10 p-0" 
+                : "w-full justify-start h-10 px-3",
+              "bg-slate-200/50 hover:bg-slate-300/70 text-slate-600 hover:text-[hsl(217,91%,60%)]",
+              "dark:bg-[hsl(222,84%,10%)] dark:hover:bg-[hsl(222,84%,15%)] dark:text-[hsl(210,40%,98%)]/80 dark:hover:text-[hsl(217,91%,60%)]"
+            )}
+            onClick={() => {
+              // Open AI Help chatbot for site navigation
+              console.log('Opening AI Help & Support chatbot for site navigation...');
+              // TODO: Implement AI Help chatbot modal/panel
+            }}
+          >
+            <div className="relative">
+              <HelpCircle className="h-4 w-4 fill-current" />
+              <div className="absolute -bottom-0.5 -right-0.5 w-2 h-2 bg-green-500 rounded-full border border-slate-200 dark:border-[hsl(222,84%,12%)]"></div>
+            </div>
+            {!isCollapsed && <span className="ml-2">AI Help & Support</span>}
+          </Button>
+
           {/* Search Button */}
           <div className="relative" ref={searchRef}>
             <Button 
@@ -634,7 +721,7 @@ export default function CollapsibleSidebar({ isCollapsed, onToggle }: SidebarPro
               )}
               onClick={() => setShowSearch(!showSearch)}
             >
-              <Search className="h-4 w-4" />
+              <Search className="h-4 w-4 fill-current" />
               {!isCollapsed && <span className="ml-2">Search</span>}
             </Button>
             
@@ -643,7 +730,7 @@ export default function CollapsibleSidebar({ isCollapsed, onToggle }: SidebarPro
               <div className="fixed left-80 bottom-20 w-96 bg-white dark:bg-gray-900 border border-border rounded-xl shadow-2xl z-[9999] overflow-hidden">
                 <div className="p-4 bg-gradient-to-r from-emerald-50 to-blue-50 dark:from-emerald-950 dark:to-blue-950 border-b border-border">
                   <div className="flex items-center gap-3 mb-3">
-                    <Search className="h-5 w-5 text-emerald-500" />
+                    <Search className="h-5 w-5 text-emerald-500 fill-current" />
                     <h3 className="font-semibold text-lg">Search</h3>
                     <Button 
                       variant="ghost" 
@@ -655,7 +742,7 @@ export default function CollapsibleSidebar({ isCollapsed, onToggle }: SidebarPro
                     </Button>
                   </div>
                   <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground fill-current" />
                     <Input
                       placeholder="Search courses, skills, instructors..."
                       value={searchQuery}
@@ -675,7 +762,7 @@ export default function CollapsibleSidebar({ isCollapsed, onToggle }: SidebarPro
                         <div className="p-3 bg-white dark:bg-gray-900 hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 dark:hover:from-blue-950 dark:hover:to-indigo-950 rounded-lg cursor-pointer transition-all duration-200 border border-gray-200 dark:border-gray-700">
                           <div className="flex items-center gap-3">
                             <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-                              <BookOpen className="h-4 w-4 text-white" />
+                              <BookOpen className="h-4 w-4 text-white fill-current" />
                             </div>
                             <div className="flex-1">
                               <p className="text-sm font-medium">Advanced React Patterns</p>
@@ -687,69 +774,10 @@ export default function CollapsibleSidebar({ isCollapsed, onToggle }: SidebarPro
                     </div>
                   ) : (
                     <div className="text-center py-8">
-                      <Search className="h-12 w-12 text-muted-foreground/50 mx-auto mb-3" />
+                      <Search className="h-12 w-12 text-muted-foreground/50 mx-auto mb-3 fill-current" />
                       <p className="text-sm text-muted-foreground">Start typing to search courses, skills, and instructors</p>
                     </div>
                   )}
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Notifications Button */}
-          <div className="relative" ref={notificationsRef}>
-            <Button 
-              variant="ghost" 
-              size={isCollapsed ? "icon" : "default"}
-              className={cn(
-                "transition-all duration-300 hover:scale-105 relative",
-                isCollapsed 
-                  ? "w-10 h-10 p-0" 
-                  : "w-full justify-start h-10 px-3",
-                "bg-slate-200/50 hover:bg-slate-300/70 text-slate-600 hover:text-[hsl(217,91%,60%)]",
-                "dark:bg-[hsl(222,84%,10%)] dark:hover:bg-[hsl(222,84%,15%)] dark:text-[hsl(210,40%,98%)]/80 dark:hover:text-[hsl(217,91%,60%)]"
-              )}
-              onClick={() => setShowNotifications(!showNotifications)}
-            >
-              <Bell className="h-4 w-4" />
-              {!isCollapsed && <span className="ml-2">Notifications</span>}
-              <span className="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full text-xs"></span>
-            </Button>
-
-            {/* Notifications Popup */}
-            {showNotifications && (
-              <div className="fixed left-80 bottom-20 w-96 bg-white dark:bg-gray-900 border border-border rounded-xl shadow-2xl z-[9999] overflow-hidden">
-                <div className="p-4 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950 dark:to-purple-950 border-b border-border">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <Bell className="h-5 w-5 text-blue-500" />
-                      <h3 className="font-semibold text-lg">Notifications</h3>
-                      <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full">3</span>
-                    </div>
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      className="h-8 w-8 hover:bg-white dark:hover:bg-black rounded-full transition-all duration-200" 
-                      onClick={() => setShowNotifications(false)}
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-                <div className="max-h-96 overflow-y-auto bg-white dark:bg-gray-900">
-                  <div className="p-4 border-b border-border bg-white dark:bg-gray-900 hover:bg-gradient-to-r hover:from-blue-50 hover:to-cyan-50 dark:hover:from-blue-950 dark:hover:to-cyan-950 cursor-pointer transition-all duration-200">
-                    <div className="flex items-start gap-4">
-                      <div className="w-3 h-3 bg-blue-500 rounded-full mt-1.5 flex-shrink-0 shadow-lg shadow-blue-500"></div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-blue-700 dark:text-blue-300">New course available</p>
-                        <p className="text-sm text-muted-foreground mt-1">Advanced React Patterns is now available for enrollment</p>
-                        <div className="flex items-center gap-2 mt-2">
-                          <span className="text-xs text-muted-foreground bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded-full">2 hours ago</span>
-                          <span className="text-xs bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300 px-2 py-1 rounded-full">Course</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
                 </div>
               </div>
             )}
@@ -770,7 +798,7 @@ export default function CollapsibleSidebar({ isCollapsed, onToggle }: SidebarPro
                   "dark:bg-[hsl(222,84%,10%)] dark:hover:bg-[hsl(222,84%,15%)] dark:text-[hsl(210,40%,98%)]/80 dark:hover:text-[hsl(217,91%,60%)]"
                 )}
               >
-                <User className="h-4 w-4" />
+                <User className="h-4 w-4 fill-current" />
                 {!isCollapsed && <span className="ml-2">Account & Settings</span>}
               </Button>
             </DropdownMenuTrigger>
@@ -789,7 +817,7 @@ export default function CollapsibleSidebar({ isCollapsed, onToggle }: SidebarPro
               
               <DropdownMenuItem className="rounded-lg bg-white dark:bg-gray-900 hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 dark:hover:from-blue-950 dark:hover:to-indigo-950 transition-all duration-200 cursor-pointer p-3 border border-gray-200 dark:border-gray-700">
                 <User className="mr-3 h-4 w-4 text-blue-500" />
-                <span className="font-medium">Profile</span>
+                <span className="font-medium">Account</span>
               </DropdownMenuItem>
               
               <DropdownMenuItem className="rounded-lg bg-white dark:bg-gray-900 hover:bg-gradient-to-r hover:from-gray-50 hover:to-slate-50 dark:hover:from-gray-950 dark:hover:to-slate-950 transition-all duration-200 cursor-pointer p-3 border border-gray-200 dark:border-gray-700">
