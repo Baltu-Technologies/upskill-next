@@ -14,8 +14,7 @@
     "db:test": "tsx scripts/testConnection.ts",
     "db:seed": "tsx scripts/seedDatabase.ts",
     "db:sandbox": "npx ampx sandbox",
-    "db:generate": "npx ampx generate outputs",
-    "postinstall": "npm run db:generate || echo 'Amplify outputs generation skipped'"
+    "db:generate": "npx ampx generate outputs"
   },
   "dependencies": {
     "@aws-amplify/ui-react": "^5.0.0",
