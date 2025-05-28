@@ -1,8 +1,8 @@
 'use client';
 
 import { Sun, Moon, Monitor } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { useTheme } from '../contexts/ThemeContext';
+import { useEffect, useState } from 'react';
 
 const themeIcons = {
   light: Sun,
@@ -17,27 +17,33 @@ const themeLabels = {
 };
 
 export default function ThemeToggle() {
+  const [isMounted, setIsMounted] = useState(false);
   const { theme, actualTheme, toggleTheme, isHydrated } = useTheme();
   const IconComponent = themeIcons[theme];
 
-  // Don't render until hydrated to prevent hydration mismatch
-  if (!isHydrated) {
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  // Don't render until mounted and hydrated to prevent hydration mismatch and SSR issues
+  if (!isMounted || !isHydrated) {
     return (
-      <Button variant="ghost" size="icon" disabled>
-        <Monitor size={16} className="opacity-50" />
+      <button 
+        disabled
+        className="inline-flex items-center justify-center h-10 w-10 rounded-md opacity-50"
+      >
+        <Monitor size={16} />
         <span className="sr-only">Loading theme...</span>
-      </Button>
+      </button>
     );
   }
 
   return (
-    <Button
-      variant="ghost"
-      size="icon"
+    <button
       onClick={toggleTheme}
       title={`Current theme: ${themeLabels[theme]} (actual: ${actualTheme}). Click to change.`}
       aria-label={`Switch theme. Current: ${themeLabels[theme]}`}
-      className="relative"
+      className="relative inline-flex items-center justify-center h-10 w-10 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
     >
       <IconComponent size={16} />
       
@@ -51,6 +57,6 @@ export default function ThemeToggle() {
       />
       
       <span className="sr-only">{themeLabels[theme]} theme (actual: {actualTheme})</span>
-    </Button>
+    </button>
   );
 } 

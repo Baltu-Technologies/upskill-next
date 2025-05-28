@@ -17,14 +17,14 @@
     "db:generate": "npx ampx generate outputs"
   },
   "dependencies": {
-    "@aws-amplify/ui-react": "^5.0.0",
+    "@aws-amplify/ui-react": "^6.11.2",
     "@radix-ui/react-dialog": "^1.1.14",
     "@radix-ui/react-dropdown-menu": "^2.1.15",
     "@radix-ui/react-label": "^2.1.7",
     "@radix-ui/react-select": "^2.2.5",
     "@radix-ui/react-separator": "^1.1.7",
     "@radix-ui/react-slot": "^1.2.3",
-    "aws-amplify": "^5.0.0",
+    "aws-amplify": "^6.15.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "framer-motion": "^12.14.0",

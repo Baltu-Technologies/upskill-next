@@ -1,6 +1,6 @@
 import { Amplify } from 'aws-amplify';
-import { ProfileService } from '@/lib/data/profileService';
-import outputs from "@/amplify_outputs.json";
+import { ProfileService } from '../lib/data/profileService';
+import outputs from "../amplify_outputs.json";
 
 // Configure Amplify
 Amplify.configure(outputs);

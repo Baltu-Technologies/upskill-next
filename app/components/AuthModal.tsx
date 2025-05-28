@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { signIn, signUp, confirmSignUp, resendSignUpCode, signOut } from 'aws-amplify/auth';
+import { signIn, signUp, confirmSignUp, resendSignUpCode } from 'aws-amplify/auth';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Eye, EyeOff, Mail, Lock, User, ArrowRight, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
 import styles from './AuthModal.module.css';

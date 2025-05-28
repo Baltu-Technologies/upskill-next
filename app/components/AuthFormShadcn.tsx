@@ -84,7 +84,7 @@ export default function AuthFormShadcn({ onSuccess }: AuthFormProps) {
     setError(null);
 
     try {
-      await signIn({
+      const result = await signIn({
         username: formData.email,
         password: formData.password
       });
@@ -128,7 +128,7 @@ export default function AuthFormShadcn({ onSuccess }: AuthFormProps) {
     setError(null);
 
     try {
-      await signUp({
+      const result = await signUp({
         username: formData.email,
         password: formData.password,
         options: {
@@ -161,7 +161,7 @@ export default function AuthFormShadcn({ onSuccess }: AuthFormProps) {
     setError(null);
 
     try {
-      await confirmSignUp({
+      const result = await confirmSignUp({
         username: pendingEmail,
         confirmationCode: formData.confirmationCode.trim()
       });
