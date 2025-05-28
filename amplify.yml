@@ -20,8 +20,6 @@ frontend:
   cache:
     paths:
       - .next/cache/**/*
-      - .npm/**/*
-      - node_modules/**/*
   customHeaders:
     - pattern: '**/*'
       headers:
@@ -31,4 +29,4 @@ frontend:
           value: '1; mode=block'
 env:
   variables:
-    NODE_VERSION: '20'
+    NODE_VERSION: '22'
