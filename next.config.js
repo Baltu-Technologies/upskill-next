@@ -24,8 +24,6 @@ const nextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
-  // Skip static generation for pages with errors
-  generateStaticParams: false,
 }
 
 module.exports = nextConfig

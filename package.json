@@ -10,11 +10,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "db:test": "tsx scripts/testConnection.ts",
-    "db:seed": "tsx scripts/seedDatabase.ts",
-    "db:sandbox": "npx ampx sandbox",
-    "db:generate": "npx ampx generate outputs"
+    "lint": "next lint"
   },
   "dependencies": {
     "@aws-amplify/ui-react": "^6.11.2",
