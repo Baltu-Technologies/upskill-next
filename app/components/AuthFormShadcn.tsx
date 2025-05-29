@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { signIn, signUp, confirmSignUp, resendSignUpCode } from 'aws-amplify/auth';
+// Temporarily disabled AWS Amplify auth functions
+// import { signIn, signUp, confirmSignUp, resendSignUpCode } from 'aws-amplify/auth';
 import { Eye, EyeOff, Mail, Lock, User, ArrowRight, CheckCircle, AlertCircle, Loader2, Sparkles, GraduationCap, Target, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -84,10 +85,10 @@ export default function AuthFormShadcn({ onSuccess }: AuthFormProps) {
     setError(null);
 
     try {
-      const result = await signIn({
-        username: formData.email,
-        password: formData.password
-      });
+      // const result = await signIn({
+      //   username: formData.email,
+      //   password: formData.password
+      // });
       setSuccess('Successfully signed in!');
       onSuccess();
       resetForm();
@@ -128,17 +129,17 @@ export default function AuthFormShadcn({ onSuccess }: AuthFormProps) {
     setError(null);
 
     try {
-      const result = await signUp({
-        username: formData.email,
-        password: formData.password,
-        options: {
-          userAttributes: {
-            email: formData.email,
-            given_name: formData.firstName.trim(),
-            family_name: formData.lastName.trim()
-          }
-        }
-      });
+      // const result = await signUp({
+      //   username: formData.email,
+      //   password: formData.password,
+      //   options: {
+      //     userAttributes: {
+      //       email: formData.email,
+      //       given_name: formData.firstName.trim(),
+      //       family_name: formData.lastName.trim()
+      //     }
+      //   }
+      // });
       setPendingEmail(formData.email);
       setCurrentStep('confirmSignUp');
       setSuccess('Account created! Please check your email for a confirmation code.');
@@ -161,10 +162,10 @@ export default function AuthFormShadcn({ onSuccess }: AuthFormProps) {
     setError(null);
 
     try {
-      const result = await confirmSignUp({
-        username: pendingEmail,
-        confirmationCode: formData.confirmationCode.trim()
-      });
+      // const result = await confirmSignUp({
+      //   username: pendingEmail,
+      //   confirmationCode: formData.confirmationCode.trim()
+      // });
       setSuccess('Email confirmed! You can now sign in.');
       setTimeout(() => {
         setCurrentStep('signIn');
@@ -184,7 +185,7 @@ export default function AuthFormShadcn({ onSuccess }: AuthFormProps) {
     setError(null);
     
     try {
-      await resendSignUpCode({ username: pendingEmail });
+      // await resendSignUpCode({ username: pendingEmail });
       setSuccess('Confirmation code resent to your email.');
     } catch (error: any) {
       console.error('Resend code error:', error);

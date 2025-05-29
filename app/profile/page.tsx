@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
@@ -64,7 +64,7 @@ const tabs = [
   { id: 'stats', label: 'My Stats and Goals', icon: Target },
 ];
 
-export default function ProfilePage() {
+function ProfilePageContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState('profile');
@@ -200,61 +200,65 @@ export default function ProfilePage() {
               {/* Optional Profile Progress */}
               <div className="space-y-2">
                 <div className="flex items-center justify-between text-sm">
-                  <div className="flex items-center gap-2">
-                    <Settings className="h-4 w-4 text-slate-500" />
-                    <span className="font-medium text-slate-600 dark:text-slate-400">
-                      Improve Your Matches <span className="text-xs">(Private)</span>
-                    </span>
-                  </div>
+                  <span className="font-medium">Optional Sections</span>
                   <span className="text-slate-600 dark:text-slate-400">
                     {completionStatus.optionalProgress}%
                   </span>
                 </div>
-                <Progress value={completionStatus.optionalProgress} className="h-2 opacity-60" />
+                <Progress value={completionStatus.optionalProgress} className="h-2" />
               </div>
             </CardContent>
           </Card>
         </div>
 
-        {/* Tabs Navigation */}
-        <div className="mb-8">
-          <div className="border-b border-slate-200 dark:border-gray-700">
-            <nav className="flex space-x-8 overflow-x-auto">
-              {tabs.map((tab) => {
-                const Icon = tab.icon;
-                const isActive = activeTab === tab.id;
-                
-                return (
-                  <button
-                    key={tab.id}
-                    onClick={() => handleTabChange(tab.id)}
-                    className={cn(
-                      "flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-all duration-200 hover:scale-105 whitespace-nowrap",
-                      isActive
-                        ? "border-[hsl(217,91%,60%)] text-[hsl(217,91%,60%)]"
-                        : "border-transparent text-slate-600 dark:text-slate-400 hover:text-[hsl(217,91%,60%)] hover:border-slate-300"
-                    )}
+        {/* Navigation Tabs */}
+        <div className="flex flex-wrap gap-2 mb-8 p-1 bg-slate-100 dark:bg-gray-800 rounded-lg">
+          {tabs.map((tab) => {
+            const IconComponent = tab.icon;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => handleTabChange(tab.id)}
+                className={cn(
+                  "flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 relative",
+                  activeTab === tab.id
+                    ? "bg-white dark:bg-gray-700 text-[hsl(217,91%,60%)] shadow-sm"
+                    : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white/50 dark:hover:bg-gray-700/50"
+                )}
+              >
+                <IconComponent className="h-4 w-4" />
+                <span>{tab.label}</span>
+                {tab.badge && (
+                  <Badge 
+                    variant="secondary" 
+                    className="ml-1 h-5 px-1.5 text-xs bg-[hsl(217,91%,60%)] text-white"
                   >
-                    <Icon className="h-4 w-4" />
-                    <span>{tab.label}</span>
-                    {tab.badge && (
-                      <Badge variant="secondary" className="ml-1 bg-[hsl(217,91%,60%)]/10 text-[hsl(217,91%,60%)] hover:bg-[hsl(217,91%,60%)]/20">
-                        {tab.badge}
-                      </Badge>
-                    )}
-                  </button>
-                );
-              })}
-            </nav>
-          </div>
+                    {tab.badge}
+                  </Badge>
+                )}
+              </button>
+            );
+          })}
         </div>
 
         {/* Tab Content */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-slate-200 dark:border-gray-700 p-6">
+        <div className="space-y-6">
           {renderProfileContent()}
         </div>
       </div>
     </div>
+  );
+}
+
+export default function ProfilePage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+      </div>
+    }>
+      <ProfilePageContent />
+    </Suspense>
   );
 }
 

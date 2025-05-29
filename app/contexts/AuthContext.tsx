@@ -1,7 +1,8 @@
 'use client';
 
 import { createContext, useContext, useEffect, useState, useCallback } from 'react';
-import { getCurrentUser, fetchUserAttributes, signOut as amplifySignOut } from 'aws-amplify/auth';
+// Temporarily disabled AWS Amplify auth functions
+// import { getCurrentUser, fetchUserAttributes, signOut as amplifySignOut } from 'aws-amplify/auth';
 
 interface AuthContextType {
   user: any;
@@ -25,19 +26,21 @@ const AuthContext = createContext<AuthContextType>({
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<any>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false); // Set to false since auth is disabled
   const [error, setError] = useState<string | null>(null);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
   const checkUser = useCallback(async () => {
     try {
       setIsLoading(true);
-      const currentUser = await getCurrentUser();
-      const userAttributes = await fetchUserAttributes();
-      setUser({
-        ...currentUser,
-        ...userAttributes
-      });
+      // Temporarily disabled - auth functions won't work without Amplify configuration
+      // const currentUser = await getCurrentUser();
+      // const userAttributes = await fetchUserAttributes();
+      // setUser({
+      //   ...currentUser,
+      //   ...userAttributes
+      // });
+      setUser(null); // No user when auth is disabled
       setError(null);
     } catch (error) {
       console.error('Auth error:', error);
@@ -54,7 +57,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const handleSignOut = useCallback(async () => {
     try {
-      await amplifySignOut();
+      // Temporarily disabled
+      // await amplifySignOut();
       setUser(null);
       setError(null);
     } catch (error) {

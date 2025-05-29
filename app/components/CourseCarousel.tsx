@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import styles from './CourseCarousel.module.css';
-import CourseService from '../services/courses.service';
+import CourseService from '../services/courses.service.js';
 
 interface Course {
   id: string;

@@ -116,32 +116,6 @@ const mainNavItems: NavItem[] = [
     color: 'text-blue-500'
   },
   {
-    title: 'My Courses',
-    icon: BookOpen,
-    badge: '12',
-    color: 'text-green-500',
-    href: '/courses/search',
-    submenu: [
-      {
-        title: 'Search Courses',
-        href: '/courses/search',
-        active: false
-      },
-      {
-        title: 'In Progress',
-        href: '/courses/search?tab=in-progress',
-        badge: '3',
-        active: false
-      },
-      {
-        title: 'Completed',
-        href: '/courses/search?tab=completed',
-        badge: '4',
-        active: false
-      }
-    ]
-  },
-  {
     title: 'Career Opportunities',
     icon: Briefcase,
     badge: '5',
