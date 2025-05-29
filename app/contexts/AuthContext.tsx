@@ -2,7 +2,11 @@
 
 import { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { getCurrentUser, fetchUserAttributes, signOut as amplifySignOut } from 'aws-amplify/auth';
-import '../config/amplify';
+import { Amplify } from 'aws-amplify';
+import outputs from "@/amplify_outputs.json";
+
+// Configure Amplify
+Amplify.configure(outputs);
 
 interface AuthContextType {
   user: any;
