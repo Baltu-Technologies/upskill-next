@@ -116,6 +116,78 @@ const mainNavItems: NavItem[] = [
     color: 'text-blue-500'
   },
   {
+    title: 'Courses',
+    icon: BookOpen,
+    color: 'text-emerald-500',
+    href: '/courses',
+    submenu: [
+      {
+        title: 'Browse All Courses',
+        href: '/courses',
+        active: false
+      },
+      {
+        title: 'My Courses',
+        href: '/courses/my-courses',
+        badge: '12',
+        active: false
+      },
+      {
+        title: 'Featured Courses',
+        href: '/courses/featured',
+        active: false
+      },
+      {
+        title: 'Programming & Development',
+        href: '/courses/programming',
+        badge: '24',
+        active: false
+      },
+      {
+        title: 'Data Science & AI',
+        href: '/courses/data-science',
+        badge: '18',
+        active: false
+      },
+      {
+        title: 'Design & UX',
+        href: '/courses/design',
+        badge: '15',
+        active: false
+      },
+      {
+        title: 'Business & Marketing',
+        href: '/courses/business',
+        badge: '21',
+        active: false
+      },
+      {
+        title: 'Cloud & DevOps',
+        href: '/courses/cloud',
+        badge: '12',
+        active: false
+      },
+      {
+        title: 'Cybersecurity',
+        href: '/courses/cybersecurity',
+        badge: '9',
+        active: false
+      },
+      {
+        title: 'Free Courses',
+        href: '/courses/free',
+        badge: 'NEW',
+        active: false
+      },
+      {
+        title: 'Course Wishlist',
+        href: '/courses/wishlist',
+        badge: '5',
+        active: false
+      }
+    ]
+  },
+  {
     title: 'Career Opportunities',
     icon: Briefcase,
     badge: '5',

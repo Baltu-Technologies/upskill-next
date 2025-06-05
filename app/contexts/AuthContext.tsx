@@ -25,60 +25,44 @@ const AuthContext = createContext<AuthContextType>({
 });
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<any>(null);
-  const [isLoading, setIsLoading] = useState(false); // Set to false since auth is disabled
+  const [user, setUser] = useState<any>({
+    // Mock user data
+    username: 'test_user',
+    email: 'test@example.com',
+    isAuthenticated: true
+  });
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
   const checkUser = useCallback(async () => {
-    try {
-      setIsLoading(true);
-      // Temporarily disabled - auth functions won't work without Amplify configuration
-      // const currentUser = await getCurrentUser();
-      // const userAttributes = await fetchUserAttributes();
-      // setUser({
-      //   ...currentUser,
-      //   ...userAttributes
-      // });
-      setUser(null); // No user when auth is disabled
-      setError(null);
-    } catch (error) {
-      console.error('Auth error:', error);
-      setUser(null);
-      // Don't show modal automatically - let components decide
-    } finally {
-      setIsLoading(false);
-    }
+    // No-op since auth is disabled
+    return;
   }, []);
 
   useEffect(() => {
-    checkUser();
-  }, [checkUser]);
+    // No need to check user since auth is disabled
+  }, []);
 
   const handleSignOut = useCallback(async () => {
-    try {
-      // Temporarily disabled
-      // await amplifySignOut();
-      setUser(null);
-      setError(null);
-    } catch (error) {
-      console.error('Sign out error:', error);
-      setError('Failed to sign out');
-    }
+    // No-op since auth is disabled
+    return;
   }, []);
 
   const showAuthModal = useCallback(() => {
-    setIsAuthModalOpen(true);
+    // No-op since auth is disabled
+    return;
   }, []);
 
   const hideAuthModal = useCallback(() => {
-    setIsAuthModalOpen(false);
+    // No-op since auth is disabled
+    return;
   }, []);
 
   const handleAuthSuccess = useCallback(() => {
-    setIsAuthModalOpen(false);
-    checkUser(); // Refresh user data after successful auth
-  }, [checkUser]);
+    // No-op since auth is disabled
+    return;
+  }, []);
 
   return (
     <AuthContext.Provider value={{ 

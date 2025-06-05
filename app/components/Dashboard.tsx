@@ -54,9 +54,6 @@ import {
   Flame,
   Gamepad2,
   Zap,
-  ChevronLeft,
-  Lightbulb,
-  Radio,
   MoreHorizontal
 } from 'lucide-react';
 import CourseCarousel from './CourseCarousel';
@@ -71,8 +68,6 @@ export default function Dashboard() {
   const [searchQuery, setSearchQuery] = useState('');
   const [showNotifications, setShowNotifications] = useState(false);
   const [language, setLanguage] = useState('English');
-  const [currentCarouselCard, setCurrentCarouselCard] = useState(0);
-  const [isCarouselPaused, setIsCarouselPaused] = useState(false);
   const [showStatsPanel, setShowStatsPanel] = useState(true);
 
   // Theme toggle function
@@ -139,17 +134,6 @@ export default function Dashboard() {
       document.removeEventListener('keydown', handleEscape);
     };
   }, []);
-
-  // Carousel auto-rotation effect
-  useEffect(() => {
-    if (!isCarouselPaused) {
-      const interval = setInterval(() => {
-        setCurrentCarouselCard((prev) => (prev + 1) % 3);
-      }, 8000); // 8 seconds
-      
-      return () => clearInterval(interval);
-    }
-  }, [isCarouselPaused]);
 
   // Mock data for job readiness
   const profileCompleteness = 75;
@@ -240,42 +224,6 @@ export default function Dashboard() {
     { task: "Try Today's Mini-Game", xp: 25, icon: Target }
   ];
 
-  // Carousel cards data
-  const carouselCards = [
-    {
-      id: 'motivation',
-      type: 'Daily Motivation & Tip',
-      icon: Lightbulb,
-      iconColor: 'text-yellow-600',
-      bgGradient: 'from-yellow-50 to-orange-50 dark:from-yellow-950/30 dark:to-orange-950/30',
-      content: 'Pro Tip: Adding a 30-sec video intro to your profile can boost interview invites by 40%!',
-      cta: 'Try it now',
-      ctaColor: 'bg-gradient-to-r from-yellow-500 to-orange-500'
-    },
-    {
-      id: 'event',
-      type: 'Upcoming Event',
-      icon: Radio,
-      iconColor: 'text-red-600',
-      bgGradient: 'from-red-50 to-pink-50 dark:from-red-950/30 dark:to-pink-950/30',
-      content: 'Live Q&A with TEKsystems recruiter — Wed, May 28 @ 2 PM',
-      cta: 'Join Now',
-      ctaColor: 'bg-gradient-to-r from-red-500 to-pink-500'
-    },
-    {
-      id: 'xp',
-      type: 'Level & XP Progress',
-      icon: TrendingUp,
-      iconColor: 'text-purple-600',
-      bgGradient: 'from-purple-50 to-indigo-50 dark:from-purple-950/30 dark:to-indigo-950/30',
-      content: `${currentXP.toLocaleString()} / ${xpToNextLevel.toLocaleString()} XP to Level ${currentLevel + 1}`,
-      progress: (xpProgress / xpToNextLevel) * 100,
-      levelBadge: `Level ${currentLevel}: ${levelName}`,
-      cta: 'View Level Up',
-      ctaColor: 'bg-gradient-to-r from-purple-500 to-indigo-500'
-    }
-  ];
-
   const nextSteps = [
     {
       type: "learning",
@@ -323,7 +271,7 @@ export default function Dashboard() {
       
       {/* Main Content Area */}
       <div className={cn("sidebar-content", isSidebarCollapsed && "collapsed")}>
-                        {/* Header Bar */}
+        {/* Header Bar */}
         <header className="sticky top-0 z-50 w-full bg-gradient-to-r from-slate-200/95 via-slate-100/95 to-slate-200/95 dark:from-[hsl(222,84%,8%)] dark:via-[hsl(222,84%,6%)] dark:to-[hsl(222,84%,8%)] backdrop-blur-xl border-b border-slate-300/50 dark:border-[hsl(217,33%,17%)]/30 shadow-sm">
           <div className="sidebar-aware-container">
             <div className="flex items-center justify-between py-4">
@@ -429,103 +377,6 @@ export default function Dashboard() {
             </div>
           </div>
         </header>
-
-        {/* Widget Carousel */}
-        <div className="sidebar-aware-container py-8">
-          <div className="relative"
-               onMouseEnter={() => setIsCarouselPaused(true)}
-               onMouseLeave={() => setIsCarouselPaused(false)}>
-            
-            {/* Carousel Container */}
-            <div className="overflow-hidden rounded-2xl">
-              <div 
-                className="flex transition-transform duration-500 ease-in-out"
-                style={{ transform: `translateX(-${currentCarouselCard * 100}%)` }}
-              >
-                {carouselCards.map((card, index) => {
-                  const IconComponent = card.icon;
-                  return (
-                    <div
-                      key={card.id}
-                      className="w-full flex-shrink-0 px-2"
-                    >
-                      <div className={`relative overflow-hidden rounded-2xl bg-gradient-to-br ${card.bgGradient} p-6 shadow-lg hover:shadow-xl transition-all duration-300 group cursor-pointer h-32`}>
-                        <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-white/5 opacity-50"></div>
-                        <div className="relative z-10 flex items-center h-full">
-                          <div className="flex items-center gap-4 flex-1">
-                            <div className={`p-3 rounded-xl bg-white/80 dark:bg-black/20 backdrop-blur-sm`}>
-                              <IconComponent className={`h-6 w-6 ${card.iconColor}`} />
-                            </div>
-                            <div className="flex-1">
-                              <p className="text-xs font-medium text-muted-foreground mb-1 uppercase tracking-wide">
-                                {card.type}
-                              </p>
-                              <p className="text-sm font-semibold text-foreground mb-3 leading-tight">
-                                {card.content}
-                              </p>
-                              {card.progress !== undefined && (
-                                <div className="mb-3">
-                                  <div className="flex items-center justify-between text-xs mb-1">
-                                    <span className="text-muted-foreground">{card.levelBadge}</span>
-                                    <span className="font-medium">{Math.round(card.progress)}%</span>
-                                  </div>
-                                  <div className="w-full bg-white/30 dark:bg-black/20 rounded-full h-2">
-                                    <div 
-                                      className="bg-gradient-to-r from-purple-500 to-indigo-500 h-2 rounded-full transition-all duration-300"
-                                      style={{ width: `${card.progress}%` }}
-                                    ></div>
-                                  </div>
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                          <div className="ml-4">
-                            <button className={`${card.ctaColor} text-white px-4 py-2 rounded-lg font-medium text-sm hover:shadow-lg hover:scale-105 transition-all duration-200`}>
-                              {card.cta}
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Carousel Controls */}
-            <button
-              onClick={() => setCurrentCarouselCard((prev) => (prev - 1 + carouselCards.length) % carouselCards.length)}
-              className="absolute left-4 top-1/2 transform -translate-y-1/2 p-2 rounded-full bg-white/80 dark:bg-black/80 backdrop-blur-sm shadow-lg hover:bg-white dark:hover:bg-black transition-all duration-200 hover:scale-110"
-              aria-label="Previous card"
-            >
-              <ChevronLeft className="h-5 w-5 text-foreground" />
-            </button>
-            
-            <button
-              onClick={() => setCurrentCarouselCard((prev) => (prev + 1) % carouselCards.length)}
-              className="absolute right-4 top-1/2 transform -translate-y-1/2 p-2 rounded-full bg-white/80 dark:bg-black/80 backdrop-blur-sm shadow-lg hover:bg-white dark:hover:bg-black transition-all duration-200 hover:scale-110"
-              aria-label="Next card"
-            >
-              <ChevronRight className="h-5 w-5 text-foreground" />
-            </button>
-
-            {/* Pagination Dots */}
-            <div className="flex justify-center mt-6 gap-2">
-              {carouselCards.map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => setCurrentCarouselCard(index)}
-                  className={`w-2 h-2 rounded-full transition-all duration-200 ${
-                    index === currentCarouselCard 
-                      ? 'bg-primary w-6' 
-                      : 'bg-muted-foreground/30 hover:bg-muted-foreground/50'
-                  }`}
-                  aria-label={`Go to card ${index + 1}`}
-                />
-              ))}
-            </div>
-          </div>
-        </div>
 
         {/* Main Content with proper overflow handling */}
         <main className="sidebar-main">
