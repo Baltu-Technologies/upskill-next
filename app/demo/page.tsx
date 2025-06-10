@@ -3,6 +3,12 @@ import Link from 'next/link'
 export default function DemoIndex() {
   const demos = [
     {
+      title: 'User Profile Management',
+      description: 'Comprehensive profile system with skills inventory and management',
+      href: '/task18-demo',
+      status: 'Complete'
+    },
+    {
       title: 'My Pathways (Complete)',
       description: 'Full implementation with analytics, progress tracking, and management',
       href: '/demo/my-pathways-dynamic',

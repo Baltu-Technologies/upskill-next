@@ -39,6 +39,12 @@ export default function DemoIndex() {
       status: 'Available'
     },
     {
+      title: 'User Profile Management',
+      description: 'Comprehensive profile system with skills inventory and management',
+      href: '/task18-demo',
+      status: 'Complete'
+    },
+    {
       title: 'Emoji Slider',
       description: 'Interactive emoji slider component',
       href: '/demo/emoji-slider',
@@ -89,7 +95,30 @@ export default function DemoIndex() {
           ))}
         </div>
 
-        <div className="mt-12 text-center">
+        {/* Profile Demo Section */}
+        <div className="mt-12 bg-white rounded-lg shadow-md p-8 border border-gray-200">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4 text-center">
+            🚀 Profile Management Demo
+          </h2>
+          <p className="text-gray-600 text-center mb-6">
+            The comprehensive profile management system is available here!
+          </p>
+          <div className="text-center">
+            <button 
+              onClick={() => window.location.href = '/task18-demo'} 
+              className="inline-block bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition-colors font-semibold"
+            >
+              Launch Profile Demo
+            </button>
+          </div>
+          <div className="mt-4 text-center">
+            <p className="text-sm text-gray-500">
+              ✅ Skills Inventory • ✅ Career Preferences • ✅ Learning History • ✅ Privacy Settings • ✅ Profile Customization
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-8 text-center">
           <p className="text-gray-500 text-sm">
             Built with Next.js, React, TypeScript, and Tailwind CSS
           </p>

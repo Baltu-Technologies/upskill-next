@@ -1,8 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-// Temporarily disabled AWS Amplify auth functions
-// import { signIn, signUp, confirmSignUp, resendSignUpCode } from 'aws-amplify/auth';
 import { Eye, EyeOff, Mail, Lock, User, ArrowRight, CheckCircle, AlertCircle, Loader2, Sparkles, GraduationCap, Target, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -85,10 +83,7 @@ export default function AuthFormShadcn({ onSuccess }: AuthFormProps) {
     setError(null);
 
     try {
-      // const result = await signIn({
-      //   username: formData.email,
-      //   password: formData.password
-      // });
+      // TODO: Implement Better Auth sign-in logic here
       setSuccess('Successfully signed in!');
       onSuccess();
       resetForm();
@@ -129,17 +124,7 @@ export default function AuthFormShadcn({ onSuccess }: AuthFormProps) {
     setError(null);
 
     try {
-      // const result = await signUp({
-      //   username: formData.email,
-      //   password: formData.password,
-      //   options: {
-      //     userAttributes: {
-      //       email: formData.email,
-      //       given_name: formData.firstName.trim(),
-      //       family_name: formData.lastName.trim()
-      //     }
-      //   }
-      // });
+      // TODO: Implement Better Auth sign-up logic here
       setPendingEmail(formData.email);
       setCurrentStep('confirmSignUp');
       setSuccess('Account created! Please check your email for a confirmation code.');
@@ -162,10 +147,7 @@ export default function AuthFormShadcn({ onSuccess }: AuthFormProps) {
     setError(null);
 
     try {
-      // const result = await confirmSignUp({
-      //   username: pendingEmail,
-      //   confirmationCode: formData.confirmationCode.trim()
-      // });
+      // TODO: Implement Better Auth email confirmation logic here
       setSuccess('Email confirmed! You can now sign in.');
       setTimeout(() => {
         setCurrentStep('signIn');
@@ -185,7 +167,7 @@ export default function AuthFormShadcn({ onSuccess }: AuthFormProps) {
     setError(null);
     
     try {
-      // await resendSignUpCode({ username: pendingEmail });
+      // TODO: Implement Better Auth resend confirmation code logic here
       setSuccess('Confirmation code resent to your email.');
     } catch (error: any) {
       console.error('Resend code error:', error);

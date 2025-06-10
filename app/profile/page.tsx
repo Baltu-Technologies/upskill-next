@@ -40,7 +40,11 @@ import {
   Building,
   GraduationCap,
   Star,
-  Users
+  Users,
+  ChevronDown,
+  ChevronUp,
+  HelpCircle,
+  ArrowLeft
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { 
@@ -54,6 +58,7 @@ import {
   CoreCandidate, 
   ProfileCompletionStatus 
 } from '@/types/profile';
+import SkillsAssessment from '@/components/SkillsAssessment';
 
 const tabs = [
   { id: 'profile', label: 'My Profile', icon: User },
@@ -495,13 +500,7 @@ function CoreProfileTab({ isEditing, setIsEditing, profileData, setProfileData, 
 
 // Placeholder components for other tabs
 function SkillsProfileTab({ profileData }: { profileData: CompleteProfile }) {
-  return (
-    <div className="text-center py-12">
-      <Brain className="h-16 w-16 text-slate-400 mx-auto mb-4" />
-      <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-2">Skills Profile</h3>
-      <p className="text-slate-600 dark:text-slate-400">Skills management coming soon...</p>
-    </div>
-  );
+  return <SkillsAssessment />;
 }
 
 function PathwaysTab() {

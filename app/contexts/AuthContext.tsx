@@ -1,8 +1,6 @@
 'use client';
 
 import { createContext, useContext, useEffect, useState, useCallback } from 'react';
-// Temporarily disabled AWS Amplify auth functions
-// import { getCurrentUser, fetchUserAttributes, signOut as amplifySignOut } from 'aws-amplify/auth';
 
 interface AuthContextType {
   user: any;
@@ -16,7 +14,7 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
-  isLoading: true,
+  isLoading: true, // Will be set to false once initial auth check (from Better Auth) is done
   error: null,
   signOut: async () => {},
   refreshUser: async () => {},
@@ -25,44 +23,43 @@ const AuthContext = createContext<AuthContextType>({
 });
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<any>({
-    // Mock user data
-    username: 'test_user',
-    email: 'test@example.com',
-    isAuthenticated: true
-  });
-  const [isLoading, setIsLoading] = useState(false);
+  const [user, setUser] = useState<any>(null); // Initialize user to null
+  const [isLoading, setIsLoading] = useState(true); // Start with loading true
   const [error, setError] = useState<string | null>(null);
-  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  // The AuthModal display logic will be handled by Better Auth components or a new system
+  // const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
   const checkUser = useCallback(async () => {
-    // No-op since auth is disabled
-    return;
+    // TODO: Implement user check with Better Auth
+    // For now, simulating no user and finishing loading
+    setUser(null);
+    setIsLoading(false);
   }, []);
 
   useEffect(() => {
-    // No need to check user since auth is disabled
-  }, []);
+    checkUser();
+  }, [checkUser]);
 
   const handleSignOut = useCallback(async () => {
-    // No-op since auth is disabled
-    return;
+    // TODO: Implement sign out with Better Auth
+    setUser(null);
   }, []);
 
   const showAuthModal = useCallback(() => {
-    // No-op since auth is disabled
-    return;
+    // This will likely be replaced by Better Auth's modal or a new UI trigger
+    // For now, it does nothing or could log a message
+    console.log("showAuthModal called, to be implemented with Better Auth");
   }, []);
 
   const hideAuthModal = useCallback(() => {
-    // No-op since auth is disabled
-    return;
+    // This will likely be replaced by Better Auth's modal or a new UI trigger
+    console.log("hideAuthModal called, to be implemented with Better Auth");
   }, []);
 
-  const handleAuthSuccess = useCallback(() => {
-    // No-op since auth is disabled
-    return;
-  }, []);
+  // This function was likely tied to the old AuthModal/AuthForm
+  // const handleAuthSuccess = useCallback(() => {
+  //   checkUser(); // Refresh user after old auth success
+  // }, [checkUser]);
 
   return (
     <AuthContext.Provider value={{ 

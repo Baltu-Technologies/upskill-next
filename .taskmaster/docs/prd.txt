@@ -44,6 +44,16 @@ Upskill Next is a modern learning platform designed to help professionals advanc
 - Recommendation engine based on interest weighting
 - BLS API integration for salary and growth data
 
+## Skills Inventory System ("My Skills")
+- Comprehensive skills inventory with guided domain structure
+- Confidence-based skill assessment (0-4 scale) with evidence upload
+- Auto-population of verified skills from completed course modules
+- Free-form skill entry with intelligent auto-suggest functionality
+- Skills endorsement workflow for instructor/employer verification
+- Progress tracking and completeness metrics for profile optimization
+- Admin dashboard for taxonomy management and skill clustering
+- Machine-readable skill profiles for employer filtering and matching
+
 ### Industry Domain Structure (16 Categories)
 1. **Advanced Manufacturing & Industrial Production** - Semiconductor fabs, precision machining, electronics assembly, additive manufacturing, contract manufacturers
 2. **Aerospace & Defense** - Commercial aircraft, spacecraft, satellite manufacturing, UAV production, defense systems
@@ -63,6 +73,73 @@ Upskill Next is a modern learning platform designed to help professionals advanc
 16. **Public Safety & Security** - Critical infrastructure protection, physical security, cybersecurity services
 
 Each industry category contains 4-5 specialized subdomains, providing detailed granularity for career pathway mapping and learner exploration.
+
+### Technology Domain Structure (15 Categories)
+1. **Automation, Robotics & Mechatronics** - PLC and SCADA systems, industrial and collaborative robots, autonomous mobile robots (AMRs), motion control, actuators, and end-effectors
+2. **Electronics & Semiconductor Technology** - PCB design and assembly, analog/digital circuit design, microfabrication processes, photolithography, packaging, test, and clean-room protocols
+3. **Artificial Intelligence & Machine Learning** - Computer vision, natural language processing, neural networks, predictive analytics, and data science workflows
+4. **Networking & Telecommunications** - Fiber optics, 5G/6G, RF systems, satellite and microwave links, SDN, embedded firmware, and IoT (consumer and industrial)
+5. **Cybersecurity** - Network and perimeter protection, cloud and OT/ICS security, threat detection and response, encryption, and key management
+6. **Cloud & Edge Computing** - Infrastructure and platform services, serverless and container orchestration, distributed storage, content delivery, and edge compute clusters
+7. **Digital Design & Visualization** - CAD, BIM, 3D modeling and simulation, digital twins, and XR technologies (VR/AR/MR)
+8. **Advanced Manufacturing & Fabrication** - CNC machining, 3D printing, hybrid manufacturing processes, surface finishing, and production-line quality control
+9. **Energy & Power Technologies** - Power electronics, renewable and conventional generation systems, smart grids, energy storage (batteries, fuel cells), and microgrid integration
+10. **Sustainable & Green Technologies** - Renewable energy systems, energy efficiency tools, carbon capture, water and waste treatment, and circular-economy solutions
+11. **Automotive & Mobility Systems** - Electric powertrains, autonomous driving sensors, vehicle networks, charging infrastructure, and ADAS systems
+12. **Aerospace & Avionics Systems** - Flight control electronics, navigation systems, propulsion technologies, spacecraft platforms, and composite aerospace materials
+13. **Optical & Photonic Systems** - Laser generation, LIDAR, photodetectors, optical fiber communication, and integrated photonics
+14. **Nanotechnology & Advanced Materials** - Nanoscale fabrication, graphene and 2D materials, structural composites, metamaterials, and functional coatings
+15. **Sensors & Measurement Technologies** - Industrial instrumentation, motion and environmental sensors, biosensors, and calibration, test, and metrology equipment
+
+Each technology domain represents a foundational area of knowledge and application that spans multiple industries. These 15 categories provide a standardized framework for organizing technical knowledge, emerging technologies, and specialized career pathways.
+
+### Formal Skills Domain Structure (12 Categories)
+Organized by work modality and fully inclusive of construction/trade backgrounds:
+
+#### 🧤 Hands-On Technical Domains
+1. **Mechanical Systems & Equipment** - Moving parts, fluid power, mechanical components, assembly, rigging (e.g., actuator mounting, pump alignment, scaffolding, hoisting)
+2. **Electrical Power & Wiring Systems** - Low- and mid-voltage systems, wiring, conduit, grounding, safety (e.g., breaker install, conduit bending, wire terminations)
+3. **Electronic & PCB Systems** - Board-level work, soldering, sensors, testing circuits (e.g., multimeter use, breadboarding, SMT rework)
+4. **Fabrication & Structural Methods** - Cutting, joining, framing, mounting, materials processing (e.g., TIG welding, drywall framing, rivet guns, 3D printing)
+5. **Measurement, Inspection & Calibration** - Test instruments, precision tools, QA techniques (e.g., micrometers, CMM, oscilloscopes, leak detection)
+6. **Safety, Compliance & Environmental Controls** - Risk mitigation, OSHA, clean-room, LOTO, PPE, ESD (e.g., hazard ID, MSDS usage, safe tool operation)
+
+#### 💻 Computer-Based Technical Domains
+7. **Digital Tools & Technical Software** - CAD, diagnostics software, control interfaces, virtual systems, software and programming (e.g., AutoCAD, HMI config, XR tools, virtual test benches)
+8. **Information Technology (IT) Systems** - Devices, basic networking, computing environments, connectivity (e.g., workstation setup, IP config, switches, VPN, OS install)
+9. **Data Monitoring & Diagnostics** - Logs, dashboards, signal tracing, fault detection (e.g., network pings, sensor trends, log file analysis)
+
+#### 🔁 Hybrid / Systems Domains
+10. **Automation, Robotics & Control Systems** - PLCs, sensors, robotic systems, motion control (e.g., ladder logic, teach pendant, sensor-actuator chain)
+11. **Systems Integration & Field Installation** - On-site assembly, testing, install of multi-tech systems (e.g., field cable routing, rack wiring, systems boot-up, punch lists)
+12. **Workplace Execution & Project Practices** - Lean methods, communication, troubleshooting, workflows (e.g., 5S, checklists, root cause analysis, work orders)
+
+Each skills domain represents a foundational area of practical competency that spans multiple industries. This job-driven framework provides a standardized structure for organizing hands-on skills, courses, and career pathways based on actual workplace tasks and competencies. The work modality groupings (Hands-On, Computer-Based, Hybrid/Systems) help learners identify their preferred working environments and career paths.
+
+### Informal Skills Domain Structure (7 Categories)
+Captures practical experience from personal projects, hobbies, and volunteer work that demonstrates real-world technical competency:
+
+1. **DIY & Maker Projects** - Arduino home-automation, 3D-printed cosplay parts, custom CNC router, retro-gaming cabinet (Cross-links: Fabrication, Electronics, Digital Tools)
+2. **Home Improvement & Repair** - Framing a wall, basic plumbing fixes, tiling a backsplash, installing light fixtures (Cross-links: Mechanical Systems, Electrical Wiring, Safety)
+3. **Personal Electronics & Coding** - Raspberry Pi media server, mobile app side-project, smart-home scripting, game modding (Cross-links: Digital Tools & Software, IT Systems, Automation)
+4. **Vehicle & Small-Engine Work** - Motorcycle carb rebuild, car stereo install, e-bike motor swap, lawn-mower tune-up (Cross-links: Mechanical Systems, Electrical Power, Measurement)
+5. **Arts, Media & Content Creation** - Podcast editing, YouTube video production, 3D modelling for animation, graphic design freelancing (Cross-links: Digital Tools, Data Monitoring, Workflow)
+6. **Community & Volunteer Builds** - FIRST robotics mentor, makerspace instructor, Habitat for Humanity carpentry, solar co-op installs (Cross-links: Systems Integration, Safety & Compliance, Workplace Execution)
+7. **Outdoor & Technical Adventure** - Drone aerial mapping, camping gear repair, ham-radio setup, solar off-grid wiring (Cross-links: IT Systems, Electrical Power, Safety & Environmental)
+
+### Proficiency Framework
+Upskill uses a 6-level proficiency scale (0–5) to track skill development and guide learner progression:
+
+| Level | Label | Description |
+|-------|-------|-------------|
+| 0 | **Unfamiliar** | Has not encountered this skill before |
+| 1 | **Exposed** | Aware of the skill through passive exposure (e.g., video, discussion) |
+| 2 | **Knowledgeable** | Completed a course; understands the concepts but has not applied them in a hands-on setting |
+| 3 | **Practiced** | Has performed the skill in a guided or simulated environment (e.g., project, lab, VR module) |
+| 4 | **Proficient** | Can perform the skill independently and accurately in a real-world or lab-based environment |
+| 5 | **Expert** | Has mastered the skill, can troubleshoot advanced use cases, and/or teaches others (out of scope for Upskill training) |
+
+As the platform evolves, both technology and skills domains may be refined to reflect emerging workforce needs and employer demands.
 
 # User Experience  
 ## User Personas
@@ -141,6 +218,12 @@ Each persona includes weighted preferences for different work environment types:
   - **object_links**: Bidirectional relationships between tech/industry/pathways
   - **user_interests**: User interest weights (0-3 scale) for domains/pathways
   - **work_environment_preferences**: User preferences for different work environments
+- **Skills Inventory Models**:
+  - **user_skills**: Individual skill entries with confidence, evidence, and verification status
+  - **skill_templates**: Pre-defined skill taxonomy organized by domain categories
+  - **skill_aliases**: Alternative names and variations for skill matching and auto-suggest
+  - **skill_endorsements**: Verification records from instructors, employers, or peers
+  - **skill_domains**: Organized categories (Electronics, Mechatronics, Programming, Safety, Soft Skills)
 
 ## APIs and Integrations
 - Course content management API
@@ -613,4 +696,122 @@ Tech Domain → Tech Sub-domain ↔ Career Pathway ↔ Industry Sub-domain ← I
 - Recommendation engine response time < 200ms
 - 99.9% uptime for core platform features
 - Secure handling of user interest data
+
+---
+
+# Skills Inventory ("My Skills") – Product Requirements Document
+
+*Last updated: 2025‑01‑05*
+
+## Purpose & Problem Statement
+
+Many entry‑level learners in technical pathways (semiconductor, robotics, data‑center operations, etc.) possess a fragmented mix of **formal skills** (courses, certifications, on‑the‑job training) and **informal skills** (hobby projects, self‑study, maker activities). Employers need a verifiable, machine‑readable snapshot of this whole‑person skillset. The "My Skills" module will:
+
+* Enable users to inventory **all** their skills with appropriate evidence.
+* Give employers data they can filter by skill, confidence, verification, and evidence.
+* Provide admins an iterative taxonomy that grows as new skills emerge.
+
+## Goals & Success Metrics
+
+| Goal                            | Metric                                                       | Target              |
+| ------------------------------- | ------------------------------------------------------------ | ------------------- |
+| Capture complete skill profiles | ≥ 70 % of active learners reach ≥ 80 % module completion     | 90 days post‑launch |
+| Increase employer engagement    | Avg. ≥ 3 skill‑based candidate filters per employer per week | 60 days post‑launch |
+| Maintain data quality           | ≤ 10 % of skills in "other/free‑text" bucket after 6 months  | Ongoing             |
+
+## Personas & Use Cases
+
+* **Learner/Job Seeker** – wants to showcase every relevant ability, get hired faster.
+* **Hiring Manager** – needs to filter candidates by verified skills/evidence.
+* **Instructor/Mentor** – endorses student skills and assigns evidence.
+* **Platform Admin** – curates taxonomy, merges duplicates, reviews clustering suggestions.
+
+## User Experience & Flow
+
+1. **Landing Panel** – progress bar + CTA "Add / Edit Skills".
+2. **Guided Domains** (accordion): Electronics, Mechatronics, Programming, Safety, Soft Skills.
+   * Checklist items with confidence (0‑4), learned‑through, evidence upload.
+   * "Add Other" at end of each domain.
+3. **Free‑Form Section** – mini‑form for entirely new skills with auto‑suggest.
+4. **Review & Save** – table summary → submit; system validates + writes via bulk API.
+5. **Optional Endorsement** – employer/instructor receives link to verify pending skills.
+
+*Progress nudges*: banners after login ("Add two more skills to reach 80 % completeness").
+
+## Functional Requirements
+
+|  ID  | Requirement                                                              | Priority |
+| ---- | ------------------------------------------------------------------------ | -------- |
+| F‑1  | Display guided domain list with pre‑seeded skills                        | Must     |
+| F‑2  | Allow user confidence selection (0–4) per skill                          | Must     |
+| F‑3  | Accept evidence file/URL attach ≤ 20 MB                                  | Must     |
+| F‑4  | Support free‑text skill entry with auto‑suggest                          | Must     |
+| F‑5  | Persist skills via **PATCH /users/{id}/skills** (bulk add/update/delete) | Must     |
+| F‑6  | Auto‑populate verified skills when a course module is completed          | Must     |
+| F‑7  | Progress computation formula (verified + claimed ÷ core total)           | Must     |
+| F‑8  | Admin dashboard to view "unmatched skills" & merge/approve               | Should   |
+| F‑9  | Nightly AI clustering job to suggest taxonomy additions                  | Should   |
+| F‑10 | Endorsement workflow (email & in‑app notification)                       | Could    |
+
+## Non‑Functional Requirements
+
+* **Security** – File uploads scanned; RBAC so only owner, endorsed mentors, and employers with permission see evidence.
+* **Performance** – Save/Load ≤ 300 ms median; clustering batch ≤ 10 min nightly.
+* **Accessibility** – WCAG 2.2 AA.
+
+## Data Model (simplified)
+
+```
+UserSkill
+  skill_id   UUID PK
+  user_id    UUID FK
+  name       TEXT
+  category   TEXT
+  source_type ENUM('formal','informal','auto_verified')
+  learned_through TEXT
+  confidence SMALLINT 0‑4
+  evidence_url TEXT
+  endorsement_status ENUM('none','pending','verified')
+  created_at TIMESTAMP
+```
+
+*Taxonomy tables*: `SkillTemplate`, `SkillAlias`.
+
+## API End‑points
+
+* **GET /users/{id}/skills** – returns array of `UserSkill`.
+* **PATCH /users/{id}/skills** – body `{add:[…], update:[…], delete:[…]}`.
+* **POST /skills/endorse** – body `{skill_id, endorser_id, action}`.
+
+## Analytics & Reporting
+
+* Skill coverage heat‑map by pathway.
+* Employer search logs (top 20 filtered skills per month).
+* Free‑text skill volume & clustering accuracy rate.
+
+## Roll‑out Plan
+
+| Phase       | Scope                                                                                    | ETA      |
+| ----------- | ---------------------------------------------------------------------------------------- | -------- |
+| **MVP**     | Guided domains, free‑form add, evidence upload, progress bar, auto‑populate from courses |  Q3‑2025 |
+| **Phase 2** | Endorsements, admin clustering UI, employer filter integration                           |  Q4‑2025 |
+| **Phase 3** | AI skill gap recommendations, printable skill summary PDF                                |  Q1‑2026 |
+
+## Risks & Mitigations
+
+* **Low evidence attachment rate** → make evidence optional but nudge with tooltips and badge rewards.
+* **Taxonomy sprawl** → weekly admin curation + AI dedupe.
+* **User overwhelm** → start with ≤ 5 domains, progressive disclosure of sub‑skills.
+
+## Open Questions
+
+1. Maximum storage quota per user for evidence?
+2. Do we allow video embeds (YouTube) vs. raw uploads only?
+3. How will soft‑skill endorsements be captured—numerical rating or textual feedback?
+4. Should confidence scores be visible to employers or used only as an internal weighting?
+
+---
+
+*End of Skills Inventory PRD*
+
 </PRD> 

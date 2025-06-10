@@ -1,0 +1,29 @@
+{
+  "meta": {
+    "generatedAt": "2025-06-10T16:23:30.888Z",
+    "tasksAnalyzed": 1,
+    "totalTasks": 33,
+    "analysisCount": 2,
+    "thresholdScore": 5,
+    "projectName": "Taskmaster",
+    "usedResearch": true
+  },
+  "complexityAnalysis": [
+    {
+      "taskId": 18,
+      "taskTitle": "Build Comprehensive User Profile Management",
+      "complexityScore": 8,
+      "recommendedSubtasks": 7,
+      "expansionPrompt": "Break down the User Profile Management system into functional components including: 1) Core data model and storage, 2) Authentication integration, 3) Profile editing interface, 4) Skills inventory system, 5) Learning history tracking, 6) Privacy and permissions, and 7) Data export/API capabilities. For each component, specify implementation details, dependencies, and testing strategies.",
+      "reasoning": "This task involves multiple interconnected components with complex data relationships, security considerations, and integration requirements. The cyclomatic complexity would be high due to numerous decision paths in privacy controls and data validation. The task already has 5 subtasks but would benefit from further decomposition to address authentication integration and testing infrastructure separately. The Halstead complexity metrics would also be high given the diverse operators and operands needed across user data management, privacy controls, and system integrations."
+    },
+    {
+      "taskId": 1,
+      "taskTitle": "Implement Authentication System",
+      "complexityScore": 7,
+      "recommendedSubtasks": 8,
+      "expansionPrompt": "Break down the Authentication System implementation into subtasks covering: 1) Requirements analysis and auth provider selection, 2) User registration flow with email verification, 3) Login functionality and session management, 4) Password reset mechanism, 5) Logout and session termination, 6) Security hardening, 7) Integration with frontend components, 8) Comprehensive testing",
+      "reasoning": "This task has high complexity due to security implications, multiple interconnected components (registration, login, sessions), integration requirements, and the need for thorough testing. Authentication systems involve complex control flows and security considerations that increase cyclomatic complexity. The task requires careful implementation of several critical paths with potential security vulnerabilities if not properly executed."
+    }
+  ]
+}

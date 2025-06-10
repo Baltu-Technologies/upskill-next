@@ -32,7 +32,9 @@ import {
   ChevronLeft,
   Lightbulb,
   Radio,
-  MoreHorizontal
+  MoreHorizontal,
+  User,
+  Settings
 } from 'lucide-react';
 import CourseCarousel from './CourseCarousel';
 import { cn } from '@/lib/utils';
@@ -226,7 +228,15 @@ export default function DashboardContent() {
               </div>
             </CardHeader>
             <CardContent className="pt-0">
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                <button 
+                  onClick={() => window.location.href = '/skills-demo'}
+                  className="flex items-center justify-center gap-2 p-4 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-500 text-white hover:shadow-lg hover:scale-105 transition-all duration-200 group/btn"
+                >
+                  <Settings className="h-5 w-5 group-hover/btn:scale-110 transition-transform duration-200" />
+                  <span className="font-medium">Skills Profile</span>
+                </button>
+                
                 <button className="flex items-center justify-center gap-2 p-4 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-500 text-white hover:shadow-lg hover:scale-105 transition-all duration-200 group/btn">
                   <Play className="h-5 w-5 group-hover/btn:scale-110 transition-transform duration-200" />
                   <span className="font-medium">Continue Learning</span>
@@ -270,6 +280,60 @@ export default function DashboardContent() {
 
         {/* Right Column - Stats & Next Steps */}
         <div className="space-y-6">
+          {/* Skills Profile Panel */}
+          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-cyan-50 via-blue-50 to-indigo-50 dark:from-cyan-950/30 dark:via-blue-950/30 dark:to-indigo-950/30 p-6 shadow-lg hover:shadow-xl transition-all duration-300 group cursor-pointer"
+               onClick={() => window.location.href = '/skills-demo'}>
+            <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-blue-500/10 opacity-50"></div>
+            <div className="absolute top-4 right-4 opacity-20 group-hover:rotate-12 transition-transform duration-300">
+              <Settings className="h-12 w-12 text-cyan-500" />
+            </div>
+            <div className="relative z-10">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-2 rounded-xl bg-cyan-500/10">
+                  <Settings className="h-6 w-6 text-cyan-500" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold">Skills Profile</h3>
+                  <p className="text-sm text-muted-foreground">Build your comprehensive skills profile</p>
+                </div>
+              </div>
+              
+              <div className="space-y-3">
+                <div className="p-4 rounded-xl bg-white/60 dark:bg-black/20 backdrop-blur-sm">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-medium">Assessment Progress</span>
+                    <span className="text-sm font-bold text-cyan-600">25%</span>
+                  </div>
+                  <div className="w-full bg-muted rounded-full h-2">
+                    <div className="bg-gradient-to-r from-cyan-500 to-blue-500 h-2 rounded-full transition-all duration-300" style={{ width: '25%' }}></div>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-2">3 of 12 formal domains completed</p>
+                </div>
+                
+                <div className="flex items-center justify-between p-3 rounded-xl bg-white/40 dark:bg-black/10 backdrop-blur-sm">
+                  <div className="flex items-center gap-2">
+                    <Award className="h-4 w-4 text-amber-500" />
+                    <span className="text-sm font-medium">Skills Rated</span>
+                  </div>
+                  <span className="text-sm font-bold">18/60</span>
+                </div>
+                
+                <div className="flex items-center justify-between p-3 rounded-xl bg-white/40 dark:bg-black/10 backdrop-blur-sm">
+                  <div className="flex items-center gap-2">
+                    <Target className="h-4 w-4 text-purple-500" />
+                    <span className="text-sm font-medium">Profile Strength</span>
+                  </div>
+                  <span className="text-sm font-bold text-amber-600">Intermediate</span>
+                </div>
+              </div>
+              
+              <button className="w-full mt-4 p-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-500 text-white font-medium hover:shadow-lg hover:scale-105 transition-all duration-200 flex items-center justify-center gap-2">
+                Complete Assessment
+                <ArrowRight className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
+
           {/* Stats Panel */}
           <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-blue-950/30 dark:via-indigo-950/30 dark:to-purple-950/30 p-6 shadow-lg hover:shadow-xl transition-all duration-300 group">
             <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-purple-500/10 opacity-50"></div>
