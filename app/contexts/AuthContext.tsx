@@ -1,6 +1,7 @@
 'use client';
 
 import { createContext, useContext, useEffect, useState, useCallback } from 'react';
+import { authClient } from '@/auth-client';
 
 interface AuthContextType {
   user: any;
@@ -14,7 +15,7 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
-  isLoading: true, // Will be set to false once initial auth check (from Better Auth) is done
+  isLoading: true,
   error: null,
   signOut: async () => {},
   refreshUser: async () => {},
@@ -23,17 +24,30 @@ const AuthContext = createContext<AuthContextType>({
 });
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<any>(null); // Initialize user to null
-  const [isLoading, setIsLoading] = useState(true); // Start with loading true
+  const [user, setUser] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  // The AuthModal display logic will be handled by Better Auth components or a new system
-  // const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
   const checkUser = useCallback(async () => {
-    // TODO: Implement user check with Better Auth
-    // For now, simulating no user and finishing loading
-    setUser(null);
-    setIsLoading(false);
+    try {
+      setIsLoading(true);
+      setError(null);
+      
+      // Get current session from Better Auth
+      const session = await authClient.getSession();
+      
+      if (session.data) {
+        setUser(session.data.user);
+      } else {
+        setUser(null);
+      }
+    } catch (error: any) {
+      console.error('Error checking user session:', error);
+      setError(error.message || 'Failed to check authentication status');
+      setUser(null);
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
 
   useEffect(() => {
@@ -41,25 +55,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [checkUser]);
 
   const handleSignOut = useCallback(async () => {
-    // TODO: Implement sign out with Better Auth
-    setUser(null);
+    try {
+      setError(null);
+      await authClient.signOut();
+      setUser(null);
+    } catch (error: any) {
+      console.error('Error signing out:', error);
+      setError(error.message || 'Failed to sign out');
+    }
   }, []);
 
   const showAuthModal = useCallback(() => {
-    // This will likely be replaced by Better Auth's modal or a new UI trigger
-    // For now, it does nothing or could log a message
-    console.log("showAuthModal called, to be implemented with Better Auth");
+    console.log("showAuthModal called - Better Auth modal integration needed");
   }, []);
 
   const hideAuthModal = useCallback(() => {
-    // This will likely be replaced by Better Auth's modal or a new UI trigger
-    console.log("hideAuthModal called, to be implemented with Better Auth");
+    console.log("hideAuthModal called - Better Auth modal integration needed");
   }, []);
-
-  // This function was likely tied to the old AuthModal/AuthForm
-  // const handleAuthSuccess = useCallback(() => {
-  //   checkUser(); // Refresh user after old auth success
-  // }, [checkUser]);
 
   return (
     <AuthContext.Provider value={{ 

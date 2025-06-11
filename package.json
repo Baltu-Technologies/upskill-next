@@ -10,7 +10,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "setup-db": "node scripts/setup-aurora-db.js",
+    "test-db": "node scripts/test-db-connection.js"
   },
   "dependencies": {
     "@aws-amplify/ui-react": "^6.11.2",

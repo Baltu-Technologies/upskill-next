@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import ThemeToggle from './ThemeToggle';
+import { authClient } from '@/auth-client';
 
 interface AuthFormProps {
   onSuccess: () => void;
@@ -25,10 +26,10 @@ interface FormData {
 export default function AuthFormShadcn({ onSuccess }: AuthFormProps) {
   const [currentStep, setCurrentStep] = useState<AuthStep>('signIn');
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
   const [pendingEmail, setPendingEmail] = useState('');
   
   const [formData, setFormData] = useState<FormData>({
@@ -37,7 +38,7 @@ export default function AuthFormShadcn({ onSuccess }: AuthFormProps) {
     confirmPassword: '',
     firstName: '',
     lastName: '',
-    confirmationCode: ''
+    confirmationCode: '',
   });
 
   const resetForm = () => {
@@ -47,21 +48,19 @@ export default function AuthFormShadcn({ onSuccess }: AuthFormProps) {
       confirmPassword: '',
       firstName: '',
       lastName: '',
-      confirmationCode: ''
+      confirmationCode: '',
     });
     setError(null);
     setSuccess(null);
-    setIsLoading(false);
   };
 
   const handleInputChange = (field: keyof FormData, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
-    if (error) setError(null);
+    setError(null);
   };
 
   const validateEmail = (email: string) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   };
 
   const validatePassword = (password: string) => {
@@ -83,19 +82,21 @@ export default function AuthFormShadcn({ onSuccess }: AuthFormProps) {
     setError(null);
 
     try {
-      // TODO: Implement Better Auth sign-in logic here
+      const result = await authClient.signIn.email({
+        email: formData.email,
+        password: formData.password,
+      });
+
+      if (result.error) {
+        throw new Error(result.error.message || 'Failed to sign in');
+      }
+
       setSuccess('Successfully signed in!');
       onSuccess();
       resetForm();
     } catch (error: any) {
       console.error('Sign in error:', error);
-      if (error.name === 'UserNotConfirmedException') {
-        setPendingEmail(formData.email);
-        setCurrentStep('confirmSignUp');
-        setError('Please confirm your email address to complete sign up');
-      } else {
-        setError(error.message || 'Failed to sign in. Please check your credentials.');
-      }
+      setError(error.message || 'Failed to sign in. Please check your credentials.');
     } finally {
       setIsLoading(false);
     }
@@ -124,10 +125,22 @@ export default function AuthFormShadcn({ onSuccess }: AuthFormProps) {
     setError(null);
 
     try {
-      // TODO: Implement Better Auth sign-up logic here
-      setPendingEmail(formData.email);
-      setCurrentStep('confirmSignUp');
-      setSuccess('Account created! Please check your email for a confirmation code.');
+      const result = await authClient.signUp.email({
+        email: formData.email,
+        password: formData.password,
+        name: `${formData.firstName} ${formData.lastName}`,
+      });
+
+      if (result.error) {
+        throw new Error(result.error.message || 'Failed to create account');
+      }
+
+      setSuccess('Account created successfully! You can now sign in.');
+      setTimeout(() => {
+        setCurrentStep('signIn');
+        setFormData(prev => ({ ...prev, email: formData.email, password: '', confirmPassword: '', firstName: '', lastName: '' }));
+        setSuccess(null);
+      }, 2000);
     } catch (error: any) {
       console.error('Sign up error:', error);
       setError(error.message || 'Failed to create account. Please try again.');
@@ -138,43 +151,15 @@ export default function AuthFormShadcn({ onSuccess }: AuthFormProps) {
 
   const handleConfirmSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.confirmationCode.trim()) {
-      setError('Confirmation code is required');
-      return;
-    }
-
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      // TODO: Implement Better Auth email confirmation logic here
-      setSuccess('Email confirmed! You can now sign in.');
-      setTimeout(() => {
-        setCurrentStep('signIn');
-        setFormData(prev => ({ ...prev, email: pendingEmail, confirmationCode: '' }));
-        setSuccess(null);
-      }, 2000);
-    } catch (error: any) {
-      console.error('Confirmation error:', error);
-      setError(error.message || 'Invalid confirmation code. Please try again.');
-    } finally {
-      setIsLoading(false);
-    }
+    // Better Auth with email/password doesn't require email confirmation by default
+    // This step can be removed or used for future email verification features
+    setCurrentStep('signIn');
   };
 
   const handleResendCode = async () => {
-    setIsLoading(true);
-    setError(null);
-    
-    try {
-      // TODO: Implement Better Auth resend confirmation code logic here
-      setSuccess('Confirmation code resent to your email.');
-    } catch (error: any) {
-      console.error('Resend code error:', error);
-      setError(error.message || 'Failed to resend confirmation code.');
-    } finally {
-      setIsLoading(false);
-    }
+    // Better Auth with email/password doesn't require email confirmation by default
+    // This can be implemented if you add email verification later
+    setSuccess('Feature not required with current setup.');
   };
 
   return (
