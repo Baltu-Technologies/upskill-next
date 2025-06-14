@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, Suspense, useCallback } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
@@ -44,7 +44,9 @@ import {
   ChevronDown,
   ChevronUp,
   HelpCircle,
-  ArrowLeft
+  ArrowLeft,
+  X,
+  Info
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { 
@@ -59,6 +61,8 @@ import {
   ProfileCompletionStatus 
 } from '@/types/profile';
 import SkillsAssessment from '@/components/SkillsAssessment';
+import { toast } from 'sonner';
+import CoreProfileSection from '@/src/components/profile/CoreProfileSection';
 
 const tabs = [
   { id: 'profile', label: 'My Profile', icon: User },
@@ -66,7 +70,6 @@ const tabs = [
   { id: 'pathways', label: 'My Pathways', icon: Route },
   { id: 'projects', label: 'Project Showcase', icon: FolderOpen, badge: '3' },
   { id: 'certifications', label: 'Certifications', icon: Award, badge: '8' },
-  { id: 'stats', label: 'My Stats and Goals', icon: Target },
 ];
 
 function ProfilePageContent() {
@@ -112,12 +115,11 @@ function ProfilePageContent() {
     switch (activeTab) {
       case 'profile':
         return (
-          <CoreProfileTab 
+          <CoreProfileSection 
             isEditing={isEditing} 
             setIsEditing={setIsEditing}
             profileData={profileData}
             setProfileData={setProfileData}
-            completionStatus={completionStatus}
           />
         );
       case 'skills':
@@ -128,16 +130,13 @@ function ProfilePageContent() {
         return <ProjectsTab profileData={profileData} />;
       case 'certifications':
         return <CertificationsTab profileData={profileData} />;
-      case 'stats':
-        return <StatsGoalsTab profileData={profileData} />;
       default:
         return (
-          <CoreProfileTab 
+          <CoreProfileSection 
             isEditing={isEditing} 
             setIsEditing={setIsEditing}
             profileData={profileData}
             setProfileData={setProfileData}
-            completionStatus={completionStatus}
           />
         );
     }
@@ -533,12 +532,4 @@ function CertificationsTab({ profileData }: { profileData: CompleteProfile }) {
   );
 }
 
-function StatsGoalsTab({ profileData }: { profileData: CompleteProfile }) {
-  return (
-    <div className="text-center py-12">
-      <Target className="h-16 w-16 text-slate-400 mx-auto mb-4" />
-      <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-2">My Stats and Goals</h3>
-      <p className="text-slate-600 dark:text-slate-400">Stats and goals tracking coming soon...</p>
-    </div>
-  );
-} 
+ 

@@ -98,13 +98,17 @@ const careerProfileItem: NavItem = {
       href: '/profile?tab=certifications',
       badge: '8',
       active: false
-    },
-    {
-      title: 'My Stats and Goals',
-      href: '/profile?tab=stats',
-      active: false
     }
   ]
+};
+
+// Stats & Goals item (separate menu item)
+const statsGoalsItem: NavItem = {
+  title: 'My Stats & Goals',
+  icon: TrendingUp,
+  color: 'text-emerald-500',
+  href: '/stats-goals',
+  active: false
 };
 
 const mainNavItems: NavItem[] = [
@@ -235,7 +239,8 @@ const mainNavItems: NavItem[] = [
         active: false
       }
     ]
-  }
+  },
+  statsGoalsItem
 ];
 
 const bottomNavItems: NavItem[] = [
