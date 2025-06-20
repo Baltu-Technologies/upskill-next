@@ -23,7 +23,9 @@ async function testConnection() {
     
     const pool = new Pool({
         connectionString,
-        ssl: process.env.BETTER_AUTH_NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+        ssl: connectionString.includes('rds.amazonaws.com') 
+            ? { rejectUnauthorized: false } 
+            : false,
         max: 1, // Just one connection for testing
         idleTimeoutMillis: 5000,
         connectionTimeoutMillis: 10000, // 10 seconds timeout

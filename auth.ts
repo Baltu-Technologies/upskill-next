@@ -5,7 +5,9 @@ import { betterAuth } from "better-auth";
 export const auth = betterAuth({
     database: new Pool({
         connectionString: process.env.BETTER_AUTH_DATABASE_URL,
-        ssl: process.env.BETTER_AUTH_NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+        ssl: process.env.BETTER_AUTH_DATABASE_URL?.includes('rds.amazonaws.com') 
+            ? { rejectUnauthorized: false } 
+            : false,
         max: 10,
         idleTimeoutMillis: 30000,
         connectionTimeoutMillis: 2000,
@@ -17,6 +19,12 @@ export const auth = betterAuth({
     emailAndPassword: {
         enabled: true,
         requireEmailVerification: false, // Set to true if you want email verification
+    },
+    socialProviders: {
+        google: {
+            clientId: process.env.GOOGLE_CLIENT_ID!,
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+        },
     },
     session: {
         expiresIn: 60 * 60 * 24 * 7, // 7 days
