@@ -42,16 +42,24 @@ export default function AuthFormShadcn({ onSuccess }: AuthFormProps) {
   const handleGoogleSignIn = async () => {
     try {
       setIsLoading(true);
-      await authClient.signIn.social({
+      setError(''); // Clear any existing errors
+      
+      const result = await authClient.signIn.social({
         provider: 'google',
         callbackURL: '/dashboard',
       });
+      
+      console.log('Google sign-in result:', result);
+      
+      // If we get here, the OAuth flow was initiated successfully
+      // The user will be redirected to Google, then back to our callback
+      
     } catch (error) {
       console.error('Google sign-in error:', error);
       setError('Failed to sign in with Google. Please try again.');
-    } finally {
       setIsLoading(false);
     }
+    // Note: We don't set isLoading to false here because the user will be redirected
   };
 
 
