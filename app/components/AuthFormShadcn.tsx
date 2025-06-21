@@ -44,22 +44,33 @@ export default function AuthFormShadcn({ onSuccess }: AuthFormProps) {
       setIsLoading(true);
       setError(''); // Clear any existing errors
       
+      console.log('Starting Google OAuth flow...');
+      
+      // Better Auth social sign-in should redirect to OAuth provider
       const result = await authClient.signIn.social({
         provider: 'google',
         callbackURL: '/dashboard',
       });
       
-      console.log('Google sign-in result:', result);
+      console.log('Google OAuth response:', result);
       
-      // If we get here, the OAuth flow was initiated successfully
-      // The user will be redirected to Google, then back to our callback
+      // If the result contains a URL, manually redirect
+      if (result && typeof result === 'object' && 'url' in result && result.url) {
+        console.log('Redirecting to:', result.url);
+        window.location.href = result.url as string;
+        return; // Don't reset loading state as we're redirecting
+      }
+      
+      // If we reach here without redirect, there might be an issue
+      console.log('Google OAuth initiated but no redirect URL received');
+      setIsLoading(false);
+      setError('Google sign-in did not redirect as expected. Please try again.');
       
     } catch (error) {
       console.error('Google sign-in error:', error);
       setError('Failed to sign in with Google. Please try again.');
       setIsLoading(false);
     }
-    // Note: We don't set isLoading to false here because the user will be redirected
   };
 
 
