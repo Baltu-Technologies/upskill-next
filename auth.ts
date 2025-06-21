@@ -4,6 +4,14 @@ import { betterAuth } from "better-auth";
 
 // Get the correct base URL for the environment
 const getBaseURL = () => {
+    console.log('Environment variables check:', {
+        BETTER_AUTH_URL: process.env.BETTER_AUTH_URL,
+        NEXTAUTH_URL: process.env.NEXTAUTH_URL,
+        AWS_BRANCH: process.env.AWS_BRANCH,
+        AWS_APP_ID: process.env.AWS_APP_ID,
+        NODE_ENV: process.env.NODE_ENV
+    });
+    
     // In production, use BETTER_AUTH_URL or construct from Amplify
     if (process.env.BETTER_AUTH_URL) return process.env.BETTER_AUTH_URL;
     if (process.env.NEXTAUTH_URL) return process.env.NEXTAUTH_URL;
@@ -15,6 +23,15 @@ const getBaseURL = () => {
     
     return "http://localhost:3000";
 };
+
+console.log('Google OAuth configuration check:', {
+    clientId: process.env.GOOGLE_CLIENT_ID ? 'SET' : 'MISSING',
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET ? 'SET' : 'MISSING',
+    baseURL: getBaseURL(),
+    redirectURI: process.env.NODE_ENV === 'production' 
+        ? "https://main.d2q5p14flkja4s.amplifyapp.com/api/auth/callback/google"
+        : "http://localhost:3000/api/auth/callback/google",
+});
 
 export const auth = betterAuth({
     database: new Pool({
