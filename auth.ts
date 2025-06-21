@@ -13,7 +13,10 @@ export const auth = betterAuth({
         connectionTimeoutMillis: 2000,
     }),
     secret: process.env.BETTER_AUTH_SECRET || process.env.AUTH_SECRET, // Fallback for compatibility
-    baseURL: process.env.BETTER_AUTH_URL || process.env.NEXTAUTH_URL || "http://localhost:3000",
+    baseURL: process.env.BETTER_AUTH_URL || process.env.NEXTAUTH_URL || 
+        (process.env.NODE_ENV === 'production' 
+            ? "https://main.d2q5p14flkja4s.amplifyapp.com" 
+            : "http://localhost:3000"),
     appName: "upskill-next",
     plugins: [nextCookies()],
     emailAndPassword: {
