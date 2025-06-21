@@ -46,6 +46,7 @@ export default function AuthFormShadcn({ onSuccess }: AuthFormProps) {
       
       console.log('Starting Google OAuth flow...');
       console.log('Current origin:', window.location.origin);
+      console.log('Environment:', process.env.NODE_ENV);
       
       // Better Auth social sign-in should redirect to OAuth provider
       const result = await authClient.signIn.social({
@@ -54,6 +55,8 @@ export default function AuthFormShadcn({ onSuccess }: AuthFormProps) {
       });
       
       console.log('Google OAuth response:', result);
+      console.log('Response type:', typeof result);
+      console.log('Response keys:', result ? Object.keys(result) : 'No result');
       
       // If the result contains a URL, manually redirect
       if (result && typeof result === 'object' && 'url' in result && result.url) {
@@ -64,21 +67,24 @@ export default function AuthFormShadcn({ onSuccess }: AuthFormProps) {
       
       // If we reach here without redirect, there might be an issue
       console.log('Google OAuth initiated but no redirect URL received');
-      console.log('Result:', result);
+      console.log('Full result:', JSON.stringify(result, null, 2));
       setIsLoading(false);
-      setError('Google sign-in configuration issue. Please check your OAuth settings.');
+      setError('Google sign-in configuration issue. Check browser console for details.');
       
     } catch (error: any) {
       console.error('Google sign-in error:', error);
       console.error('Error details:', {
         message: error?.message,
         stack: error?.stack,
-        name: error?.name
+        name: error?.name,
+        cause: error?.cause
       });
       
       let errorMessage = 'Failed to sign in with Google. Please try again.';
       if (error?.message?.includes('redirect')) {
         errorMessage = 'OAuth redirect configuration error. Please contact support.';
+      } else if (error?.message?.includes('fetch')) {
+        errorMessage = 'Network error. Check your internet connection.';
       }
       
       setError(errorMessage);

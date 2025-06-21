@@ -45,6 +45,9 @@ export const auth = betterAuth({
         google: {
             clientId: process.env.GOOGLE_CLIENT_ID as string,
             clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+            redirectURI: process.env.NODE_ENV === 'production' 
+                ? "https://main.d2q5p14flkja4s.amplifyapp.com/api/auth/callback/google"
+                : "http://localhost:3000/api/auth/callback/google",
         },
     },
     session: {
