@@ -45,6 +45,7 @@ export default function AuthFormShadcn({ onSuccess }: AuthFormProps) {
       setError(''); // Clear any existing errors
       
       console.log('Starting Google OAuth flow...');
+      console.log('Current origin:', window.location.origin);
       
       // Better Auth social sign-in should redirect to OAuth provider
       const result = await authClient.signIn.social({
@@ -63,12 +64,24 @@ export default function AuthFormShadcn({ onSuccess }: AuthFormProps) {
       
       // If we reach here without redirect, there might be an issue
       console.log('Google OAuth initiated but no redirect URL received');
+      console.log('Result:', result);
       setIsLoading(false);
-      setError('Google sign-in did not redirect as expected. Please try again.');
+      setError('Google sign-in configuration issue. Please check your OAuth settings.');
       
-    } catch (error) {
+    } catch (error: any) {
       console.error('Google sign-in error:', error);
-      setError('Failed to sign in with Google. Please try again.');
+      console.error('Error details:', {
+        message: error?.message,
+        stack: error?.stack,
+        name: error?.name
+      });
+      
+      let errorMessage = 'Failed to sign in with Google. Please try again.';
+      if (error?.message?.includes('redirect')) {
+        errorMessage = 'OAuth redirect configuration error. Please contact support.';
+      }
+      
+      setError(errorMessage);
       setIsLoading(false);
     }
   };

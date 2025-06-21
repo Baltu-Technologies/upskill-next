@@ -2,6 +2,20 @@ import { Pool } from "pg";
 import { nextCookies } from "better-auth/next-js";
 import { betterAuth } from "better-auth";
 
+// Get the correct base URL for the environment
+const getBaseURL = () => {
+    // In production, use BETTER_AUTH_URL or construct from Amplify
+    if (process.env.BETTER_AUTH_URL) return process.env.BETTER_AUTH_URL;
+    if (process.env.NEXTAUTH_URL) return process.env.NEXTAUTH_URL;
+    
+    // For Amplify, check if we're in production
+    if (process.env.AWS_BRANCH && process.env.AWS_APP_ID) {
+        return `https://${process.env.AWS_BRANCH}.${process.env.AWS_APP_ID}.amplifyapp.com`;
+    }
+    
+    return "http://localhost:3000";
+};
+
 export const auth = betterAuth({
     database: new Pool({
         connectionString: process.env.BETTER_AUTH_DATABASE_URL,
@@ -13,12 +27,13 @@ export const auth = betterAuth({
         connectionTimeoutMillis: 2000,
     }),
     secret: process.env.BETTER_AUTH_SECRET || process.env.AUTH_SECRET, // Fallback for compatibility
-    baseURL: process.env.BETTER_AUTH_URL || process.env.NEXTAUTH_URL || "http://localhost:3000",
+    baseURL: getBaseURL(),
     trustedOrigins: [
         "http://localhost:3000",
         "http://localhost:3001", 
         "http://localhost:3002",
-        "https://main.d2q5p14flkja4s.amplifyapp.com"
+        "https://main.d2q5p14flkja4s.amplifyapp.com",
+        "https://4flkja4s.amplifyapp.com"
     ],
     appName: "upskill-next",
     plugins: [nextCookies()],
