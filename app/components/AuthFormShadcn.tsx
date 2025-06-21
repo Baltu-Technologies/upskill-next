@@ -78,8 +78,11 @@ export default function AuthFormShadcn({ onSuccess }: AuthFormProps) {
     setError('');
 
     try {
+      console.log(`Starting ${currentStep} with:`, { email: formData.email });
+      
+      let result;
       if (currentStep === 'signIn') {
-        await authClient.signIn.email({
+        result = await authClient.signIn.email({
           email: formData.email,
           password: formData.password,
           callbackURL: '/dashboard'
@@ -90,7 +93,7 @@ export default function AuthFormShadcn({ onSuccess }: AuthFormProps) {
           return;
         }
         
-        await authClient.signUp.email({
+        result = await authClient.signUp.email({
           email: formData.email,
           password: formData.password,
           name: `${formData.firstName} ${formData.lastName}`.trim(),
@@ -98,8 +101,21 @@ export default function AuthFormShadcn({ onSuccess }: AuthFormProps) {
         });
       }
       
-      onSuccess();
+      console.log(`${currentStep} result:`, result);
+      
+      // Check if authentication was successful
+      if (result?.data?.user) {
+        console.log('Authentication successful, calling onSuccess');
+        onSuccess();
+      } else if (result?.error) {
+        console.error('Authentication error:', result.error);
+        setError(result.error.message || `Failed to ${currentStep === 'signIn' ? 'sign in' : 'sign up'}`);
+      } else {
+        console.log('Authentication response unclear, calling onSuccess anyway');
+        onSuccess();
+      }
     } catch (err: any) {
+      console.error(`${currentStep} error:`, err);
       setError(err?.message || `Failed to ${currentStep === 'signIn' ? 'sign in' : 'sign up'}`);
     } finally {
       setIsLoading(false);
