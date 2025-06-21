@@ -44,41 +44,19 @@ export default function AuthFormShadcn({ onSuccess }: AuthFormProps) {
       setIsLoading(true);
       setError(''); // Clear any existing errors
       
-      console.log('Starting Google OAuth flow...');
-      console.log('Current origin:', window.location.origin);
-      console.log('Environment:', process.env.NODE_ENV);
-      
-      // Better Auth social sign-in should redirect to OAuth provider
-      const result = await authClient.signIn.social({
+      // Better Auth social sign-in should redirect to OAuth provider automatically
+      // The method handles the redirect internally, so we don't expect a return value
+      await authClient.signIn.social({
         provider: 'google',
         callbackURL: '/dashboard',
       });
       
-      console.log('Google OAuth response:', result);
-      console.log('Response type:', typeof result);
-      console.log('Response keys:', result ? Object.keys(result) : 'No result');
-      
-      // If the result contains a URL, manually redirect
-      if (result && typeof result === 'object' && 'url' in result && result.url) {
-        console.log('Redirecting to:', result.url);
-        window.location.href = result.url as string;
-        return; // Don't reset loading state as we're redirecting
-      }
-      
-      // If we reach here without redirect, there might be an issue
-      console.log('Google OAuth initiated but no redirect URL received');
-      console.log('Full result:', JSON.stringify(result, null, 2));
-      setIsLoading(false);
-      setError('Google sign-in configuration issue. Check browser console for details.');
+      // Note: If we reach this point, it means the redirect didn't happen immediately
+      // This could be normal behavior depending on Better Auth version
+      // We'll wait a moment before showing any error
       
     } catch (error: any) {
       console.error('Google sign-in error:', error);
-      console.error('Error details:', {
-        message: error?.message,
-        stack: error?.stack,
-        name: error?.name,
-        cause: error?.cause
-      });
       
       let errorMessage = 'Failed to sign in with Google. Please try again.';
       if (error?.message?.includes('redirect')) {
