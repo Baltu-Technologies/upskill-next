@@ -14,6 +14,12 @@ export const auth = betterAuth({
     }),
     secret: process.env.BETTER_AUTH_SECRET || process.env.AUTH_SECRET, // Fallback for compatibility
     baseURL: process.env.BETTER_AUTH_URL || process.env.NEXTAUTH_URL || "http://localhost:3000",
+    trustedOrigins: [
+        "http://localhost:3000",
+        "http://localhost:3001", 
+        "http://localhost:3002",
+        "https://main.d2q5p14flkja4s.amplifyapp.com"
+    ],
     appName: "upskill-next",
     plugins: [nextCookies()],
     emailAndPassword: {
@@ -47,7 +53,7 @@ export const auth = betterAuth({
         }
     },
     advanced: {
-        generateId: false,
+        generateId: () => crypto.randomUUID(), // Enable ID generation
         crossSubDomainCookies: {
             enabled: false,
         },
