@@ -24,6 +24,11 @@ frontend:
         - npm install @parcel/watcher --save-optional || echo "Watcher install failed, continuing..."
     build:
       commands:
+        - env | grep -e BETTER_AUTH_DATABASE_URL >> .env.production
+        - env | grep -e BETTER_AUTH_SECRET >> .env.production
+        - env | grep -e BETTER_AUTH_URL >> .env.production
+        - env | grep -e GOOGLE_CLIENT_ID >> .env.production
+        - env | grep -e GOOGLE_CLIENT_SECRET >> .env.production
         - npm run build
   artifacts:
     baseDirectory: .next
@@ -31,6 +36,7 @@ frontend:
       - '**/*'
   cache:
     paths:
+      - node_modules/**/*
       - .next/cache/**/*
   customHeaders:
     - pattern: '**/*'
