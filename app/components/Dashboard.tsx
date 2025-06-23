@@ -249,26 +249,13 @@ export default function Dashboard() {
 
   return (
     <div className="sidebar-layout">
-      {/* Desktop Sidebar - Always rendered but fixed positioned */}
-      <div className="hidden md:block">
+      {/* Desktop Sidebar Only - Hidden on Mobile/Tablet */}
+      <div className="hidden lg:block">
         <CollapsibleSidebar 
           isCollapsed={isSidebarCollapsed} 
           onToggle={() => setIsSidebarCollapsed(!isSidebarCollapsed)} 
         />
       </div>
-
-      {/* Mobile Sidebar Overlay */}
-      {!isSidebarCollapsed && (
-        <div className="fixed inset-0 z-50 md:hidden">
-          <div className="absolute inset-0 bg-background/80 backdrop-blur-sm" onClick={() => setIsSidebarCollapsed(true)} />
-          <div className="absolute left-0 top-0 h-full max-w-[80vw]">
-            <CollapsibleSidebar 
-              isCollapsed={false} 
-              onToggle={() => setIsSidebarCollapsed(true)} 
-            />
-          </div>
-        </div>
-      )}
       
       {/* Main Content Area */}
       <div className={cn("sidebar-content", isSidebarCollapsed && "collapsed")}>
@@ -276,17 +263,8 @@ export default function Dashboard() {
         <header className="sticky top-0 z-50 w-full bg-gradient-to-r from-slate-200/95 via-slate-100/95 to-slate-200/95 dark:from-[hsl(222,84%,8%)] dark:via-[hsl(222,84%,6%)] dark:to-[hsl(222,84%,8%)] backdrop-blur-xl border-b border-slate-300/50 dark:border-[hsl(217,33%,17%)]/30 shadow-sm">
           <div className="sidebar-aware-container">
             <div className="flex items-center justify-between py-4">
-              {/* Left: Mobile Menu + Greeting */}
+              {/* Left: Greeting Only */}
               <div className="flex items-center gap-4">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="md:hidden h-9 w-9 rounded-xl bg-slate-200/60 hover:bg-slate-300/80 text-slate-600 hover:text-[hsl(217,91%,60%)] dark:bg-[hsl(222,84%,12%)] dark:hover:bg-[hsl(222,84%,15%)] dark:text-[hsl(210,40%,98%)] dark:hover:text-[hsl(217,91%,60%)] transition-all duration-300 hover:scale-105"
-                  onClick={() => setIsSidebarCollapsed(false)}
-                >
-                  <Menu className="h-4 w-4" />
-                </Button>
-                
                 <div className="flex flex-col">
                   <h1 className="text-xl md:text-2xl font-bold text-slate-700 dark:text-[hsl(210,40%,98%)]">
                     {getGreeting()}, {user?.signInDetails?.loginId?.split('@')[0] || 'Learner'}!
@@ -296,9 +274,9 @@ export default function Dashboard() {
 
               {/* Right: Stats Dashboard with Collapse Toggle */}
               <div className="flex items-center gap-4">
-                {/* Expandable Stats Display */}
+                {/* Expandable Stats Display - Desktop Only */}
                 {showStatsPanel && (
-                  <div className="hidden md:flex items-center gap-6 animate-in slide-in-from-right-4 duration-300">
+                  <div className="hidden lg:flex items-center gap-6 animate-in slide-in-from-right-4 duration-300">
                     {/* Streak */}
                     <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-200/60 dark:bg-[hsl(222,84%,12%)] backdrop-blur-sm">
                       <div className="w-6 h-6 rounded-lg bg-gradient-to-r from-orange-500/20 to-red-500/20 flex items-center justify-center">
@@ -353,8 +331,8 @@ export default function Dashboard() {
                   </div>
                 )}
 
-                {/* Mobile Stats (compact) - always show on mobile */}
-                <div className="md:hidden flex items-center gap-2">
+                {/* Mobile/Tablet Stats (compact) - show on mobile and tablet */}
+                <div className="lg:hidden flex items-center gap-2">
                   <div className="flex items-center gap-1 px-2 py-1 rounded-lg bg-slate-200/60 dark:bg-[hsl(222,84%,12%)]">
                     <Flame className="h-3 w-3 text-orange-600" />
                     <span className="text-xs font-bold text-orange-600">{learningStreak}</span>
