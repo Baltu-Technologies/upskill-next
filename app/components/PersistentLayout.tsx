@@ -69,11 +69,12 @@ export default function PersistentLayout({ children }: PersistentLayoutProps) {
         "lg:ml-16",
         !isSidebarCollapsed && "lg:ml-80"
       )}>
-        {/* Floating Top Navigation */}
-        <div className="absolute top-4 right-4 z-50">
-          <nav className="bg-white/80 dark:bg-[hsl(222,84%,8%)]/80 backdrop-blur-xl rounded-2xl border border-slate-300/50 dark:border-[hsl(217,33%,17%)]/30 px-4 py-3 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]
-                       before:content-[''] before:absolute before:inset-0 before:bg-gradient-to-b before:from-white/20 before:via-transparent before:to-transparent before:backdrop-blur-[2px] before:z-[-1] before:rounded-2xl
-                       dark:before:from-black/20">
+        {/* Top Navigation - Fixed on Mobile, Floating on Desktop */}
+        <div className="fixed top-0 left-0 right-0 z-50 lg:absolute lg:top-4 lg:right-4 lg:left-auto">
+          <nav className="bg-white/95 dark:bg-[hsl(222,84%,8%)]/95 backdrop-blur-xl border-b border-slate-300/50 dark:border-[hsl(217,33%,17%)]/30 px-4 py-3 shadow-lg 
+                       lg:bg-white/80 lg:dark:bg-[hsl(222,84%,8%)]/80 lg:rounded-2xl lg:border lg:hover:shadow-xl lg:transition-all lg:duration-300 lg:hover:scale-[1.02]
+                       lg:before:content-[''] lg:before:absolute lg:before:inset-0 lg:before:bg-gradient-to-b lg:before:from-white/20 lg:before:via-transparent lg:before:to-transparent lg:before:backdrop-blur-[2px] lg:before:z-[-1] lg:before:rounded-2xl
+                       lg:dark:before:from-black/20">
             <div className="flex items-center gap-3">
 
                         {/* Gamification Stats + Toggle */}
@@ -297,7 +298,7 @@ export default function PersistentLayout({ children }: PersistentLayoutProps) {
         </div>
 
         {/* Page Content */}
-        <main className="flex-1 overflow-auto pt-6 pr-6 pb-20 lg:pb-6">
+        <main className="flex-1 overflow-auto pt-20 lg:pt-6 px-6 pb-20 lg:pb-6">
           {children}
         </main>
       </div>
