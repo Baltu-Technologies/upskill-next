@@ -631,6 +631,85 @@ export default function CollapsibleSidebar({ isCollapsed, onToggle }: SidebarPro
     };
   }, []);
 
+  // Mobile swipe gesture handling
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
+
+  // Minimum swipe distance (in pixels)
+  const minSwipeDistance = 50;
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    if (!isMobile) return;
+    setTouchEnd(null); // otherwise the swipe is fired even with usual touch events
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const onTouchMove = (e: React.TouchEvent) => {
+    if (!isMobile) return;
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const onTouchEnd = () => {
+    if (!isMobile || !touchStart || !touchEnd) return;
+    
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+
+    // Swipe left to collapse when menu is open
+    if (isLeftSwipe && !isCollapsed) {
+      onToggle();
+    }
+    
+    // Swipe right to expand when menu is collapsed
+    // Only trigger if swipe starts near the left edge of screen
+    if (isRightSwipe && isCollapsed && touchStart <= 50) {
+      onToggle();
+    }
+  };
+
+  // Add global touch handler for opening sidebar from screen edge when collapsed
+  useEffect(() => {
+    if (!isMobile) return;
+
+    const handleGlobalTouchStart = (e: TouchEvent) => {
+      // Only handle when sidebar is collapsed and touch starts from left edge
+      if (isCollapsed && e.touches[0].clientX <= 20) {
+        setTouchStart(e.touches[0].clientX);
+        setTouchEnd(null);
+      }
+    };
+
+    const handleGlobalTouchMove = (e: TouchEvent) => {
+      if (isCollapsed && touchStart !== null && touchStart <= 20) {
+        setTouchEnd(e.touches[0].clientX);
+      }
+    };
+
+    const handleGlobalTouchEnd = () => {
+      if (isCollapsed && touchStart !== null && touchEnd !== null && touchStart <= 20) {
+        const distance = touchStart - touchEnd;
+        const isRightSwipe = distance < -minSwipeDistance;
+        
+        if (isRightSwipe) {
+          onToggle();
+        }
+      }
+      setTouchStart(null);
+      setTouchEnd(null);
+    };
+
+    document.addEventListener('touchstart', handleGlobalTouchStart, { passive: true });
+    document.addEventListener('touchmove', handleGlobalTouchMove, { passive: true });
+    document.addEventListener('touchend', handleGlobalTouchEnd);
+
+    return () => {
+      document.removeEventListener('touchstart', handleGlobalTouchStart);
+      document.removeEventListener('touchmove', handleGlobalTouchMove);
+      document.removeEventListener('touchend', handleGlobalTouchEnd);
+    };
+  }, [isMobile, isCollapsed, touchStart, touchEnd, onToggle]);
+
   return (
     <div 
         className={cn(
@@ -658,6 +737,9 @@ export default function CollapsibleSidebar({ isCollapsed, onToggle }: SidebarPro
           fontFamily: "'Inter Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
           zIndex: 40 
         }}
+        onTouchStart={onTouchStart}
+        onTouchMove={onTouchMove}
+        onTouchEnd={onTouchEnd}
       >
       {/* Sidebar Header with Career Profile */}
       <div className="bg-gradient-to-r from-slate-300/80 to-slate-200/80 dark:from-[hsl(222,84%,10%)] dark:to-[hsl(222,84%,12%)] backdrop-blur-sm border-b border-slate-300/70 dark:border-[hsl(217,33%,17%)]/20">
