@@ -16,6 +16,7 @@ import {
   X
 } from 'lucide-react';
 import CollapsibleSidebar from './CollapsibleSidebar';
+import MobileBottomNav from './MobileBottomNav';
 import { cn } from '@/lib/utils';
 
 interface PersistentLayoutProps {
@@ -54,16 +55,19 @@ export default function PersistentLayout({ children }: PersistentLayoutProps) {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800 flex overflow-hidden">
-      {/* Sidebar */}
-      <CollapsibleSidebar 
-        isCollapsed={isSidebarCollapsed} 
-        onToggle={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-      />
+      {/* Sidebar - Desktop Only */}
+      <div className="hidden lg:block">
+        <CollapsibleSidebar 
+          isCollapsed={isSidebarCollapsed} 
+          onToggle={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+        />
+      </div>
 
       {/* Main Content Area */}
       <div className={cn(
         "flex-1 flex flex-col transition-all duration-300 overflow-hidden",
-        isSidebarCollapsed ? "ml-16" : "ml-80"
+        "lg:ml-16",
+        !isSidebarCollapsed && "lg:ml-80"
       )}>
         {/* Floating Top Navigation */}
         <div className="absolute top-4 right-4 z-50">
@@ -75,7 +79,7 @@ export default function PersistentLayout({ children }: PersistentLayoutProps) {
                         {/* Gamification Stats + Toggle */}
             {/* Desktop Gamification Stats with Swipe Animation */}
             {showStatsPanel && (
-              <div className="hidden md:flex items-center gap-3 transition-all duration-500 ease-in-out transform animate-in slide-in-from-right-4 fade-in">
+              <div className="hidden lg:flex items-center gap-3 transition-all duration-500 ease-in-out transform animate-in slide-in-from-right-4 fade-in">
               {/* Learning Streak */}
               <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-200/60 dark:bg-[hsl(222,84%,12%)] backdrop-blur-sm hover:scale-105 transition-all duration-200">
                 <div className="w-6 h-6 rounded-lg bg-gradient-to-r from-orange-500/20 to-red-500/20 flex items-center justify-center">
@@ -121,7 +125,7 @@ export default function PersistentLayout({ children }: PersistentLayoutProps) {
 
             {/* Mobile Stats with Swipe Animation */}
             {showStatsPanel && (
-              <div className="md:hidden flex items-center gap-2 transition-all duration-500 ease-in-out transform animate-in slide-in-from-right-2 fade-in">
+              <div className="lg:hidden flex items-center gap-2 transition-all duration-500 ease-in-out transform animate-in slide-in-from-right-2 fade-in">
               <div className="flex items-center gap-1 px-2 py-1 rounded-lg bg-slate-200/60 dark:bg-[hsl(222,84%,12%)] hover:scale-105 transition-all duration-200">
                 <Flame className="h-3 w-3 text-orange-600" />
                 <span className="text-xs font-bold text-orange-600">15</span>
@@ -293,10 +297,13 @@ export default function PersistentLayout({ children }: PersistentLayoutProps) {
         </div>
 
         {/* Page Content */}
-        <main className="flex-1 overflow-auto pt-6 pr-6">
+        <main className="flex-1 overflow-auto pt-6 pr-6 pb-20 lg:pb-6">
           {children}
         </main>
       </div>
+      
+      {/* Mobile Bottom Navigation */}
+      <MobileBottomNav />
     </div>
   );
 } 

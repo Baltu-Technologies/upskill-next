@@ -58,7 +58,7 @@ import {
 } from 'lucide-react';
 import CourseCarousel from './CourseCarousel';
 import CollapsibleSidebar from './CollapsibleSidebar';
-import MobileBottomNav from './MobileBottomNav';
+
 import { cn } from '@/lib/utils';
 
 export default function Dashboard() {
@@ -248,118 +248,10 @@ export default function Dashboard() {
   ];
 
   return (
-    <div className="sidebar-layout">
-      {/* Desktop Sidebar Only - Hidden on Mobile/Tablet */}
-      <div className="hidden lg:block">
-        <CollapsibleSidebar 
-          isCollapsed={isSidebarCollapsed} 
-          onToggle={() => setIsSidebarCollapsed(!isSidebarCollapsed)} 
-        />
-      </div>
-      
-      {/* Main Content Area */}
-      <div className={cn("sidebar-content", isSidebarCollapsed && "collapsed")}>
-        {/* Header Bar */}
-        <header className="sticky top-0 z-50 w-full bg-gradient-to-r from-slate-200/95 via-slate-100/95 to-slate-200/95 dark:from-[hsl(222,84%,8%)] dark:via-[hsl(222,84%,6%)] dark:to-[hsl(222,84%,8%)] backdrop-blur-xl border-b border-slate-300/50 dark:border-[hsl(217,33%,17%)]/30 shadow-sm">
-          <div className="sidebar-aware-container">
-            <div className="flex items-center justify-between py-4">
-              {/* Left: Greeting Only */}
-              <div className="flex items-center gap-4">
-                <div className="flex flex-col">
-                  <h1 className="text-xl md:text-2xl font-bold text-slate-700 dark:text-[hsl(210,40%,98%)]">
-                    {getGreeting()}, {user?.signInDetails?.loginId?.split('@')[0] || 'Learner'}!
-                  </h1>
-                </div>
-              </div>
-
-              {/* Right: Stats Dashboard with Collapse Toggle */}
-              <div className="flex items-center gap-4">
-                {/* Expandable Stats Display - Desktop Only */}
-                {showStatsPanel && (
-                  <div className="hidden lg:flex items-center gap-6 animate-in slide-in-from-right-4 duration-300">
-                    {/* Streak */}
-                    <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-200/60 dark:bg-[hsl(222,84%,12%)] backdrop-blur-sm">
-                      <div className="w-6 h-6 rounded-lg bg-gradient-to-r from-orange-500/20 to-red-500/20 flex items-center justify-center">
-                        <Flame className="h-3 w-3 text-orange-600" />
-                      </div>
-                      <div className="text-center">
-                        <div className="text-sm font-bold text-orange-600">{learningStreak}</div>
-                        <div className="text-xs text-slate-500 dark:text-[hsl(210,40%,98%)]/70">Streak</div>
-                      </div>
-                    </div>
-
-                    {/* This Week */}
-                    <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-200/60 dark:bg-[hsl(222,84%,12%)] backdrop-blur-sm">
-                      <div className="w-6 h-6 rounded-lg bg-gradient-to-r from-blue-500/20 to-indigo-500/20 flex items-center justify-center">
-                        <Calendar className="h-3 w-3 text-blue-600" />
-                      </div>
-                      <div className="text-center">
-                        <div className="text-sm font-bold text-blue-600">8.5h</div>
-                        <div className="text-xs text-slate-500 dark:text-[hsl(210,40%,98%)]/70">This Week</div>
-                      </div>
-                    </div>
-
-                    {/* Total XP */}
-                    <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-200/60 dark:bg-[hsl(222,84%,12%)] backdrop-blur-sm">
-                      <div className="w-6 h-6 rounded-lg bg-gradient-to-r from-purple-500/20 to-violet-500/20 flex items-center justify-center">
-                        <Zap className="h-3 w-3 text-purple-600" />
-                      </div>
-                      <div className="text-center">
-                        <div className="text-sm font-bold text-purple-600">{currentXP.toLocaleString()}</div>
-                        <div className="text-xs text-slate-500 dark:text-[hsl(210,40%,98%)]/70">Total XP</div>
-                      </div>
-                    </div>
-
-                    {/* Weekly Goal Progress */}
-                    <div className="flex items-center gap-3 px-3 py-2 rounded-xl bg-slate-200/60 dark:bg-[hsl(222,84%,12%)] backdrop-blur-sm">
-                      <div className="w-6 h-6 rounded-lg bg-gradient-to-r from-green-500/20 to-emerald-500/20 flex items-center justify-center">
-                        <Target className="h-3 w-3 text-green-600" />
-                      </div>
-                      <div className="flex flex-col items-center gap-1">
-                        <div className="text-xs text-slate-500 dark:text-[hsl(210,40%,98%)]/70">Weekly Goal</div>
-                        <div className="flex items-center gap-2">
-                          <div className="w-16 bg-slate-300/60 dark:bg-[hsl(222,84%,15%)] rounded-full h-1.5">
-                            <div 
-                              className="bg-gradient-to-r from-green-500 to-emerald-500 h-1.5 rounded-full transition-all duration-300"
-                              style={{ width: '75%' }}
-                            ></div>
-                          </div>
-                          <span className="text-xs font-bold text-green-600">75%</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* Mobile/Tablet Stats (compact) - show on mobile and tablet */}
-                <div className="lg:hidden flex items-center gap-2">
-                  <div className="flex items-center gap-1 px-2 py-1 rounded-lg bg-slate-200/60 dark:bg-[hsl(222,84%,12%)]">
-                    <Flame className="h-3 w-3 text-orange-600" />
-                    <span className="text-xs font-bold text-orange-600">{learningStreak}</span>
-                  </div>
-                  <div className="flex items-center gap-1 px-2 py-1 rounded-lg bg-slate-200/60 dark:bg-[hsl(222,84%,12%)]">
-                    <Zap className="h-3 w-3 text-purple-600" />
-                    <span className="text-xs font-bold text-purple-600">{Math.floor(currentXP/1000)}k</span>
-                  </div>
-                </div>
-
-                {/* Gamification Toggle Button */}
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-10 w-10 rounded-xl bg-slate-200/60 hover:bg-slate-300/80 text-slate-600 hover:text-[hsl(217,91%,60%)] dark:bg-[hsl(222,84%,12%)] dark:hover:bg-[hsl(222,84%,15%)] dark:text-[hsl(210,40%,98%)] dark:hover:text-[hsl(217,91%,60%)] transition-all duration-300 hover:scale-105 group"
-                  onClick={() => setShowStatsPanel(!showStatsPanel)}
-                >
-                  <Gamepad2 className="h-5 w-5 transition-transform duration-500 group-hover:rotate-[360deg]" />
-                </Button>
-              </div>
-            </div>
-          </div>
-        </header>
-
-        {/* Main Content with proper overflow handling */}
-        <main className="sidebar-main">
-          <div className="max-w-none space-y-8">
+    <div className="w-full">
+      {/* Main Content with proper overflow handling */}
+      <main className="p-6 pb-20 lg:pb-6">
+        <div className="max-w-none space-y-8">
             {/* Welcome Bar */}
             <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-indigo-50 via-blue-50 to-cyan-50 dark:from-indigo-950/30 dark:via-blue-950/30 dark:to-cyan-950/30 p-6 shadow-lg hover:shadow-xl transition-all duration-300 group">
               <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/10 to-cyan-500/10 opacity-50"></div>
@@ -946,10 +838,8 @@ export default function Dashboard() {
             </div>
           </div>
         </main>
-      </div>
       
-      {/* Mobile Bottom Navigation */}
-      <MobileBottomNav />
+
     </div>
   );
 } 

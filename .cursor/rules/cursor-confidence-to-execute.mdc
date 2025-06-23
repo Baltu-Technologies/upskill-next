@@ -1,0 +1,26 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# 🔒 Cursor Rule: Require ≥ 95% Confidence Before Acting
+
+## Rule ID
+confidence-threshold-rule
+
+## Description
+Cursor must not execute code, commit, push, or take significant action unless it is at least **95% confident** in the correctness of its proposed solution.
+
+## Behavior
+
+- Before executing code, making a commit, pushing changes, or taking any significant action, Cursor should self-assess its confidence level.
+- If confidence is **≥ 95%**, proceed as normal.
+- If confidence is **below 95% but ≥ 90%**, treat it as a *red flag*: Cursor must **ask clarifying questions** or **flag uncertainty** before proceeding.
+- If confidence is **below 90%**, do **not proceed** and explicitly state that it cannot provide a reliable solution.
+
+## Rationale
+
+- Community best practices advise:
+  > “If you think there might not be a correct answer, you say so… Provide a confidence level… I have found a confidence level below 95% is an amber flag, 90–95% is a red flag, anything below 90% is usually garbage.” :contentReference[oaicite:1]{index=1}
+- Prompt-engineering guidance also recommends:
+  > “Ask clarifying questions until you are 95% sure you can complete the task successfully.” :contentReference[oaicite:2]{index=2}

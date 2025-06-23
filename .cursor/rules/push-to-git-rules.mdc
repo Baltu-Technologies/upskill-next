@@ -1,0 +1,8 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+Cursor must never push changes to Git automatically.
+Before executing any git push, Cursor must ask the user for permission.
+If the user does not explicitly approve, the push must be canceled.
