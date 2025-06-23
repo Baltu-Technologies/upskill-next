@@ -64,54 +64,32 @@ interface SubMenuItem {
   badge?: string;
 }
 
-// Career Profile item (separate from main nav)
-const careerProfileItem: NavItem = {
-  title: 'My Career Profile',
-  icon: User,
-  color: 'text-cyan-500',
-  isProfile: true,
-  href: '/profile',
-  submenu: [
-    {
-      title: 'My Profile',
-      href: '/profile',
-      active: false
-    },
-    {
-      title: 'Skills Profile',
-      href: '/profile?tab=skills',
-      active: false
-    },
-    {
-      title: 'My Pathways',
-      href: '/profile?tab=pathways',
-      active: false
-    },
-    {
-      title: 'Project Showcase',
-      href: '/profile?tab=projects',
-      badge: '3',
-      active: false
-    },
-    {
-      title: 'Certifications',
-      href: '/profile?tab=certifications',
-      badge: '8',
-      active: false
-    }
-  ]
-};
-
-// Stats & Goals item (separate menu item)
-const statsGoalsItem: NavItem = {
-  title: 'My Stats & Goals',
-  icon: TrendingUp,
-  color: 'text-emerald-500',
-  href: '/stats-goals',
-  active: false
-};
-
 const mainNavItems: NavItem[] = [
+  // User Profile - Shows user's name with profile submenu
+  {
+    title: 'Peter Costa',
+    icon: User,
+    color: 'text-cyan-500',
+    isProfile: true,
+    href: '/profile',
+    submenu: [
+      {
+        title: 'My Profile',
+        href: '/profile',
+        active: false
+      },
+      {
+        title: 'Study Hub',
+        href: '/study-hub/study-list',
+        active: false
+      },
+      {
+        title: 'My Stats & Goals',
+        href: '/stats-goals',
+        active: false
+      }
+    ]
+  },
   {
     title: 'Home',
     icon: Home,
@@ -216,31 +194,7 @@ const mainNavItems: NavItem[] = [
         active: false
       }
     ]
-  },
-  {
-    title: 'Study Hub',
-    icon: GraduationCap,
-    color: 'text-indigo-500',
-    href: '/study-hub/study-list',
-    submenu: [
-      {
-        title: 'My Study List',
-        href: '/study-hub/study-list',
-        active: false
-      },
-      {
-        title: 'My Notes',
-        href: '/study-hub/notes',
-        active: false
-      },
-      {
-        title: 'Dojo',
-        href: '/study-hub/dojo',
-        active: false
-      }
-    ]
-  },
-  statsGoalsItem
+  }
 ];
 
 const bottomNavItems: NavItem[] = [
@@ -659,46 +613,50 @@ export default function CollapsibleSidebar({ isCollapsed, onToggle }: SidebarPro
           zIndex: 40 
         }}
       >
-      {/* Sidebar Header with Career Profile */}
-      <div className="bg-gradient-to-r from-slate-300/80 to-slate-200/80 dark:from-[hsl(222,84%,10%)] dark:to-[hsl(222,84%,12%)] backdrop-blur-sm border-b border-slate-300/70 dark:border-[hsl(217,33%,17%)]/20">
+      {/* Logo Section with Toggle Button */}
+      <div className="px-4 py-6 border-b border-slate-300/50 dark:border-[hsl(217,33%,17%)]/30 bg-gradient-to-r from-slate-300/80 to-slate-200/80 dark:from-[hsl(222,84%,10%)] dark:to-[hsl(222,84%,12%)] backdrop-blur-sm">
         {isCollapsed ? (
-          /* Collapsed State - Show only toggle button centered */
-          <div className="flex items-center justify-center p-4">
+          /* Collapsed State - Show logo icon and toggle button */
+          <div className="flex flex-col items-center gap-3">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
+              <span className="text-white font-bold text-sm">U</span>
+            </div>
             <Button
               variant="ghost"
               size="icon"
               onClick={onToggle}
-              className="h-8 w-8 bg-slate-300/80 hover:bg-slate-400/80 text-slate-600 hover:text-[hsl(217,91%,60%)]
+              className="h-6 w-6 bg-slate-300/80 hover:bg-slate-400/80 text-slate-600 hover:text-[hsl(217,91%,60%)]
                         dark:bg-[hsl(222,84%,12%)] dark:hover:bg-[hsl(222,84%,15%)] dark:text-[hsl(210,40%,98%)] dark:hover:text-[hsl(217,91%,60%)]
-                        hover:scale-110 transition-all duration-300 hover:rotate-180 rounded-full border-none"
+                        hover:scale-105 transition-all duration-200 rounded-full border-none"
             >
-              <ChevronRight className="h-4 w-4 transition-transform duration-300" />
+              <ChevronRight className="h-3 w-3" />
             </Button>
           </div>
         ) : (
-          /* Expanded State - Show both profile and toggle */
-          <div className="flex items-center justify-between p-4">
-            {/* Career Profile Section */}
-            <div className="flex-1 mr-4">
-              <InteractiveNavButton
-                item={careerProfileItem}
-                isCollapsed={isCollapsed}
-                isActive={false}
-                expandedMenus={expandedMenus}
-                onToggleSubmenu={handleToggleSubmenu}
-              />
+          /* Expanded State - Show full logo with toggle button on the right */
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center shadow-lg">
+                <span className="text-white font-bold text-lg">U</span>
+              </div>
+              <div>
+                <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                  Upskill
+                </h1>
+                <p className="text-xs text-slate-500 dark:text-[hsl(210,40%,98%)]/60">
+                  Learn. Grow. Succeed.
+                </p>
+              </div>
             </div>
-            
-            {/* Toggle Button */}
             <Button
               variant="ghost"
               size="icon"
               onClick={onToggle}
               className="h-8 w-8 bg-slate-300/80 hover:bg-slate-400/80 text-slate-600 hover:text-[hsl(217,91%,60%)]
                         dark:bg-[hsl(222,84%,12%)] dark:hover:bg-[hsl(222,84%,15%)] dark:text-[hsl(210,40%,98%)] dark:hover:text-[hsl(217,91%,60%)]
-                        hover:scale-110 transition-all duration-300 hover:rotate-180 rounded-full border-none flex-shrink-0"
+                        hover:scale-105 transition-all duration-200 rounded-full border-none flex-shrink-0"
             >
-              <ChevronLeft className="h-4 w-4 transition-transform duration-300" />
+              <ChevronLeft className="h-4 w-4" />
             </Button>
           </div>
         )}

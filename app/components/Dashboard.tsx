@@ -58,6 +58,7 @@ import {
 } from 'lucide-react';
 import CourseCarousel from './CourseCarousel';
 import CollapsibleSidebar from './CollapsibleSidebar';
+import MobileBottomNav from './MobileBottomNav';
 import { cn } from '@/lib/utils';
 
 export default function Dashboard() {
@@ -395,15 +396,6 @@ export default function Dashboard() {
                 {/* Top Row: Greeting and Quick Stats */}
                 <div className="flex items-center justify-between mb-6">
                   <div className="flex items-center gap-4">
-                    <div className="flex items-center gap-3">
-                      <div className="flex items-center gap-2">
-                        <TrendingUp className="h-6 w-6 text-primary" />
-                        <div className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                          Upskill
-                        </div>
-                      </div>
-                    </div>
-                    <div className="h-8 w-px bg-gradient-to-b from-transparent via-border to-transparent"></div>
                     <div>
                       <h2 className="text-2xl font-bold text-foreground">
                         {getGreeting()}, {user?.signInDetails?.loginId?.split('@')[0] || 'Learner'}!
@@ -977,6 +969,9 @@ export default function Dashboard() {
           </div>
         </main>
       </div>
+      
+      {/* Mobile Bottom Navigation */}
+      <MobileBottomNav />
     </div>
   );
 } 

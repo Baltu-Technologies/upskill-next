@@ -65,34 +65,17 @@ export default function PersistentLayout({ children }: PersistentLayoutProps) {
         "flex-1 flex flex-col transition-all duration-300 overflow-hidden",
         isSidebarCollapsed ? "ml-16" : "ml-80"
       )}>
-        {/* Gamified Top Navigation */}
-        <nav className="relative bg-gradient-to-b from-slate-200/60 via-slate-200/80 to-slate-200/95 dark:from-[hsl(222,84%,8%)]/60 dark:via-[hsl(222,84%,8%)]/80 dark:to-[hsl(222,84%,8%)] backdrop-blur-xl border-b border-slate-300/80 dark:border-[hsl(217,33%,17%)]/20 px-6 py-4 flex items-center justify-between z-40 shadow-sm
-                     before:content-[''] before:absolute before:inset-0 before:bg-gradient-to-b before:from-transparent before:via-white/10 before:to-transparent before:backdrop-blur-[2px] before:z-[-1]
-                     after:content-[''] after:absolute after:top-0 after:left-0 after:right-0 after:h-1/2 after:bg-gradient-to-b after:from-white/20 after:to-transparent after:backdrop-blur-[4px] after:z-[-1]
-                     dark:before:via-black/10 dark:after:from-black/20">
-          {/* Left Side: Logo/Branding */}
-          <div className="flex items-center gap-4">
-            <button 
-              onClick={() => router.push('/')}
-              className="flex items-center gap-2 group hover:scale-105 transition-all duration-200"
-            >
-              <div className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent hover:from-blue-500 hover:to-purple-500 transition-all duration-300">
-                🚀 Upskill
-              </div>
-            </button>
-          </div>
+        {/* Floating Top Navigation */}
+        <div className="absolute top-4 right-4 z-50">
+          <nav className="bg-white/80 dark:bg-[hsl(222,84%,8%)]/80 backdrop-blur-xl rounded-2xl border border-slate-300/50 dark:border-[hsl(217,33%,17%)]/30 px-4 py-3 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]
+                       before:content-[''] before:absolute before:inset-0 before:bg-gradient-to-b before:from-white/20 before:via-transparent before:to-transparent before:backdrop-blur-[2px] before:z-[-1] before:rounded-2xl
+                       dark:before:from-black/20">
+            <div className="flex items-center gap-3">
 
-          {/* Spacer for layout */}
-          <div className="flex-1"></div>
-
-          {/* Right Side: Gamification Stats + Toggle */}
-          <div className="flex items-center gap-3">
+                        {/* Gamification Stats + Toggle */}
             {/* Desktop Gamification Stats with Swipe Animation */}
-            <div className={`hidden md:flex items-center gap-3 transition-all duration-500 ease-in-out transform ${
-              showStatsPanel 
-                ? 'translate-x-0 opacity-100 scale-100' 
-                : 'translate-x-8 opacity-0 scale-95 pointer-events-none'
-            }`}>
+            {showStatsPanel && (
+              <div className="hidden md:flex items-center gap-3 transition-all duration-500 ease-in-out transform animate-in slide-in-from-right-4 fade-in">
               {/* Learning Streak */}
               <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-200/60 dark:bg-[hsl(222,84%,12%)] backdrop-blur-sm hover:scale-105 transition-all duration-200">
                 <div className="w-6 h-6 rounded-lg bg-gradient-to-r from-orange-500/20 to-red-500/20 flex items-center justify-center">
@@ -133,14 +116,12 @@ export default function PersistentLayout({ children }: PersistentLayoutProps) {
                   </div>
                 </div>
               </div>
-            </div>
+              </div>
+            )}
 
             {/* Mobile Stats with Swipe Animation */}
-            <div className={`md:hidden flex items-center gap-2 transition-all duration-500 ease-in-out transform ${
-              showStatsPanel 
-                ? 'translate-x-0 opacity-100 scale-100' 
-                : 'translate-x-4 opacity-0 scale-95 pointer-events-none'
-            }`}>
+            {showStatsPanel && (
+              <div className="md:hidden flex items-center gap-2 transition-all duration-500 ease-in-out transform animate-in slide-in-from-right-2 fade-in">
               <div className="flex items-center gap-1 px-2 py-1 rounded-lg bg-slate-200/60 dark:bg-[hsl(222,84%,12%)] hover:scale-105 transition-all duration-200">
                 <Flame className="h-3 w-3 text-orange-600" />
                 <span className="text-xs font-bold text-orange-600">15</span>
@@ -149,7 +130,8 @@ export default function PersistentLayout({ children }: PersistentLayoutProps) {
                 <Zap className="h-3 w-3 text-purple-600" />
                 <span className="text-xs font-bold text-purple-600">1.8k</span>
               </div>
-            </div>
+              </div>
+            )}
 
             {/* Gamification Toggle Button */}
             <Button
@@ -306,11 +288,12 @@ export default function PersistentLayout({ children }: PersistentLayoutProps) {
                 </div>
               </div>
             </Button>
-          </div>
-        </nav>
+            </div>
+          </nav>
+        </div>
 
         {/* Page Content */}
-        <main className="flex-1 overflow-auto pt-6">
+        <main className="flex-1 overflow-auto pt-6 pr-6">
           {children}
         </main>
       </div>
