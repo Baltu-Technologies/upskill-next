@@ -1,5 +1,10 @@
 import ResponsiveTest from '../components/ResponsiveTest';
+import PersistentLayout from '../components/PersistentLayout';
 
 export default function TestResponsivePage() {
-  return <ResponsiveTest />;
+  return (
+    <PersistentLayout>
+      <ResponsiveTest />
+    </PersistentLayout>
+  );
 } 

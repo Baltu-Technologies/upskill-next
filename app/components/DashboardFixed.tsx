@@ -1,38 +1,19 @@
 'use client';
 
-import { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuLabel, 
-  DropdownMenuSeparator, 
-  DropdownMenuTrigger 
-} from '@/components/ui/dropdown-menu';
 import { 
   BookOpen, 
   GraduationCap, 
   TrendingUp, 
   Users, 
-  Menu, 
-  User, 
-  Settings, 
-  LogOut,
-  Search,
-  Bell,
   Plus
 } from 'lucide-react';
-import ThemeToggle from './ThemeToggle';
 import CourseCarousel from './CourseCarousel';
-import CollapsibleSidebar from './CollapsibleSidebar';
-import { cn } from '@/lib/utils';
 
 export default function DashboardFixed() {
-  const { user, signOut } = useAuth();
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const { user } = useAuth();
 
   const stats = [
     {
@@ -66,107 +47,7 @@ export default function DashboardFixed() {
   ];
 
   return (
-    <div className="sidebar-layout">
-      {/* Desktop Sidebar - Always rendered but fixed positioned */}
-      <div className="hidden md:block">
-        <CollapsibleSidebar 
-          isCollapsed={isSidebarCollapsed} 
-          onToggle={() => setIsSidebarCollapsed(!isSidebarCollapsed)} 
-        />
-      </div>
-
-      {/* Mobile Sidebar Overlay */}
-      {!isSidebarCollapsed && (
-        <div className="fixed inset-0 z-50 md:hidden">
-          <div className="absolute inset-0 bg-background/80 backdrop-blur-sm" onClick={() => setIsSidebarCollapsed(true)} />
-          <div className="absolute left-0 top-0 h-full max-w-[80vw]">
-            <CollapsibleSidebar 
-              isCollapsed={false} 
-              onToggle={() => setIsSidebarCollapsed(true)} 
-            />
-          </div>
-        </div>
-      )}
-      
-      {/* Main Content Area */}
-      <div className={cn("sidebar-content", isSidebarCollapsed && "collapsed")}>
-        {/* Header */}
-        <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-          <div className="sidebar-aware-container flex h-16 items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="md:hidden"
-                onClick={() => setIsSidebarCollapsed(false)}
-              >
-                <Menu className="h-5 w-5" />
-              </Button>
-              
-              <div className="flex items-center gap-2">
-                <h1 className="text-xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent md:hidden">
-                  🚀 Upskill
-                </h1>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-4">
-              {/* Search */}
-              <Button variant="ghost" size="icon" className="hidden md:flex">
-                <Search className="h-5 w-5" />
-              </Button>
-
-              {/* Notifications */}
-              <Button variant="ghost" size="icon">
-                <Bell className="h-5 w-5" />
-              </Button>
-
-              {/* Theme Toggle */}
-              <ThemeToggle />
-
-              {/* User Menu */}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground">
-                      <User className="h-4 w-4" />
-                    </div>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56" align="end" forceMount>
-                  <DropdownMenuLabel className="font-normal">
-                    <div className="flex flex-col space-y-1">
-                      <p className="text-sm font-medium leading-none">
-                        {user?.signInDetails?.loginId || user?.email || 'User'}
-                      </p>
-                      <p className="text-xs leading-none text-muted-foreground">
-                        {user?.email || user?.signInDetails?.loginId}
-                      </p>
-                    </div>
-                  </DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem>
-                    <User className="mr-2 h-4 w-4" />
-                    <span>Profile</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <Settings className="mr-2 h-4 w-4" />
-                    <span>Settings</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={signOut}>
-                    <LogOut className="mr-2 h-4 w-4" />
-                    <span>Log out</span>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-          </div>
-        </header>
-
-        {/* Main Content with proper overflow handling */}
-        <main className="sidebar-main">
-          <div className="max-w-none space-y-8">
+    <div className="space-y-8">
             {/* Welcome Section */}
             <div className="space-y-2">
               <h2 className="text-3xl font-bold tracking-tight">
@@ -280,9 +161,6 @@ export default function DashboardFixed() {
                   </Card>
                 ))}
               </div>
-            </div>
-          </div>
-        </main>
       </div>
     </div>
   );
