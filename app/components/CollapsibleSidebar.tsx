@@ -1,41 +1,19 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
+import { useRouter, usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
-import { Input } from '@/components/ui/input';
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuLabel, 
-  DropdownMenuSeparator, 
-  DropdownMenuTrigger 
-} from '@/components/ui/dropdown-menu';
 import { 
   Home,
   BookOpen, 
-  GraduationCap, 
-  Users, 
-  TrendingUp,
   Settings,
-  Award,
   Search,
-  Bell,
-  Plus,
   ChevronLeft,
   ChevronRight,
   ChevronDown,
   User,
   Briefcase,
-  X,
-  Sun,
-  Moon,
-  Monitor,
-  LogOut,
-  HelpCircle,
-  Menu
+  HelpCircle
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTheme } from '../contexts/ThemeContext';
@@ -64,143 +42,7 @@ interface SubMenuItem {
   badge?: string;
 }
 
-const mainNavItems: NavItem[] = [
-  // User Profile - Shows user's name with profile submenu
-  {
-    title: 'Peter Costa',
-    icon: User,
-    color: 'text-cyan-500',
-    isProfile: true,
-    href: '/profile',
-    submenu: [
-      {
-        title: 'My Profile',
-        href: '/profile',
-        active: false
-      },
-      {
-        title: 'My Pathways',
-        href: '/profile?tab=pathways',
-        active: false
-      },
-      {
-        title: 'My Stats & Goals',
-        href: '/stats-goals',
-        active: false
-      },
-      {
-        title: 'Study Hub',
-        href: '/study-hub/study-list',
-        active: false
-      }
-    ]
-  },
-  {
-    title: 'Home',
-    icon: Home,
-    href: '/',
-    active: true,
-    color: 'text-blue-500'
-  },
-  {
-    title: 'Courses',
-    icon: BookOpen,
-    color: 'text-emerald-500',
-    href: '/courses',
-    submenu: [
-      {
-        title: 'Browse All Courses',
-        href: '/courses',
-        active: false
-      },
-      {
-        title: 'My Courses',
-        href: '/courses/my-courses',
-        badge: '12',
-        active: false
-      },
-      {
-        title: 'Featured Courses',
-        href: '/courses/featured',
-        active: false
-      },
-      {
-        title: 'Programming & Development',
-        href: '/courses/programming',
-        badge: '24',
-        active: false
-      },
-      {
-        title: 'Data Science & AI',
-        href: '/courses/data-science',
-        badge: '18',
-        active: false
-      },
-      {
-        title: 'Design & UX',
-        href: '/courses/design',
-        badge: '15',
-        active: false
-      },
-      {
-        title: 'Business & Marketing',
-        href: '/courses/business',
-        badge: '21',
-        active: false
-      },
-      {
-        title: 'Cloud & DevOps',
-        href: '/courses/cloud',
-        badge: '12',
-        active: false
-      },
-      {
-        title: 'Cybersecurity',
-        href: '/courses/cybersecurity',
-        badge: '9',
-        active: false
-      },
-      {
-        title: 'Free Courses',
-        href: '/courses/free',
-        badge: 'NEW',
-        active: false
-      },
-      {
-        title: 'Course Wishlist',
-        href: '/courses/wishlist',
-        badge: '5',
-        active: false
-      }
-    ]
-  },
-  {
-    title: 'Career Opportunities',
-    icon: Briefcase,
-    badge: '5',
-    color: 'text-purple-500',
-    href: '/employers/search',
-    submenu: [
-      {
-        title: 'Search Employers',
-        href: '/employers/search',
-        active: false
-      },
-      {
-        title: 'Saved Employers',
-        href: '/employers/saved',
-        badge: '3',
-        active: false
-      },
-      {
-        title: 'My Employer Connections',
-        href: '/employers/connections',
-        badge: '2',
-        active: false
-      }
-    ]
-  }
-];
+
 
 const bottomNavItems: NavItem[] = [
   // Settings moved to profile dropdown
@@ -215,6 +57,10 @@ const SubMenuItem = ({
   isCollapsed: boolean;
 }) => {
   const router = useRouter();
+  const pathname = usePathname();
+  
+  // Check if this item is active based on current pathname
+  const isActive = item.href === pathname;
   
   const handleClick = () => {
     if (item.href) {
@@ -233,19 +79,24 @@ const SubMenuItem = ({
           "ml-4 mr-1 px-2 py-2.5 text-sm rounded-lg w-[calc(100%-1.25rem)]",
           "hover:scale-105 backdrop-blur-sm border-none shadow-sm",
           item.href ? "cursor-pointer" : "cursor-default",
-          item.active 
-            ? "bg-slate-200/70 text-[hsl(217,91%,60%)]" 
-            : "bg-slate-200/50 text-slate-600 hover:bg-slate-300/70 hover:text-[hsl(217,91%,60%)]",
+          isActive 
+            ? "bg-[hsl(217,91%,60%)]/20 text-[hsl(217,91%,60%)] shadow-md border border-[hsl(217,91%,60%)]/20" 
+            : "bg-transparent text-slate-600 hover:bg-[hsl(217,91%,60%)]/10 hover:text-[hsl(217,91%,60%)] hover:shadow-sm hover:border hover:border-[hsl(217,91%,60%)]/20",
           // Dark mode variants
-          item.active
-            ? "dark:bg-[hsl(222,84%,15%)] dark:text-[hsl(217,91%,60%)]"
-            : "dark:bg-[hsl(222,84%,10%)] dark:text-[hsl(210,40%,98%)]/80 dark:hover:bg-[hsl(222,84%,15%)] dark:hover:text-[hsl(217,91%,60%)]"
+          isActive
+            ? "dark:bg-[hsl(217,91%,60%)]/20 dark:text-[hsl(217,91%,60%)] dark:shadow-md dark:border dark:border-[hsl(217,91%,60%)]/30"
+            : "dark:bg-transparent dark:text-[hsl(210,40%,98%)]/80 dark:hover:bg-[hsl(217,91%,60%)]/15 dark:hover:text-[hsl(217,91%,60%)] dark:hover:shadow-sm dark:hover:border dark:hover:border-[hsl(217,91%,60%)]/20"
         )}
         size="sm"
       >
         {/* Hover indicator line */}
-        <div className="absolute left-1 top-0 h-full w-0.5 bg-[hsl(217,91%,60%)]/50 
-                        scale-y-0 group-hover:scale-y-100 transition-transform duration-300 origin-center" />
+        <div className="absolute left-1 top-0 h-full w-0.5 bg-[hsl(217,91%,60%)]/70 
+                        scale-y-0 group-hover:scale-y-100 transition-transform duration-300 origin-center shadow-sm" />
+        
+        {/* Active indicator line */}
+        {isActive && (
+          <div className="absolute left-1 top-0 h-full w-0.5 bg-[hsl(217,91%,60%)] shadow-md" />
+        )}
         
         <span className="flex-1 text-left transition-all duration-300 group-hover:translate-x-1 leading-tight truncate min-w-0">
           {item.title}
@@ -257,7 +108,7 @@ const SubMenuItem = ({
         
         {item.badge && (
           <span className="ml-1 text-xs px-1 py-0.5 rounded-full font-medium
-                          bg-gradient-to-r from-[hsl(217,91%,60%)]/70 to-[hsl(142,71%,45%)]/70 text-white group-hover:from-[hsl(217,91%,60%)] group-hover:to-[hsl(142,71%,45%)]
+                          bg-[hsl(217,91%,60%)]/70 text-white group-hover:bg-[hsl(217,91%,60%)]
                           dark:bg-[hsl(222,84%,15%)] dark:text-[hsl(210,40%,98%)]/70 dark:group-hover:bg-[hsl(217,91%,60%)]/20 dark:group-hover:text-[hsl(217,91%,60%)] dark:bg-none
                           transition-all duration-300 group-hover:scale-110 shrink-0 flex-none">
             {item.badge}
@@ -326,12 +177,12 @@ const InteractiveNavButton = ({
           // Special styling for profile section
           item.isProfile && !isCollapsed ? "py-4 min-h-[4rem]" : "",
           isActive 
-            ? "bg-gradient-to-r from-[hsl(217,91%,60%)]/15 to-[hsl(142,71%,45%)]/15 text-[hsl(217,91%,60%)] shadow-lg shadow-[hsl(217,91%,60%)]/20" 
-            : "bg-slate-200/60 hover:bg-slate-300/80 text-slate-700 hover:text-[hsl(217,91%,60%)]",
+            ? "bg-[hsl(217,91%,60%)]/20 text-[hsl(217,91%,60%)] shadow-lg shadow-[hsl(217,91%,60%)]/25 border border-[hsl(217,91%,60%)]/30" 
+            : "bg-transparent hover:bg-[hsl(217,91%,60%)]/10 text-slate-700 hover:text-[hsl(217,91%,60%)] hover:shadow-md hover:border hover:border-[hsl(217,91%,60%)]/20",
           // Dark mode variants
           isActive
-            ? "dark:bg-gradient-to-r dark:from-[hsl(217,91%,60%)]/15 dark:to-[hsl(142,71%,45%)]/15 dark:text-[hsl(217,91%,60%)] dark:shadow-lg dark:shadow-[hsl(217,91%,60%)]/20"
-            : "dark:bg-[hsl(222,84%,12%)] dark:hover:bg-[hsl(222,84%,15%)] dark:text-[hsl(210,40%,98%)] dark:hover:text-[hsl(217,91%,60%)]"
+            ? "dark:bg-[hsl(217,91%,60%)]/20 dark:text-[hsl(217,91%,60%)] dark:shadow-lg dark:shadow-[hsl(217,91%,60%)]/25 dark:border dark:border-[hsl(217,91%,60%)]/40"
+            : "dark:bg-transparent dark:hover:bg-[hsl(217,91%,60%)]/15 dark:text-[hsl(210,40%,98%)] dark:hover:text-[hsl(217,91%,60%)] dark:hover:shadow-md dark:hover:border dark:hover:border-[hsl(217,91%,60%)]/25"
         )}
         size={isCollapsed ? "icon" : "default"}
       >
@@ -343,7 +194,7 @@ const InteractiveNavButton = ({
         {item.isProfile && !isCollapsed ? (
           <div className="flex items-center gap-3 mr-3">
             <div className="relative">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[hsl(217,91%,60%)] to-[hsl(142,71%,45%)] p-0.5">
+              <div className="w-8 h-8 rounded-full bg-[hsl(217,91%,60%)] p-0.5">
                 <div className="w-full h-full rounded-full bg-slate-100 dark:bg-[hsl(222,84%,12%)] flex items-center justify-center">
                   <Icon className="h-4 w-4 text-[hsl(217,91%,60%)]" />
                 </div>
@@ -387,7 +238,7 @@ const InteractiveNavButton = ({
                   "transition-all duration-300 group-hover:scale-110 group-hover:shadow-sm",
                   isActive 
                     ? "bg-[hsl(217,91%,60%)] text-[hsl(210,40%,98%)] shadow-md" 
-                    : "bg-gradient-to-r from-[hsl(217,91%,60%)]/80 to-[hsl(142,71%,45%)]/80 text-white group-hover:from-[hsl(217,91%,60%)] group-hover:to-[hsl(142,71%,45%)]",
+                    : "bg-[hsl(217,91%,60%)]/80 text-white group-hover:bg-[hsl(217,91%,60%)]",
                   // Dark mode variants  
                   !isActive && "dark:bg-[hsl(222,84%,15%)] dark:text-[hsl(210,40%,98%)] dark:group-hover:bg-[hsl(217,91%,60%)] dark:group-hover:text-[hsl(210,40%,98%)] dark:bg-none"
                 )}>
@@ -418,7 +269,7 @@ const InteractiveNavButton = ({
           )}>
             {item.isProfile ? (
               <div className="flex items-center gap-2">
-                <div className="w-6 h-6 rounded-full bg-gradient-to-br from-[hsl(217,91%,60%)] to-[hsl(142,71%,45%)] p-0.5">
+                <div className="w-6 h-6 rounded-full bg-[hsl(217,91%,60%)] p-0.5">
                   <div className="w-full h-full rounded-full bg-slate-100 dark:bg-[hsl(222,84%,15%)] flex items-center justify-center">
                     <User className="h-3 w-3 text-[hsl(217,91%,60%)]" />
                   </div>
@@ -488,19 +339,114 @@ const QuickActionButton = ({
 
 export default function CollapsibleSidebar({ isCollapsed, onToggle }: SidebarProps) {
   const router = useRouter();
+  const pathname = usePathname();
   const { theme, setTheme } = useTheme();
   const { signOut } = useAuth();
 
   const [expandedMenus, setExpandedMenus] = useState<Set<string>>(new Set());
   const [isMobile, setIsMobile] = useState(false);
-  
-  // Bottom navigation states
-  const [showSearch, setShowSearch] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [language, setLanguage] = useState('English');
-  
-  // Refs for click outside detection
-  const searchRef = useRef<HTMLDivElement>(null);
+
+  // Define navigation items (active state will be calculated dynamically)
+  const mainNavItems: NavItem[] = [
+    // Home - Shows "Welcome, Peter!" in main content area
+    {
+      title: 'Home',
+      icon: Home,
+      href: '/',
+      color: 'text-blue-500'
+    },
+    
+    // Career Explorer with submenu
+    {
+      title: 'Career Explorer',
+      icon: Search,
+      color: 'text-emerald-500',
+      href: '/career-exploration',
+      submenu: [
+        {
+          title: 'Industries',
+          href: '/career-exploration/industries'
+        },
+        {
+          title: 'Technologies',
+          href: '/career-exploration/technologies'
+        },
+        {
+          title: 'Career Pathways',
+          href: '/career-exploration/pathways'
+        }
+      ]
+    },
+    
+    // Courses with submenu
+    {
+      title: 'Courses',
+      icon: BookOpen,
+      color: 'text-purple-500',
+      href: '/courses',
+      submenu: [
+        {
+          title: 'My Learning',
+          href: '/courses/my-learning'
+        },
+        {
+          title: 'All Courses',
+          href: '/courses'
+        },
+        {
+          title: 'Certifications',
+          href: '/courses/certifications'
+        }
+      ]
+    },
+    
+    // Career Opportunities with submenu
+    {
+      title: 'Career Opportunities',
+      icon: Briefcase,
+      color: 'text-orange-500',
+      href: '/employers',
+      submenu: [
+        {
+          title: 'Employers',
+          href: '/employers'
+        },
+        {
+          title: 'Job Matches',
+          href: '/employers/job-matches'
+        },
+        {
+          title: 'My Submissions',
+          href: '/employers/submissions'
+        }
+      ]
+    }
+  ];
+
+  // Function to check if a main nav item is active
+  const isMainNavItemActive = (item: NavItem): boolean => {
+    if (item.href === '/') {
+      // Home route should be active for both "/" and "/dashboard" since authenticated users get redirected
+      return pathname === '/' || pathname === '/dashboard';
+    }
+    return pathname.startsWith(item.href || '');
+  };
+
+  // Define profile submenu items
+  const profileSubmenuItems = [
+    {
+      title: 'My Profile',
+      href: '/profile'
+    },
+    {
+      title: 'Stats & Goals',
+      href: '/stats-goals'
+    },
+    {
+      title: 'Study Hub',
+      href: '/study-hub'
+    }
+  ];
 
   // Auto-collapse submenus when sidebar is collapsed
   useEffect(() => {
@@ -508,6 +454,33 @@ export default function CollapsibleSidebar({ isCollapsed, onToggle }: SidebarPro
       setExpandedMenus(new Set());
     }
   }, [isCollapsed]);
+
+  // Auto-expand relevant menus based on current page
+  useEffect(() => {
+    const newExpandedMenus = new Set<string>();
+    
+    // Profile-related pages
+    if (pathname === '/profile' || pathname === '/stats-goals' || pathname === '/study-hub') {
+      newExpandedMenus.add('Profile');
+    }
+    
+    // Career Explorer pages
+    if (pathname.startsWith('/career-exploration')) {
+      newExpandedMenus.add('Career Explorer');
+    }
+    
+    // Courses pages
+    if (pathname.startsWith('/courses')) {
+      newExpandedMenus.add('Courses');
+    }
+    
+    // Career Opportunities pages
+    if (pathname.startsWith('/employers')) {
+      newExpandedMenus.add('Career Opportunities');
+    }
+    
+    setExpandedMenus(newExpandedMenus);
+  }, [pathname]);
 
   // Check for mobile screen size
   useEffect(() => {
@@ -542,53 +515,6 @@ export default function CollapsibleSidebar({ isCollapsed, onToggle }: SidebarPro
       setTheme('light');
     }
   };
-
-  // Language toggle function
-  const toggleLanguage = () => {
-    const languages = ['English', 'Spanish', 'French', 'German', 'Portuguese'];
-    const currentIndex = languages.indexOf(language);
-    const nextIndex = (currentIndex + 1) % languages.length;
-    setLanguage(languages[nextIndex]);
-  };
-
-  // Get current language flag
-  const getLanguageFlag = () => {
-    switch (language) {
-      case 'Spanish': return '🇪🇸';
-      case 'French': return '🇫🇷';
-      case 'German': return '🇩🇪';
-      case 'Portuguese': return '🇵🇹';
-      default: return '🇺🇸';
-    }
-  };
-
-  // Close popups when clicking outside
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
-        setShowSearch(false);
-      }
-    }
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
-
-  // Close search on escape key
-  useEffect(() => {
-    function handleEscape(event: KeyboardEvent) {
-      if (event.key === 'Escape') {
-        setShowSearch(false);
-      }
-    }
-
-    document.addEventListener('keydown', handleEscape);
-    return () => {
-      document.removeEventListener('keydown', handleEscape);
-    };
-  }, []);
 
   return (
     <div 
@@ -667,6 +593,71 @@ export default function CollapsibleSidebar({ isCollapsed, onToggle }: SidebarPro
         )}
       </div>
 
+      {/* User Profile Section */}
+      <div className="px-3 py-4 border-b border-slate-300/50 dark:border-[hsl(217,33%,17%)]/30">
+        {isCollapsed ? (
+          /* Collapsed State - Show only avatar */
+          <div className="flex justify-center">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => handleToggleSubmenu('Profile')}
+              className="w-12 h-12 p-0 rounded-full hover:scale-105 transition-all duration-200
+                        bg-slate-200/60 hover:bg-slate-300/80 dark:bg-[hsl(222,84%,12%)] dark:hover:bg-[hsl(222,84%,15%)]"
+            >
+              <div className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
+                <span className="text-white font-semibold text-sm">PC</span>
+              </div>
+            </Button>
+          </div>
+        ) : (
+          /* Expanded State - Show full profile info as clickable menu item */
+          <Button
+            variant="ghost"
+            onClick={() => handleToggleSubmenu('Profile')}
+            className={cn(
+              "w-full justify-start relative overflow-hidden group transition-all duration-300 ease-out",
+              "px-4 py-4 mx-0 rounded-xl",
+              "hover:scale-105 active:scale-95 transition-transform",
+              "backdrop-blur-sm shadow-sm border-none min-h-[5rem]",
+              expandedMenus.has('Profile')
+                ? "bg-[hsl(217,91%,60%)]/20 text-[hsl(217,91%,60%)] shadow-lg shadow-[hsl(217,91%,60%)]/25 border border-[hsl(217,91%,60%)]/30" 
+                : "bg-transparent hover:bg-[hsl(217,91%,60%)]/10 text-slate-700 hover:text-[hsl(217,91%,60%)] hover:shadow-md hover:border hover:border-[hsl(217,91%,60%)]/20",
+              // Dark mode variants
+              expandedMenus.has('Profile')
+                ? "dark:bg-[hsl(217,91%,60%)]/20 dark:text-[hsl(217,91%,60%)] dark:shadow-lg dark:shadow-[hsl(217,91%,60%)]/25 dark:border dark:border-[hsl(217,91%,60%)]/40"
+                : "dark:bg-transparent dark:hover:bg-[hsl(217,91%,60%)]/15 dark:text-[hsl(210,40%,98%)]/80 dark:hover:text-[hsl(217,91%,60%)] dark:hover:shadow-md dark:hover:border dark:hover:border-[hsl(217,91%,60%)]/25"
+            )}
+          >
+            <div className="flex items-center gap-4 w-full">
+              <div className="w-12 h-12 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center shadow-lg">
+                <span className="text-white font-semibold text-base">PC</span>
+              </div>
+              <div className="flex-1 min-w-0 text-left">
+                <h3 className="text-base font-semibold truncate">
+                  Peter Costa
+                </h3>
+              </div>
+              <ChevronDown 
+                className={cn(
+                  "h-4 w-4 transition-transform duration-300",
+                  expandedMenus.has('Profile') ? "rotate-180" : ""
+                )} 
+              />
+            </div>
+          </Button>
+        )}
+        
+        {/* Profile Submenu */}
+        {expandedMenus.has('Profile') && !isCollapsed && (
+          <div className="mt-2 space-y-1">
+            {profileSubmenuItems.map((item) => (
+              <SubMenuItem key={item.title} item={item} isCollapsed={false} />
+            ))}
+          </div>
+        )}
+      </div>
+
       {/* Main Navigation */}
       <nav className="flex-1 px-3 pt-6 pb-3 overflow-y-auto 
                       scrollbar-thin scrollbar-track-slate-200/30 scrollbar-thumb-blue-500/80 
@@ -678,7 +669,7 @@ export default function CollapsibleSidebar({ isCollapsed, onToggle }: SidebarPro
               key={index}
               item={item}
               isCollapsed={isCollapsed}
-              isActive={item.active}
+              isActive={isMainNavItemActive(item)}
               expandedMenus={expandedMenus}
               onToggleSubmenu={handleToggleSubmenu}
             />
@@ -688,14 +679,8 @@ export default function CollapsibleSidebar({ isCollapsed, onToggle }: SidebarPro
 
       {/* Bottom Navigation */}
       <div className="p-3 space-y-3 mt-auto border-t border-slate-300/50 dark:border-[hsl(217,33%,17%)]/30">
-        {!isCollapsed && (
-          <div className="text-xs font-medium text-slate-500 dark:text-[hsl(210,40%,98%)]/50 uppercase tracking-wide mb-2">
-            Tools
-          </div>
-        )}
-        
-                  <div className="space-y-2">
-          {/* Help Button */}
+        <div className="space-y-2">
+          {/* Settings Button */}
           <Button 
             variant="ghost" 
             size={isCollapsed ? "icon" : "default"}
@@ -704,193 +689,38 @@ export default function CollapsibleSidebar({ isCollapsed, onToggle }: SidebarPro
               isCollapsed 
                 ? "w-10 h-10 p-0" 
                 : "w-full justify-start h-10 px-3",
-              "bg-slate-200/50 hover:bg-slate-300/70 text-slate-600 hover:text-[hsl(217,91%,60%)]",
-              "dark:bg-[hsl(222,84%,10%)] dark:hover:bg-[hsl(222,84%,15%)] dark:text-[hsl(210,40%,98%)]/80 dark:hover:text-[hsl(217,91%,60%)]"
+              "bg-transparent hover:bg-slate-300/40 text-slate-600 hover:text-[hsl(217,91%,60%)]",
+              "dark:bg-transparent dark:hover:bg-[hsl(222,84%,10%)] dark:text-[hsl(210,40%,98%)]/80 dark:hover:text-[hsl(217,91%,60%)]"
             )}
             onClick={() => {
-              // Open AI Help chatbot for site navigation
-              console.log('Opening AI Help & Support chatbot for site navigation...');
-              // TODO: Implement AI Help chatbot modal/panel
+              router.push('/settings');
             }}
           >
-            <div className="relative">
-              <HelpCircle className="h-4 w-4 fill-current" />
-              <div className="absolute -bottom-0.5 -right-0.5 w-2 h-2 bg-green-500 rounded-full border border-slate-200 dark:border-[hsl(222,84%,12%)]"></div>
-            </div>
-            {!isCollapsed && <span className="ml-2">AI Help & Support</span>}
+            <Settings className="h-4 w-4 fill-current" />
+            {!isCollapsed && <span className="ml-2">Settings</span>}
           </Button>
 
-          {/* Search Button */}
-          <div className="relative" ref={searchRef}>
-            <Button 
-              variant="ghost" 
-              size={isCollapsed ? "icon" : "default"}
-              className={cn(
-                "transition-all duration-300 hover:scale-105",
-                isCollapsed 
-                  ? "w-10 h-10 p-0" 
-                  : "w-full justify-start h-10 px-3",
-                "bg-slate-200/50 hover:bg-slate-300/70 text-slate-600 hover:text-[hsl(217,91%,60%)]",
-                "dark:bg-[hsl(222,84%,10%)] dark:hover:bg-[hsl(222,84%,15%)] dark:text-[hsl(210,40%,98%)]/80 dark:hover:text-[hsl(217,91%,60%)]"
-              )}
-              onClick={() => setShowSearch(!showSearch)}
-            >
-              <Search className="h-4 w-4 fill-current" />
-              {!isCollapsed && <span className="ml-2">Search</span>}
-            </Button>
-            
-            {/* Search Popup */}
-            {showSearch && (
-              <div className="fixed left-80 bottom-20 w-96 bg-white dark:bg-gray-900 border border-border rounded-xl shadow-2xl z-[9999] overflow-hidden">
-                <div className="p-4 bg-gradient-to-r from-emerald-50 to-blue-50 dark:from-emerald-950 dark:to-blue-950 border-b border-border">
-                  <div className="flex items-center gap-3 mb-3">
-                    <Search className="h-5 w-5 text-emerald-500 fill-current" />
-                    <h3 className="font-semibold text-lg">Search</h3>
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      className="h-8 w-8 hover:bg-white dark:hover:bg-black rounded-full transition-all duration-200 ml-auto" 
-                      onClick={() => setShowSearch(false)}
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  </div>
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground fill-current" />
-                    <Input
-                      placeholder="Search courses, skills, instructors..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className="pl-10 bg-white dark:bg-gray-800 border-border rounded-lg focus:ring-2 focus:ring-emerald-500 transition-all duration-200"
-                      autoFocus
-                    />
-                  </div>
-                </div>
-                <div className="p-4 max-h-96 overflow-y-auto bg-white dark:bg-gray-900">
-                  {searchQuery ? (
-                    <div className="space-y-3">
-                      <div className="text-sm text-muted-foreground mb-3">
-                        Search results for <span className="font-medium text-foreground">"{searchQuery}"</span>
-                      </div>
-                      <div className="space-y-2">
-                        <div className="p-3 bg-white dark:bg-gray-900 hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 dark:hover:from-blue-950 dark:hover:to-indigo-950 rounded-lg cursor-pointer transition-all duration-200 border border-gray-200 dark:border-gray-700">
-                          <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-                              <BookOpen className="h-4 w-4 text-white fill-current" />
-                            </div>
-                            <div className="flex-1">
-                              <p className="text-sm font-medium">Advanced React Patterns</p>
-                              <p className="text-xs text-muted-foreground">Course • 12 lessons</p>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="text-center py-8">
-                      <Search className="h-12 w-12 text-muted-foreground/50 mx-auto mb-3 fill-current" />
-                      <p className="text-sm text-muted-foreground">Start typing to search courses, skills, and instructors</p>
-                    </div>
-                  )}
-                </div>
-              </div>
+          {/* Help & Support Button */}
+          <Button 
+            variant="ghost" 
+            size={isCollapsed ? "icon" : "default"}
+            className={cn(
+              "transition-all duration-300 hover:scale-105",
+              isCollapsed 
+                ? "w-10 h-10 p-0" 
+                : "w-full justify-start h-10 px-3",
+              "bg-transparent hover:bg-slate-300/40 text-slate-600 hover:text-[hsl(217,91%,60%)]",
+              "dark:bg-transparent dark:hover:bg-[hsl(222,84%,10%)] dark:text-[hsl(210,40%,98%)]/80 dark:hover:text-[hsl(217,91%,60%)]"
             )}
-          </div>
-
-          {/* Profile Menu */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button 
-                variant="ghost" 
-                size={isCollapsed ? "icon" : "default"}
-                className={cn(
-                  "transition-all duration-300 hover:scale-105",
-                  isCollapsed 
-                    ? "w-10 h-10 p-0" 
-                    : "w-full justify-start h-10 px-3",
-                  "bg-slate-200/50 hover:bg-slate-300/70 text-slate-600 hover:text-[hsl(217,91%,60%)]",
-                  "dark:bg-[hsl(222,84%,10%)] dark:hover:bg-[hsl(222,84%,15%)] dark:text-[hsl(210,40%,98%)]/80 dark:hover:text-[hsl(217,91%,60%)]"
-                )}
-              >
-                <User className="h-4 w-4 fill-current" />
-                {!isCollapsed && <span className="ml-2">Account & Settings</span>}
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-72 bg-white dark:bg-gray-900 border border-border shadow-2xl rounded-xl p-2" align="end" forceMount side="right">
-              <DropdownMenuLabel className="font-normal p-3 rounded-lg bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950 dark:to-purple-950 mb-2">
-                <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
-                    <User className="h-5 w-5 text-white" />
-                  </div>
-                  <div className="flex flex-col space-y-1">
-                    <p className="text-sm font-semibold leading-none">Peter Costa</p>
-                    <p className="text-xs leading-none text-muted-foreground">peter@example.com</p>
-                  </div>
-                </div>
-              </DropdownMenuLabel>
-              
-              <DropdownMenuItem className="rounded-lg bg-white dark:bg-gray-900 hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 dark:hover:from-blue-950 dark:hover:to-indigo-950 transition-all duration-200 cursor-pointer p-3 border border-gray-200 dark:border-gray-700">
-                <User className="mr-3 h-4 w-4 text-blue-500" />
-                <span className="font-medium">Account</span>
-              </DropdownMenuItem>
-              
-              <DropdownMenuItem className="rounded-lg bg-white dark:bg-gray-900 hover:bg-gradient-to-r hover:from-gray-50 hover:to-slate-50 dark:hover:from-gray-950 dark:hover:to-slate-950 transition-all duration-200 cursor-pointer p-3 border border-gray-200 dark:border-gray-700">
-                <Settings className="mr-3 h-4 w-4 text-gray-500" />
-                <span className="font-medium">Settings</span>
-              </DropdownMenuItem>
-              
-              <DropdownMenuSeparator className="my-2" />
-              
-              {/* Theme Toggle */}
-              <DropdownMenuItem 
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  toggleTheme();
-                }}
-                className="cursor-pointer bg-white dark:bg-gray-900 hover:bg-gradient-to-r hover:from-amber-50 hover:to-orange-50 dark:hover:from-amber-950 dark:hover:to-orange-950 transition-all duration-200 rounded-lg p-3 border border-gray-200 dark:border-gray-700"
-              >
-                <div className="flex items-center justify-between w-full">
-                  <div className="flex items-center">
-                    {theme === 'light' ? <Sun className="mr-3 h-4 w-4 text-amber-500" /> : 
-                     theme === 'dark' ? <Moon className="mr-3 h-4 w-4 text-blue-400" /> : 
-                     <Monitor className="mr-3 h-4 w-4 text-gray-500" />}
-                    <span className="font-medium">Theme</span>
-                  </div>
-                  <span className="text-xs text-muted-foreground capitalize bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded-full border">
-                    {theme}
-                  </span>
-                </div>
-              </DropdownMenuItem>
-              
-              {/* Language Toggle */}
-              <DropdownMenuItem 
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  toggleLanguage();
-                }}
-                className="cursor-pointer bg-white dark:bg-gray-900 hover:bg-gradient-to-r hover:from-green-50 hover:to-emerald-50 dark:hover:from-green-950 dark:hover:to-emerald-950 transition-all duration-200 rounded-lg p-3 border border-gray-200 dark:border-gray-700"
-              >
-                <div className="flex items-center justify-between w-full">
-                  <div className="flex items-center">
-                    <span className="mr-3 text-lg">{getLanguageFlag()}</span>
-                    <span className="font-medium">Language</span>
-                  </div>
-                  <span className="text-xs text-muted-foreground bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded-full border">
-                    {language}
-                  </span>
-                </div>
-              </DropdownMenuItem>
-              
-              <DropdownMenuSeparator className="my-2" />
-              
-              <DropdownMenuItem onClick={signOut} className="rounded-lg bg-white dark:bg-gray-900 hover:bg-gradient-to-r hover:from-red-50 hover:to-pink-50 dark:hover:from-red-950 dark:hover:to-pink-950 transition-all duration-200 cursor-pointer p-3 text-red-600 dark:text-red-400 border border-gray-200 dark:border-gray-700">
-                <LogOut className="mr-3 h-4 w-4" />
-                <span className="font-medium">Log out</span>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+            onClick={() => {
+              // Open Help & Support page or modal
+              console.log('Opening Help & Support...');
+              router.push('/help');
+            }}
+          >
+            <HelpCircle className="h-4 w-4 fill-current" />
+            {!isCollapsed && <span className="ml-2">Help & Support</span>}
+          </Button>
         </div>
       </div>
     </div>
