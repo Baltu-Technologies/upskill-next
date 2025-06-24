@@ -302,7 +302,24 @@ export default function AuthFormShadcn({ onSuccess }: AuthFormProps) {
         {/* Terms and Toggle */}
         <div className="px-6 pb-6">
           <p className="text-[#90b2cb] text-xs font-normal leading-normal text-center mb-4">
-            By continuing, you agree to our Terms of Service and Privacy Policy
+            By continuing, you agree to our{' '}
+            <a 
+              href="/terms-of-service" 
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[#0c92f2] hover:text-[#0b7fd1] underline transition-colors"
+            >
+              Terms of Service
+            </a>
+            {' '}and{' '}
+            <a 
+              href="/privacy-policy" 
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[#0c92f2] hover:text-[#0b7fd1] underline transition-colors"
+            >
+              Privacy Policy
+            </a>
           </p>
           <button
             onClick={() => setCurrentStep(currentStep === 'signIn' ? 'signUp' : 'signIn')}

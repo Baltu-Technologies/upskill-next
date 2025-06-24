@@ -328,43 +328,27 @@ export default function CoreProfileSection({
 
   return (
     <div className="space-y-8">
-      {/* Enhanced Header with gradient background */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[hsl(217,91%,60%)] to-[hsl(217,91%,50%)] p-8 shadow-xl">
-        <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-white/5 opacity-50"></div>
-        <div className="relative z-10 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div className="p-3 rounded-xl bg-white/20 backdrop-blur-sm">
-              <User className="h-8 w-8 text-white" />
-            </div>
-            <div>
-              <h2 className="text-3xl font-bold text-white mb-1">
-                {isEditing ? 'Editing Core Profile' : 'Core Profile'}
-              </h2>
-              <p className="text-blue-100 text-sm">
-                {isEditing ? 'Make changes to your professional profile' : 'Your employer-ready professional information'}
-              </p>
-            </div>
-          </div>
-          {!isEditing ? (
-            <Button
-              onClick={() => setIsEditing(true)}
-              className="bg-white/20 hover:bg-white/30 text-white border-white/20 backdrop-blur-sm transition-all duration-200 hover:scale-105"
-              variant="outline"
-            >
-              <Edit3 className="h-4 w-4 mr-2" />
-              Edit
-            </Button>
-          ) : null}
+      {/* Edit button in top right if not editing */}
+      {!isEditing && (
+        <div className="flex justify-end">
+          <Button
+            onClick={() => setIsEditing(true)}
+            className="bg-blue-600 hover:bg-blue-700 text-white"
+            variant="default"
+          >
+            <Edit3 className="h-4 w-4 mr-2" />
+            Edit Profile
+          </Button>
         </div>
-        
-        {/* Progress indicator when editing */}
-        {isEditing && hasUnsavedChanges && (
-          <div className="mt-4 flex items-center gap-2 text-blue-100 text-sm">
-            <div className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>
-            <span>Unsaved changes • Auto-saving every 10 seconds</span>
-          </div>
-        )}
-      </div>
+      )}
+      
+      {/* Progress indicator when editing */}
+      {isEditing && hasUnsavedChanges && (
+        <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400 text-sm bg-yellow-50 dark:bg-yellow-900/20 p-3 rounded-lg border border-yellow-200 dark:border-yellow-800">
+          <div className="w-2 h-2 bg-yellow-500 rounded-full animate-pulse"></div>
+          <span>Unsaved changes • Auto-saving every 10 seconds</span>
+        </div>
+      )}
 
       {/* Two-column layout on desktop, single-column on mobile */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">

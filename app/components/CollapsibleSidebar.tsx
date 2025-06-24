@@ -84,13 +84,13 @@ const mainNavItems: NavItem[] = [
         active: false
       },
       {
-        title: 'Study Hub',
-        href: '/study-hub/study-list',
+        title: 'My Stats & Goals',
+        href: '/stats-goals',
         active: false
       },
       {
-        title: 'My Stats & Goals',
-        href: '/stats-goals',
+        title: 'Study Hub',
+        href: '/study-hub/study-list',
         active: false
       }
     ]
