@@ -55,8 +55,8 @@ export default function MobileBottomNav({ className }: MobileBottomNavProps) {
   const { theme, setTheme } = useTheme();
   const { signOut } = useAuth();
 
-  // Core navigation items
-  const navItems: NavItem[] = [
+  // Left side navigation items
+  const leftNavItems: NavItem[] = [
     {
       title: 'Home',
       icon: Home,
@@ -68,7 +68,11 @@ export default function MobileBottomNav({ className }: MobileBottomNavProps) {
       icon: BookOpen,
       href: '/courses',
       isActive: pathname.startsWith('/courses')
-    },
+    }
+  ];
+
+  // Right side navigation items
+  const rightNavItems: NavItem[] = [
     {
       title: 'Careers',
       icon: Briefcase,
@@ -134,83 +138,80 @@ export default function MobileBottomNav({ className }: MobileBottomNavProps) {
       "safe-area-inset-bottom",
       className
     )}>
-      <div className="flex items-center justify-around px-2 py-2 pb-safe">
-        {/* Core Navigation Items */}
-        {navItems.map((item) => {
-          const Icon = item.icon;
-          return (
-            <Button
-              key={item.title}
-              variant="ghost"
-              size="icon"
-              onClick={() => handleNavClick(item.href)}
-              className={cn(
-                "relative flex flex-col items-center justify-center h-12 w-12 p-1",
-                "transition-all duration-200 ease-out",
-                "hover:scale-105 active:scale-95",
-                item.isActive 
-                  ? "text-blue-600 dark:text-blue-400" 
-                  : "text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400"
-              )}
-            >
-              <div className="relative">
-                <Icon className={cn(
-                  "h-5 w-5 transition-all duration-200",
-                  item.isActive && "fill-current"
-                )} />
-                {item.badge && (
-                  <span className="absolute -top-1 -right-1 h-4 w-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-medium">
-                    {item.badge}
-                  </span>
+      <div className="flex items-center justify-between px-4 py-2 pb-safe">
+        {/* Left Navigation Items */}
+        <div className="flex items-center space-x-6">
+          {leftNavItems.map((item) => {
+            const Icon = item.icon;
+            return (
+              <Button
+                key={item.title}
+                variant="ghost"
+                size="icon"
+                onClick={() => handleNavClick(item.href)}
+                className={cn(
+                  "relative flex flex-col items-center justify-center h-12 w-12 p-1",
+                  "transition-all duration-200 ease-out",
+                  "hover:scale-105 active:scale-95",
+                  item.isActive 
+                    ? "text-blue-600 dark:text-blue-400" 
+                    : "text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400"
                 )}
-              </div>
-              <span className={cn(
-                "text-xs font-medium mt-1 transition-all duration-200",
-                item.isActive 
-                  ? "text-blue-600 dark:text-blue-400" 
-                  : "text-gray-500 dark:text-gray-400"
-              )}>
-                {item.title}
-              </span>
-              {item.isActive && (
-                <div className="absolute -top-2 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-blue-600 dark:bg-blue-400 rounded-full" />
-              )}
-            </Button>
-          );
-        })}
+              >
+                <div className="relative">
+                  <Icon className={cn(
+                    "h-5 w-5 transition-all duration-200",
+                    item.isActive && "fill-current"
+                  )} />
+                  {item.badge && (
+                    <span className="absolute -top-1 -right-1 h-4 w-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-medium">
+                      {item.badge}
+                    </span>
+                  )}
+                </div>
+                <span className={cn(
+                  "text-xs font-medium mt-1 transition-all duration-200",
+                  item.isActive 
+                    ? "text-blue-600 dark:text-blue-400" 
+                    : "text-gray-500 dark:text-gray-400"
+                )}>
+                  {item.title}
+                </span>
+                {item.isActive && (
+                  <div className="absolute -top-2 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-blue-600 dark:bg-blue-400 rounded-full" />
+                )}
+              </Button>
+            );
+          })}
+        </div>
 
-        {/* Profile Menu with Dropdown */}
+        {/* Center Profile Avatar */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
               variant="ghost"
               size="icon"
               className={cn(
-                "relative flex flex-col items-center justify-center h-12 w-12 p-1",
+                "relative flex items-center justify-center h-16 w-16 p-0",
                 "transition-all duration-200 ease-out",
                 "hover:scale-105 active:scale-95",
-                isProfileActive 
-                  ? "text-blue-600 dark:text-blue-400" 
-                  : "text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400"
+                "rounded-full",
+                isProfileActive && "ring-2 ring-blue-500 ring-offset-2 ring-offset-white dark:ring-offset-gray-900"
               )}
             >
               <div className="relative">
-                <User className={cn(
-                  "h-5 w-5 transition-all duration-200",
-                  isProfileActive && "fill-current"
-                )} />
+                <div className={cn(
+                  "w-12 h-12 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center",
+                  "transition-all duration-200",
+                  "shadow-lg hover:shadow-xl",
+                  isProfileActive && "shadow-blue-500/25"
+                )}>
+                  <User className="h-6 w-6 text-white" />
+                </div>
+                {isProfileActive && (
+                  <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-blue-600 dark:bg-blue-400 rounded-full" />
+                )}
               </div>
-              <span className={cn(
-                "text-xs font-medium mt-1 transition-all duration-200",
-                isProfileActive 
-                  ? "text-blue-600 dark:text-blue-400" 
-                  : "text-gray-500 dark:text-gray-400"
-              )}>
-                Profile
-              </span>
-              {isProfileActive && (
-                <div className="absolute -top-2 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-blue-600 dark:bg-blue-400 rounded-full" />
-              )}
             </Button>
           </DropdownMenuTrigger>
           
@@ -309,6 +310,52 @@ export default function MobileBottomNav({ className }: MobileBottomNavProps) {
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
+
+        {/* Right Navigation Items */}
+        <div className="flex items-center space-x-6">
+          {rightNavItems.map((item) => {
+            const Icon = item.icon;
+            return (
+              <Button
+                key={item.title}
+                variant="ghost"
+                size="icon"
+                onClick={() => handleNavClick(item.href)}
+                className={cn(
+                  "relative flex flex-col items-center justify-center h-12 w-12 p-1",
+                  "transition-all duration-200 ease-out",
+                  "hover:scale-105 active:scale-95",
+                  item.isActive 
+                    ? "text-blue-600 dark:text-blue-400" 
+                    : "text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400"
+                )}
+              >
+                <div className="relative">
+                  <Icon className={cn(
+                    "h-5 w-5 transition-all duration-200",
+                    item.isActive && "fill-current"
+                  )} />
+                  {item.badge && (
+                    <span className="absolute -top-1 -right-1 h-4 w-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-medium">
+                      {item.badge}
+                    </span>
+                  )}
+                </div>
+                <span className={cn(
+                  "text-xs font-medium mt-1 transition-all duration-200",
+                  item.isActive 
+                    ? "text-blue-600 dark:text-blue-400" 
+                    : "text-gray-500 dark:text-gray-400"
+                )}>
+                  {item.title}
+                </span>
+                {item.isActive && (
+                  <div className="absolute -top-2 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-blue-600 dark:bg-blue-400 rounded-full" />
+                )}
+              </Button>
+            );
+          })}
+        </div>
       </div>
     </div>
   );
