@@ -3,6 +3,21 @@ description:
 globs: 
 alwaysApply: true
 ---
-Cursor must never push changes to Git automatically.
-Before executing any git push, Cursor must ask the user for permission.
-If the user does not explicitly approve, the push must be canceled.
+# Cursor Rule: Require Explicit Git Consent
+
+## Rule ID
+explicit-git-consent
+
+## Description
+Cursor must not automatically commit or push any changes to GitHub (or any remote) without first obtaining **explicit permission** from the user.
+
+## Behavior
+
+- Before executing any `git commit`, `git add`  or `git push`, Cursor must **prompt the user for confirmation**.
+- If the user does **not explicitly approve**, the action must be **canceled**.
+- Cursor should clearly articulate what will be committed or pushed before asking.
+
+## Rationale
+
+- Community discussions widely emphasize the importance of **human-in-the-loop confirmation** before bypassing Git safeguards or executing version control actions—especially for push operations :contentReference[oaicite:1]{index=1}.
+- Pre-push hooks and IDE integrations often include an explicit confirmation step to prevent unintended actions :contentReference[oaicite:2]{index=2}.

@@ -16,7 +16,7 @@ import {
   BookOpen, 
   GraduationCap, 
   TrendingUp,
-  Bell,
+  Bot,
   User,
   Briefcase,
   MessageSquare,
@@ -81,11 +81,10 @@ export default function MobileBottomNav({ className }: MobileBottomNavProps) {
       isActive: pathname.startsWith('/employers')
     },
     {
-      title: 'Notifications',
-      icon: Bell,
-      href: '/notifications',
-      badge: '3',
-      isActive: pathname === '/notifications'
+      title: 'AI Assistant',
+      icon: Bot,
+      href: '/study-hub/ask-ai',
+      isActive: pathname.startsWith('/study-hub/ask-ai')
     }
   ];
 
@@ -200,17 +199,12 @@ export default function MobileBottomNav({ className }: MobileBottomNavProps) {
               )}
             >
               <div className="relative">
-                <div className={cn(
-                  "w-12 h-12 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center",
-                  "transition-all duration-200",
-                  "shadow-lg hover:shadow-xl",
-                  isProfileActive && "shadow-blue-500/25"
-                )}>
-                  <User className="h-6 w-6 text-white" />
+                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 p-0.5">
+                  <div className="w-full h-full rounded-full bg-white dark:bg-gray-900 flex items-center justify-center">
+                    <User className="h-6 w-6 text-gray-600 dark:text-gray-300" />
+                  </div>
                 </div>
-                {isProfileActive && (
-                  <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-blue-600 dark:bg-blue-400 rounded-full" />
-                )}
+                <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-green-500 rounded-full border-2 border-white dark:border-gray-900" />
               </div>
             </Button>
           </DropdownMenuTrigger>
@@ -325,31 +319,47 @@ export default function MobileBottomNav({ className }: MobileBottomNavProps) {
                   "relative flex flex-col items-center justify-center h-12 w-12 p-1",
                   "transition-all duration-200 ease-out",
                   "hover:scale-105 active:scale-95",
-                  item.isActive 
-                    ? "text-blue-600 dark:text-blue-400" 
-                    : "text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400"
+                  item.title === 'AI Assistant' 
+                    ? cn(
+                        "rounded-full",
+                        item.isActive 
+                          ? "bg-gradient-to-br from-purple-500 via-blue-500 to-cyan-500 text-white" 
+                          : "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gradient-to-br hover:from-purple-500 hover:via-blue-500 hover:to-cyan-500 hover:text-white"
+                      )
+                    : item.isActive 
+                      ? "text-blue-600 dark:text-blue-400" 
+                      : "text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400"
                 )}
               >
                 <div className="relative">
                   <Icon className={cn(
                     "h-5 w-5 transition-all duration-200",
-                    item.isActive && "fill-current"
+                    item.isActive && item.title !== 'AI Assistant' && "fill-current"
                   )} />
                   {item.badge && (
                     <span className="absolute -top-1 -right-1 h-4 w-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-medium">
                       {item.badge}
                     </span>
                   )}
+                  {item.title === 'AI Assistant' && (
+                    <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-400 rounded-full border-2 border-white dark:border-gray-900">
+                      <div className="w-full h-full rounded-full bg-green-400 animate-pulse"></div>
+                    </div>
+                  )}
                 </div>
                 <span className={cn(
                   "text-xs font-medium mt-1 transition-all duration-200",
-                  item.isActive 
-                    ? "text-blue-600 dark:text-blue-400" 
-                    : "text-gray-500 dark:text-gray-400"
+                  item.title === 'AI Assistant'
+                    ? item.isActive 
+                      ? "text-white" 
+                      : "text-gray-500 dark:text-gray-400"
+                    : item.isActive 
+                      ? "text-blue-600 dark:text-blue-400" 
+                      : "text-gray-500 dark:text-gray-400"
                 )}>
                   {item.title}
                 </span>
-                {item.isActive && (
+                {item.isActive && item.title !== 'AI Assistant' && (
                   <div className="absolute -top-2 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-blue-600 dark:bg-blue-400 rounded-full" />
                 )}
               </Button>
