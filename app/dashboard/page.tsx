@@ -1,9 +1,8 @@
 'use client';
 
-import DashboardContent from '../components/DashboardContent';
+import LearnerDashboard from '../components/LearnerDashboard';
 
 export default function DashboardPage() {
-  // Use the extracted dashboard content without layout wrapper
-  // since the layout is now handled by the (dashboard) layout
-  return <DashboardContent />;
+  // Use the new learner-focused dashboard
+  return <LearnerDashboard />;
 } 

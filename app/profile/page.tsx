@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, Suspense, useCallback } from 'react';
+import React from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
@@ -503,11 +504,29 @@ function SkillsProfileTab({ profileData }: { profileData: CompleteProfile }) {
 }
 
 function PathwaysTab() {
+  // Import the MyPathways component dynamically to avoid SSR issues
+  const [MyPathwaysComponent, setMyPathwaysComponent] = useState<React.ComponentType<any> | null>(null);
+  
+  useEffect(() => {
+    // Dynamically import the MyPathways component
+    import('@/src/components/career-exploration/MyPathways').then(module => {
+      setMyPathwaysComponent(() => module.default);
+    });
+  }, []);
+
+  if (!MyPathwaysComponent) {
+    return (
+      <div className="text-center py-12">
+        <Route className="h-16 w-16 text-slate-400 mx-auto mb-4 animate-spin" />
+        <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-2">Loading Pathways</h3>
+        <p className="text-slate-600 dark:text-slate-400">Preparing your pathway management interface...</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="text-center py-12">
-      <Route className="h-16 w-16 text-slate-400 mx-auto mb-4" />
-      <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-2">My Pathways</h3>
-      <p className="text-slate-600 dark:text-slate-400">Learning pathways coming soon...</p>
+    <div className="w-full">
+      <MyPathwaysComponent className="!max-w-none !p-0" />
     </div>
   );
 }

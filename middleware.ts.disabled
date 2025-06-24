@@ -1,0 +1,87 @@
+import { NextRequest, NextResponse } from 'next/server';
+
+// Define protected routes that require authentication
+const protectedRoutes = [
+  '/dashboard',
+  '/profile',
+  '/study-hub',
+  '/courses',
+  '/employers',
+  '/stats-goals',
+  '/skills-demo',
+  '/task18-demo'
+];
+
+// Define public routes that don't require authentication
+const publicRoutes = [
+  '/',
+  '/demo',
+  '/api/auth', // Better Auth API routes
+];
+
+// Define admin routes that require admin role
+const adminRoutes = [
+  '/admin'
+];
+
+export async function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+
+  // Allow API routes and static files
+  if (
+    pathname.startsWith('/api/') ||
+    pathname.startsWith('/_next/') ||
+    pathname.startsWith('/favicon') ||
+    pathname.includes('.')
+  ) {
+    return NextResponse.next();
+  }
+
+  // Check if route is public
+  const isPublicRoute = publicRoutes.some(route => 
+    pathname === route || pathname.startsWith(route + '/')
+  );
+
+  if (isPublicRoute) {
+    return NextResponse.next();
+  }
+
+  // For protected routes, check for session cookie
+  const isProtectedRoute = protectedRoutes.some(route => 
+    pathname === route || pathname.startsWith(route + '/')
+  );
+
+  const isAdminRoute = adminRoutes.some(route => 
+    pathname === route || pathname.startsWith(route + '/')
+  );
+
+  if (isProtectedRoute || isAdminRoute) {
+    // Check for Better Auth session cookie
+    const sessionCookie = request.cookies.get('better-auth.session_token');
+    
+    if (!sessionCookie?.value) {
+      // Redirect to login with return URL
+      const loginUrl = new URL('/', request.url);
+      loginUrl.searchParams.set('returnTo', pathname);
+      return NextResponse.redirect(loginUrl);
+    }
+
+    // For admin routes, we'll let the page component handle role verification
+    // since we can't easily verify roles in Edge Runtime without database access
+  }
+
+  return NextResponse.next();
+}
+
+export const config = {
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - api (API routes)
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     */
+    '/((?!api|_next/static|_next/image|favicon.ico).*)',
+  ],
+}; 

@@ -79,6 +79,11 @@ const mainNavItems: NavItem[] = [
         active: false
       },
       {
+        title: 'My Pathways',
+        href: '/profile?tab=pathways',
+        active: false
+      },
+      {
         title: 'Study Hub',
         href: '/study-hub/study-list',
         active: false
