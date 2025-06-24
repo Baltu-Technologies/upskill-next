@@ -28,7 +28,7 @@ export default function PersistentLayout({ children }: PersistentLayoutProps) {
   const { user, signOut } = useAuth();
   const { theme, setTheme } = useTheme();
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
+  const [isMobile, setIsMobile] = useState(true); // Start as mobile to prevent sidebar flash
   const [showStatsPanel, setShowStatsPanel] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [showMessages, setShowMessages] = useState(false);
@@ -255,7 +255,7 @@ export default function PersistentLayout({ children }: PersistentLayoutProps) {
         </div>
 
         {/* Page Content */}
-        <main className="flex-1 overflow-auto pt-20 lg:pt-6 px-6 pb-20 lg:pb-6">
+        <main className="flex-1 overflow-auto pt-16 lg:pt-2 px-6 pb-20 lg:pb-6">
           {children}
         </main>
 
