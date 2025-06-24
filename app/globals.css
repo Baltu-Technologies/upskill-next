@@ -182,6 +182,8 @@ html {
   text-size-adjust: 100%;
   /* Enable smooth scrolling */
   scroll-behavior: smooth;
+  /* Support for dynamic viewport height */
+  --viewport-height: 100vh;
 }
 
 html,
@@ -832,8 +834,8 @@ select:focus-visible,
   min-height: 0;
 }
 
-/* Responsive utilities - Mobile & Tablet (no sidebar) */
-@media (max-width: 1024px) {
+/* Responsive utilities - Mobile & Small Tablet (no sidebar, bottom nav) */
+@media (max-width: 899px) {
   .container {
     padding: 0 var(--space-3);
   }
@@ -843,7 +845,7 @@ select:focus-visible,
   }
   
   .sidebar-content {
-    margin-left: 0 !important; /* Remove sidebar margin on mobile/tablet */
+    margin-left: 0 !important; /* Remove sidebar margin on mobile/small tablet */
   }
   
   .sidebar-main {
@@ -863,9 +865,98 @@ select:focus-visible,
   }
 }
 
-/* Desktop only (with sidebar) */
-@media (min-width: 1025px) {
+/* Large Tablet & Desktop (with sidebar) */
+@media (min-width: 900px) {
   .sidebar-main {
     padding: var(--space-6);
+  }
+}
+
+/* Mobile viewport height utilities */
+.mobile-vh-full {
+  height: var(--viewport-height);
+}
+
+.mobile-min-vh-full {
+  min-height: var(--viewport-height);
+}
+
+.mobile-max-vh-full {
+  max-height: var(--viewport-height);
+}
+
+/* Browser UI hiding on mobile & small tablets */
+@media (max-width: 899px) {
+  .mobile-fullscreen {
+    height: var(--viewport-height);
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+  }
+  
+  /* Ensure smooth transitions when browser UI appears/disappears */
+  .mobile-viewport-transition {
+    transition: height 0.3s ease-out;
+  }
+  
+  /* Ensure scrollable content within mobile containers */
+  .mobile-scrollable {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
+  
+  /* Enhanced browser UI hiding */
+  
+  html.browser-ui-hidden body {
+    /* Prevent scrolling on body when in minimal UI mode */
+    position: fixed;
+    width: 100%;
+    height: var(--viewport-height);
+    overflow: hidden;
+  }
+  
+  /* Maximize viewport when browser UI is hidden */
+  .browser-ui-hidden .mobile-fullscreen {
+    height: var(--screen-height);
+    min-height: var(--screen-height);
+  }
+  
+  .browser-ui-hidden .mobile-viewport-transition {
+    height: var(--screen-height);
+    min-height: var(--screen-height);
+  }
+  
+  /* Ensure content fills the full screen when browser UI is hidden */
+  .browser-ui-hidden .mobile-scrollable {
+    height: 100%;
+    max-height: 100%;
+  }
+  
+  /* Force address bar to hide by scrolling */
+  html.browser-ui-hidden {
+    /* Trigger minimal UI with meta viewport */
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+    /* Force minimal UI mode */
+    overflow: hidden;
+  }
+  
+  /* Optimize for mobile Safari */
+  @supports (-webkit-touch-callout: none) {
+    html.browser-ui-hidden {
+      /* iOS Safari specific optimizations */
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    
+    html.browser-ui-hidden body {
+      /* Prevent bounce scrolling */
+      -webkit-overflow-scrolling: auto;
+      overscroll-behavior: none;
+    }
   }
 }

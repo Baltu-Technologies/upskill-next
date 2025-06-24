@@ -10,6 +10,15 @@ const config: Config = {
   ],
   prefix: "",
   theme: {
+    screens: {
+      'sm': '640px',
+      'md': '768px',
+      'lg': '1024px',
+      'xl': '1280px',
+      '2xl': '1536px',
+      // Custom breakpoint for tablet/mobile split
+      'tablet': '900px',
+    },
     container: {
       center: true,
       padding: "2rem",

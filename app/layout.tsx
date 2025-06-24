@@ -16,6 +16,14 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "Upskill Next",
   description: "AI Powered Career Planning and Upskilling Platform",
+  viewport: {
+    width: "device-width",
+    initialScale: 1,
+    maximumScale: 1,
+    userScalable: false,
+    // Enable minimal UI mode on mobile browsers
+    viewportFit: "cover",
+  },
 };
 
 export default function RootLayout({

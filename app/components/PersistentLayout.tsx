@@ -37,10 +37,10 @@ export default function PersistentLayout({ children }: PersistentLayoutProps) {
   const notificationsRef = useRef<HTMLDivElement>(null);
   const messagesRef = useRef<HTMLDivElement>(null);
 
-  // Mobile detection
+  // Mobile detection - smartphones and small tablets (iPad Mini) use bottom nav
   useEffect(() => {
     const checkIsMobile = () => {
-      setIsMobile(window.innerWidth < 1024); // lg breakpoint
+      setIsMobile(window.innerWidth < 900); // Custom breakpoint for small tablets
     };
     
     checkIsMobile();
@@ -81,14 +81,14 @@ export default function PersistentLayout({ children }: PersistentLayoutProps) {
       {/* Main Content */}
       <div className={cn(
         "flex flex-col flex-1 transition-all duration-300 ease-in-out",
-        !isMobile && (isSidebarCollapsed ? "lg:ml-16" : "lg:ml-72")
+        !isMobile && (isSidebarCollapsed ? "tablet:ml-16" : "tablet:ml-72")
       )}>
         {/* Top Navigation */}
-        <div className="fixed top-0 left-0 right-0 z-40 lg:relative lg:top-auto lg:left-auto lg:right-auto lg:z-auto lg:mx-6 lg:mt-6">
+        <div className="fixed top-0 left-0 right-0 z-40 tablet:relative tablet:top-auto tablet:left-auto tablet:right-auto tablet:z-auto tablet:mx-6 tablet:mt-6">
           <nav className="bg-white/95 dark:bg-[hsl(222,84%,8%)]/95 backdrop-blur-xl border-b border-slate-300/50 dark:border-[hsl(217,33%,17%)]/30 px-4 py-3 shadow-lg 
-                       lg:bg-white/80 lg:dark:bg-[hsl(222,84%,8%)]/80 lg:rounded-2xl lg:border lg:hover:shadow-xl lg:transition-all lg:duration-300 lg:hover:scale-[1.02]
-                       lg:before:content-[''] lg:before:absolute lg:before:inset-0 lg:before:bg-gradient-to-b lg:before:from-white/20 lg:before:via-transparent lg:before:to-transparent lg:before:backdrop-blur-[2px] lg:before:z-[-1] lg:before:rounded-2xl
-                       lg:dark:before:from-black/20">
+                       tablet:bg-white/80 tablet:dark:bg-[hsl(222,84%,8%)]/80 tablet:rounded-2xl tablet:border tablet:hover:shadow-xl tablet:transition-all tablet:duration-300 tablet:hover:scale-[1.02]
+                       tablet:before:content-[''] tablet:before:absolute tablet:before:inset-0 tablet:before:bg-gradient-to-b tablet:before:from-white/20 tablet:before:via-transparent tablet:before:to-transparent tablet:before:backdrop-blur-[2px] tablet:before:z-[-1] tablet:before:rounded-2xl
+                       tablet:dark:before:from-black/20">
             <div className="flex items-center justify-between">
               {/* Navigation Rules Space (Left) */}
               <div className="flex-1">
@@ -107,8 +107,8 @@ export default function PersistentLayout({ children }: PersistentLayoutProps) {
                 </div>
               </div>
 
-              {/* Desktop Only - Additional Navigation */}
-              <div className="hidden lg:flex items-center gap-3 ml-4">
+              {/* Large Tablet & Desktop Only - Additional Navigation */}
+              <div className="hidden tablet:flex items-center gap-3 ml-4">
                 {/* Gamification Toggle Button */}
                 <Button
                   variant="ghost"
@@ -255,7 +255,7 @@ export default function PersistentLayout({ children }: PersistentLayoutProps) {
         </div>
 
         {/* Page Content */}
-        <main className="flex-1 overflow-auto pt-16 lg:pt-2 px-6 pb-20 lg:pb-6">
+        <main className="flex-1 overflow-auto pt-[68px] tablet:pt-2 px-6 pb-20 tablet:pb-6">
           {children}
         </main>
 

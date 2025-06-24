@@ -123,8 +123,8 @@ export default function MobileBottomNav({ className }: MobileBottomNavProps) {
                          pathname.startsWith('/stats-goals');
 
   return (
-    <div className={cn(
-      "fixed bottom-0 left-0 right-0 z-50 lg:hidden",
+    <div     className={cn(
+      "fixed bottom-0 left-0 right-0 z-50 tablet:hidden",
       "bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl",
       "border-t border-gray-200/80 dark:border-gray-700/50",
       "shadow-[0_-8px_32px_rgba(0,0,0,0.08)] dark:shadow-[0_-8px_32px_rgba(0,0,0,0.3)]",

@@ -253,6 +253,25 @@ export default function AskAIPage() {
   const [newMessageTo, setNewMessageTo] = useState('');
   const [selectedContact, setSelectedContact] = useState<typeof availableContacts[0] | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [lastScrollY, setLastScrollY] = useState(0);
+  const [isScrollingDown, setIsScrollingDown] = useState(false);
+
+  // Utility function to force browser UI hiding
+  const forceBrowserUIHide = () => {
+    if (window.innerWidth < 1024) {
+      // Force focus away from any input elements to help hide keyboard
+      if (document.activeElement && 'blur' in document.activeElement) {
+        (document.activeElement as HTMLElement).blur();
+      }
+      
+      // Force a small scroll to trigger minimal UI
+      const currentScroll = window.scrollY;
+      window.scrollTo(0, currentScroll + 2);
+      
+      // Add the browser UI hidden class
+      document.documentElement.classList.add('browser-ui-hidden');
+    }
+  };
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -263,6 +282,142 @@ export default function AskAIPage() {
       scrollToBottom();
     }
   }, [currentView, isLoading]);
+
+  // Hide URL bar and bottom browser UI on mobile when scrolling down
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      
+      // Only apply on mobile devices and small tablets
+      if (window.innerWidth < 900) {
+        if (currentScrollY > lastScrollY && currentScrollY > 100) {
+          // Scrolling down and past threshold - hide browser UI
+          setIsScrollingDown(true);
+          
+          // Add class to trigger minimal UI mode
+          document.documentElement.classList.add('browser-ui-hidden');
+          
+          // Force viewport height calculation to maximize screen space
+          if (window.visualViewport) {
+            const viewportHeight = window.visualViewport.height;
+            const screenHeight = window.screen.height;
+            
+            document.documentElement.style.setProperty(
+              '--viewport-height', 
+              `${viewportHeight}px`
+            );
+            document.documentElement.style.setProperty(
+              '--screen-height', 
+              `${screenHeight}px`
+            );
+          } else {
+            // Fallback for browsers without visualViewport
+            document.documentElement.style.setProperty(
+              '--viewport-height', 
+              `${window.innerHeight}px`
+            );
+            document.documentElement.style.setProperty(
+              '--screen-height', 
+              `${window.screen.height}px`
+            );
+          }
+          
+          // Force a tiny scroll to trigger browser UI hiding
+          setTimeout(() => {
+            window.scrollTo(0, currentScrollY + 1);
+          }, 10);
+          
+        } else if (currentScrollY < lastScrollY || currentScrollY <= 50) {
+          // Scrolling up or near top - show browser UI
+          setIsScrollingDown(false);
+          
+          // Remove minimal UI class
+          document.documentElement.classList.remove('browser-ui-hidden');
+          
+          // Reset viewport height to default
+          document.documentElement.style.setProperty(
+            '--viewport-height', 
+            '100vh'
+          );
+          document.documentElement.style.setProperty(
+            '--screen-height', 
+            '100vh'
+          );
+        }
+      }
+      
+      setLastScrollY(currentScrollY);
+    };
+
+    // Throttle scroll events for better performance
+    let ticking = false;
+    const throttledHandleScroll = () => {
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          handleScroll();
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+
+    window.addEventListener('scroll', throttledHandleScroll, { passive: true });
+    
+    // Enhanced resize and viewport change handling
+    const handleResize = () => {
+      if (window.innerWidth < 900) {
+        if (window.visualViewport) {
+          const viewportHeight = window.visualViewport.height;
+          document.documentElement.style.setProperty(
+            '--viewport-height', 
+            `${viewportHeight}px`
+          );
+        } else {
+          document.documentElement.style.setProperty(
+            '--viewport-height', 
+            `${window.innerHeight}px`
+          );
+        }
+      } else {
+        // Desktop - reset everything
+        document.documentElement.classList.remove('browser-ui-hidden');
+        document.documentElement.style.setProperty(
+          '--viewport-height', 
+          '100vh'
+        );
+        document.documentElement.style.setProperty(
+          '--screen-height', 
+          '100vh'
+        );
+      }
+    };
+
+    // Listen for viewport changes (when browser UI shows/hides)
+    const handleViewportChange = () => {
+      if (window.visualViewport && window.innerWidth < 900) {
+        const viewportHeight = window.visualViewport.height;
+        document.documentElement.style.setProperty(
+          '--viewport-height', 
+          `${viewportHeight}px`
+        );
+      }
+    };
+
+    window.addEventListener('resize', handleResize, { passive: true });
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', handleViewportChange);
+    }
+
+    return () => {
+      window.removeEventListener('scroll', throttledHandleScroll);
+      window.removeEventListener('resize', handleResize);
+      if (window.visualViewport) {
+        window.visualViewport.removeEventListener('resize', handleViewportChange);
+      }
+      // Clean up on unmount
+      document.documentElement.classList.remove('browser-ui-hidden');
+    };
+  }, [lastScrollY]);
 
   const filteredConversations = conversations.filter(conv =>
     conv.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -415,9 +570,12 @@ export default function AskAIPage() {
   // New Message View - Apple Messages Style
   if (currentView === 'newMessage') {
     return (
-      <div className="fixed inset-x-0 top-[4.5rem] bottom-20 lg:static lg:h-[calc(100vh-8rem)] bg-white dark:bg-black flex flex-col z-[60] lg:z-auto lg:rounded-lg lg:border lg:border-gray-200 lg:dark:border-gray-800 lg:shadow-sm overflow-hidden">
+      <div 
+        className="fixed inset-0 top-[68px] bottom-20 tablet:static tablet:h-[calc(100vh-8rem)] bg-white dark:bg-black flex flex-col z-[60] tablet:z-auto tablet:rounded-lg tablet:border tablet:border-gray-200 tablet:dark:border-gray-800 tablet:shadow-sm overflow-hidden mobile-viewport-transition"
+        onTouchStart={forceBrowserUIHide}
+      >
         {/* New Message Header */}
-        <div className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-4 py-3 lg:rounded-t-lg">
+        <div className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-4 py-3 tablet:rounded-t-lg">
           <div className="flex items-center justify-between">
             <Button
               variant="ghost"
@@ -476,7 +634,7 @@ export default function AskAIPage() {
         </div>
 
         {/* Contact Suggestions */}
-        <div className="flex-1 bg-white dark:bg-black overflow-y-auto overscroll-contain">
+        <div className="flex-1 bg-white dark:bg-black overflow-y-auto overscroll-contain mobile-scrollable">
           {!selectedContact && (
             <>
               {/* Suggested Contacts Header */}
@@ -584,9 +742,12 @@ export default function AskAIPage() {
     const messages = getMessages(activeConversation.id);
     
     return (
-      <div className="fixed inset-x-0 top-[4.5rem] bottom-20 lg:static lg:h-[calc(100vh-8rem)] bg-white dark:bg-black flex flex-col z-[60] lg:z-auto lg:rounded-lg lg:border lg:border-gray-200 lg:dark:border-gray-800 lg:shadow-sm overflow-hidden">
+      <div 
+        className="fixed inset-0 top-[68px] bottom-20 tablet:static tablet:h-[calc(100vh-8rem)] bg-white dark:bg-black flex flex-col z-[60] tablet:z-auto tablet:rounded-lg tablet:border tablet:border-gray-200 tablet:dark:border-gray-800 tablet:shadow-sm overflow-hidden mobile-viewport-transition"
+        onTouchStart={forceBrowserUIHide}
+      >
         {/* Chat Header - iOS Style */}
-        <div className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-4 py-3 flex items-center justify-between lg:rounded-t-lg">
+        <div className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-4 py-3 flex items-center justify-between tablet:rounded-t-lg">
           <div className="flex items-center gap-3">
             <Button
               variant="ghost"
@@ -636,7 +797,7 @@ export default function AskAIPage() {
         </div>
 
         {/* Messages Area */}
-        <div className="flex-1 px-4 py-4 bg-white dark:bg-black overflow-y-auto overscroll-contain">
+        <div className="flex-1 px-4 py-4 bg-white dark:bg-black overflow-y-auto overscroll-contain mobile-scrollable">
           <div className="space-y-4">
             {messages.map((message, index) => (
               <div
@@ -699,7 +860,7 @@ export default function AskAIPage() {
         </div>
 
         {/* Message Input - iOS Style */}
-        <div className="bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 px-4 py-3 lg:rounded-b-lg">
+        <div className="bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 px-4 py-3 tablet:rounded-b-lg">
           <div className="flex items-end gap-3">
             <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400 hover:text-gray-600 mb-1">
               <Plus className="h-5 w-5" />
@@ -752,9 +913,12 @@ export default function AskAIPage() {
 
   // Messages List View - iOS Style
   return (
-    <div className="fixed inset-x-0 top-[4.5rem] bottom-20 lg:static lg:h-[calc(100vh-8rem)] bg-white dark:bg-black flex flex-col z-[60] lg:z-auto lg:rounded-lg lg:border lg:border-gray-200 lg:dark:border-gray-800 lg:shadow-sm overflow-hidden">
+    <div 
+      className="fixed inset-0 top-[68px] bottom-20 tablet:static tablet:h-[calc(100vh-8rem)] bg-white dark:bg-black flex flex-col z-[60] tablet:z-auto tablet:rounded-lg tablet:border tablet:border-gray-200 tablet:dark:border-gray-800 tablet:shadow-sm overflow-hidden mobile-viewport-transition"
+      onTouchStart={forceBrowserUIHide}
+    >
       {/* Header - iOS Messages Style */}
-      <div className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-4 py-3 lg:rounded-t-lg">
+      <div className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-4 py-3 tablet:rounded-t-lg">
         <div className="flex items-center justify-between mb-4">
           <Button
             variant="ghost"
@@ -812,7 +976,7 @@ export default function AskAIPage() {
       </div>
 
       {/* Conversations List */}
-      <div className="flex-1 overflow-y-auto overscroll-contain">
+      <div className="flex-1 overflow-y-auto overscroll-contain mobile-scrollable">
         {filteredConversations.map((conversation) => (
           <div
             key={conversation.id}
@@ -878,7 +1042,7 @@ export default function AskAIPage() {
 
       {/* Edit Mode Bottom Actions */}
       {isEditMode && selectedConversations.size > 0 && (
-        <div className="bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 px-4 py-3 lg:rounded-b-lg">
+        <div className="bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 px-4 py-3 tablet:rounded-b-lg">
           <div className="flex items-center justify-center gap-8">
             <Button
               variant="ghost"
