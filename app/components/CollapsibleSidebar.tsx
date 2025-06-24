@@ -13,11 +13,26 @@ import {
   ChevronDown,
   User,
   Briefcase,
-  HelpCircle
+  HelpCircle,
+  MessageCircle,
+  BarChart3,
+  Target,
+  Trophy,
+  Users,
+  GraduationCap,
+  Zap,
+  Award,
+  TrendingUp,
+  Calendar,
+  FileText,
+  Clock,
+  Star,
+  Gamepad2
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTheme } from '../contexts/ThemeContext';
 import { useAuth } from '../contexts/AuthContext';
+import Image from 'next/image';
 
 interface SidebarProps {
   isCollapsed: boolean;
@@ -549,8 +564,14 @@ export default function CollapsibleSidebar({ isCollapsed, onToggle }: SidebarPro
         {isCollapsed ? (
           /* Collapsed State - Show logo icon and toggle button */
           <div className="flex flex-col items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
-              <span className="text-white font-bold text-sm">U</span>
+            <div className="w-8 h-8 rounded-lg bg-white p-1 shadow-lg">
+              <Image 
+                src="/media/baltu_technologies_logo_long_upskill_white.png" 
+                alt="Upskill Logo" 
+                width={24} 
+                height={24}
+                className="w-full h-full object-contain"
+              />
             </div>
             <Button
               variant="ghost"
@@ -567,8 +588,14 @@ export default function CollapsibleSidebar({ isCollapsed, onToggle }: SidebarPro
           /* Expanded State - Show full logo with toggle button on the right */
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center shadow-lg">
-                <span className="text-white font-bold text-lg">U</span>
+              <div className="w-10 h-10 rounded-xl bg-white p-2 shadow-lg">
+                <Image 
+                  src="/media/baltu_technologies_logo_long_upskill_white.png" 
+                  alt="Upskill Logo" 
+                  width={40} 
+                  height={40}
+                  className="w-full h-full object-contain"
+                />
               </div>
               <div>
                 <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
@@ -605,8 +632,14 @@ export default function CollapsibleSidebar({ isCollapsed, onToggle }: SidebarPro
               className="w-12 h-12 p-0 rounded-full hover:scale-105 transition-all duration-200
                         bg-slate-200/60 hover:bg-slate-300/80 dark:bg-[hsl(222,84%,12%)] dark:hover:bg-[hsl(222,84%,15%)]"
             >
-              <div className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
-                <span className="text-white font-semibold text-sm">PC</span>
+              <div className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 p-0.5">
+                <Image 
+                  src="/media/Peter_Costa_Bio_2024.jpg" 
+                  alt="Peter Costa" 
+                  width={40} 
+                  height={40}
+                  className="w-full h-full object-cover rounded-full"
+                />
               </div>
             </Button>
           </div>
@@ -630,8 +663,14 @@ export default function CollapsibleSidebar({ isCollapsed, onToggle }: SidebarPro
             )}
           >
             <div className="flex items-center gap-4 w-full">
-              <div className="w-12 h-12 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center shadow-lg">
-                <span className="text-white font-semibold text-base">PC</span>
+              <div className="w-12 h-12 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 p-0.5 shadow-lg">
+                <Image 
+                  src="/media/Peter_Costa_Bio_2024.jpg" 
+                  alt="Peter Costa" 
+                  width={48} 
+                  height={48}
+                  className="w-full h-full object-cover rounded-full"
+                />
               </div>
               <div className="flex-1 min-w-0 text-left">
                 <h3 className="text-base font-semibold truncate">

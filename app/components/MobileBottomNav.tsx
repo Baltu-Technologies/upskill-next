@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { 
@@ -29,6 +29,7 @@ import {
 import { cn } from '@/lib/utils';
 import { useTheme } from '../contexts/ThemeContext';
 import { useAuth } from '../contexts/AuthContext';
+import Image from 'next/image';
 
 interface MobileBottomNavProps {
   className?: string;
@@ -194,8 +195,14 @@ export default function MobileBottomNav({ className }: MobileBottomNavProps) {
             >
               <div className="relative">
                 <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 p-0.5">
-                  <div className="w-full h-full rounded-full bg-white dark:bg-gray-900 flex items-center justify-center">
-                    <User className="h-6 w-6 text-gray-600 dark:text-gray-300" />
+                  <div className="w-full h-full rounded-full overflow-hidden">
+                    <Image 
+                      src="/media/Peter_Costa_Bio_2024.jpg" 
+                      alt="Peter Costa" 
+                      width={48} 
+                      height={48}
+                      className="w-full h-full object-cover"
+                    />
                   </div>
                 </div>
                 <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-green-500 rounded-full border-2 border-white dark:border-gray-900" />
@@ -212,8 +219,14 @@ export default function MobileBottomNav({ className }: MobileBottomNavProps) {
             {/* User Profile Header */}
             <DropdownMenuLabel className="font-normal p-3 rounded-lg bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950 dark:to-purple-950 mb-2">
               <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
-                  <User className="h-5 w-5 text-white" />
+                <div className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 p-0.5">
+                  <Image 
+                    src="/media/Peter_Costa_Bio_2024.jpg" 
+                    alt="Peter Costa" 
+                    width={40} 
+                    height={40}
+                    className="w-full h-full object-cover rounded-full"
+                  />
                 </div>
                 <div className="flex flex-col space-y-1">
                   <p className="text-sm font-semibold leading-none">Peter Costa</p>
