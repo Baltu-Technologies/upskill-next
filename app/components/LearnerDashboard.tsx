@@ -44,308 +44,299 @@ const mockDashboardData = {
     dayStreak: 12
   },
   courseInProgress: {
-    title: "Advanced Fiber Optics Installation",
+    title: "Advanced Fiber Optic Installation",
     progress: 68,
+    currentModule: 3,
     totalLessons: 24,
     completedLessons: 16,
+    lessonsRemaining: 8,
     nextLesson: "Fusion Splicing Techniques"
   },
   jobOpportunities: {
     newMatches: 3,
-    totalMatches: 47,
+    totalMatches: 18,
     topMatch: {
-      company: "Verizon",
-      position: "Fiber Technician",
-      matchPercentage: 94,
+      title: "Senior Fiber Technician",
+      company: "TechCorp Solutions",
+      matchPercentage: 92,
       location: "Boston, MA"
     }
   },
   certifications: {
-    earned: 8,
+    earned: 4,
     inProgress: 2,
-    available: 15,
-    recentCert: "FOA CFOT Certification"
+    available: 12,
+    nextCertification: "FOA CFOT Certification",
+    nextProgress: 75,
+    recentCert: "Fiber Optic Safety"
   },
   profileCompletion: {
-    percentage: 85,
-    missingFields: ["Portfolio Projects", "References", "Skills Assessment"]
+    percentage: 78,
+    missingFields: [
+      "Professional Experience",
+      "Skills Assessment",
+      "Portfolio Projects",
+      "References"
+    ]
   },
   careerPathway: {
-    currentPath: "Fiber Optic Technician",
-    overallProgress: 72,
+    currentPathway: "Fiber Optic Technician Track",
+    currentPath: "Fiber Optic Technician Track",
+    currentStep: 3,
+    totalSteps: 5,
+    completionPercentage: 68,
+    overallProgress: 68,
+    estimatedCompletion: "2 months remaining",
     currentPhase: "Advanced Installation",
     nextMilestone: "Certification Exam"
   }
 };
 
 export default function LearnerDashboard() {
-  const [data] = useState(mockDashboardData);
+  const data = mockDashboardData;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
-      {/* Welcome Section */}
-      <div className="mb-8 flex items-center gap-6">
-        <div className="relative">
-          <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 p-1 shadow-lg">
-            <div className="w-full h-full rounded-xl overflow-hidden">
-              <Image 
-                src={data.user.avatar} 
-                alt="Peter Costa" 
-                width={80} 
-                height={80} 
-                className="w-full h-full object-cover rounded-xl" 
-              />
-            </div>
-          </div>
-          <div className="absolute -bottom-1 -right-1 bg-yellow-500 text-white text-xs font-bold px-2 py-1 rounded-lg shadow-md">
-            {data.user.level}
-          </div>
-        </div>
-        <div>
-          <h1 className="text-4xl font-bold text-slate-900 dark:text-white">
-            Welcome, <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">{data.user.firstName}!</span>
-          </h1>
-          <p className="text-slate-600 dark:text-slate-300 text-lg mt-1">{data.user.title}</p>
-        </div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-slate-100 to-slate-200 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 p-4 md:p-6">
+      {/* Floating background elements */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-blue-500/5 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-1/3 right-1/4 w-96 h-96 bg-purple-500/5 rounded-full blur-3xl animate-pulse delay-1000" />
       </div>
 
-      {/* Dashboard Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        
-        {/* Recent Activity */}
-        <Card className="border-l-4 border-l-green-500 hover:shadow-lg transition-all duration-300 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm">
-          <CardHeader className="pb-3">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg">
-                <Activity className="h-5 w-5 text-green-600" />
-              </div>
-              <CardTitle className="text-slate-900 dark:text-white">Recent Activity</CardTitle>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <div>
-              <p className="font-medium text-slate-900 dark:text-white">{data.recentActivity.lastAction}</p>
-              <p className="text-sm text-slate-500 dark:text-slate-400">{data.recentActivity.timeAgo}</p>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-slate-600 dark:text-slate-300">Actions Today:</span>
-              <span className="font-semibold text-green-600">{data.recentActivity.actionsToday}</span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-slate-600 dark:text-slate-300">Day Streak:</span>
-              <div className="flex items-center gap-1">
-                <Flame className="h-4 w-4 text-orange-500" />
-                <span className="font-semibold text-orange-600">{data.recentActivity.dayStreak}</span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Course In Progress */}
-        <Card className="border-l-4 border-l-blue-500 hover:shadow-lg transition-all duration-300 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm">
-          <CardHeader className="pb-3">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
-                <BookOpen className="h-5 w-5 text-blue-600" />
-              </div>
-              <CardTitle className="text-slate-900 dark:text-white">Course In Progress</CardTitle>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <h3 className="font-medium text-slate-900 dark:text-white line-clamp-2">{data.courseInProgress.title}</h3>
-              <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-                {data.courseInProgress.completedLessons} of {data.courseInProgress.totalLessons} lessons
-              </p>
-            </div>
-            
-            <div className="space-y-2">
-              <div className="flex justify-between text-sm">
-                <span className="text-slate-600 dark:text-slate-300">Progress</span>
-                <span className="font-semibold text-blue-600">{data.courseInProgress.progress}%</span>
-              </div>
-              <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2">
-                <div 
-                  className="bg-gradient-to-r from-blue-500 to-blue-600 h-2 rounded-full transition-all duration-300"
-                  style={{ width: `${data.courseInProgress.progress}%` }}
+      <div className="relative z-10 max-w-7xl mx-auto">
+        {/* Welcome Section - More space and better positioning */}
+        <div className="mb-8 md:mb-12">
+          <div className="flex flex-col md:flex-row md:items-center gap-4 md:gap-6">
+            {/* Avatar */}
+            <div className="w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 p-1 shadow-lg">
+              <div className="w-full h-full rounded-xl overflow-hidden">
+                <Image 
+                  src={data.user.avatar} 
+                  alt="Peter Costa" 
+                  width={80} 
+                  height={80} 
+                  className="w-full h-full object-cover rounded-xl" 
                 />
               </div>
             </div>
             
-            <div className="pt-2 border-t border-slate-200 dark:border-slate-700">
-              <p className="text-sm text-slate-600 dark:text-slate-300">Next: {data.courseInProgress.nextLesson}</p>
-              <button className="text-blue-600 hover:text-blue-700 text-sm font-medium flex items-center gap-1 mt-1">
-                Continue Learning <ArrowRight className="h-3 w-3" />
-              </button>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Job Opportunities */}
-        <Card className="border-l-4 border-l-purple-500 hover:shadow-lg transition-all duration-300 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm">
-          <CardHeader className="pb-3">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
-                <Briefcase className="h-5 w-5 text-purple-600" />
-              </div>
-              <CardTitle className="text-slate-900 dark:text-white">Job Opportunities</CardTitle>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <div className="grid grid-cols-2 gap-4 text-center">
-              <div>
-                <p className="text-2xl font-bold text-purple-600">{data.jobOpportunities.newMatches}</p>
-                <p className="text-xs text-slate-500 dark:text-slate-400">New Matches</p>
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-slate-700 dark:text-slate-300">{data.jobOpportunities.totalMatches}</p>
-                <p className="text-xs text-slate-500 dark:text-slate-400">Total Matches</p>
-              </div>
-            </div>
-            
-            <div className="pt-3 border-t border-slate-200 dark:border-slate-700">
-              <div className="flex items-center justify-between">
-                <div className="flex-1">
-                  <p className="font-medium text-slate-900 dark:text-white text-sm">{data.jobOpportunities.topMatch.position}</p>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">{data.jobOpportunities.topMatch.company}</p>
-                </div>
-                <div className="text-right">
-                  <span className="bg-gradient-to-r from-purple-500 to-purple-600 text-white text-xs font-bold px-2 py-1 rounded-full">
-                    {data.jobOpportunities.topMatch.matchPercentage}% Match
+            {/* Welcome Text */}
+            <div className="flex-1">
+              <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent mb-2">
+                Welcome, {data.user.firstName}!
+              </h1>
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+                <p className="text-sm md:text-base text-gray-600 dark:text-gray-400">
+                  {data.user.title}
+                </p>
+                <div className="flex items-center gap-2 text-xs md:text-sm">
+                  <span className="px-2 py-1 bg-gradient-to-r from-yellow-400 to-orange-500 text-white rounded-full font-semibold">
+                    Level {data.user.level}
                   </span>
                 </div>
               </div>
-              <button className="text-purple-600 hover:text-purple-700 text-sm font-medium flex items-center gap-1 mt-2">
-                View All Jobs <ArrowRight className="h-3 w-3" />
-              </button>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
-        {/* Certifications */}
-        <Card className="border-l-4 border-l-yellow-500 hover:shadow-lg transition-all duration-300 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm">
-          <CardHeader className="pb-3">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg">
-                <Award className="h-5 w-5 text-yellow-600" />
+        {/* Dashboard Metrics Grid - Smaller, more compact boxes */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+          
+          {/* Recent Activity Card */}
+          <Card className="group relative overflow-hidden bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-l-4 border-l-green-500 hover:shadow-lg transition-all duration-300">
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-base font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                  <Activity className="h-4 w-4 text-green-500" />
+                  Recent Activity
+                </CardTitle>
               </div>
-              <CardTitle className="text-slate-900 dark:text-white">Certifications</CardTitle>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <div className="grid grid-cols-3 gap-3 text-center">
+            </CardHeader>
+            <CardContent className="space-y-3">
               <div>
-                <p className="text-xl font-bold text-yellow-600">{data.certifications.earned}</p>
-                <p className="text-xs text-slate-500 dark:text-slate-400">Earned</p>
+                <p className="text-sm font-medium text-gray-900 dark:text-white">
+                  {data.recentActivity.lastAction}
+                </p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  {data.recentActivity.timeAgo}
+                </p>
               </div>
-              <div>
-                <p className="text-xl font-bold text-blue-600">{data.certifications.inProgress}</p>
-                <p className="text-xs text-slate-500 dark:text-slate-400">In Progress</p>
+              <div className="flex justify-between text-xs">
+                <span className="text-gray-600 dark:text-gray-400">
+                  Actions today: <span className="font-semibold text-green-600">{data.recentActivity.actionsToday}</span>
+                </span>
+                <span className="text-gray-600 dark:text-gray-400">
+                  Streak: <span className="font-semibold text-orange-600">{data.recentActivity.dayStreak} days</span>
+                </span>
               </div>
-              <div>
-                <p className="text-xl font-bold text-slate-500">{data.certifications.available}</p>
-                <p className="text-xs text-slate-500 dark:text-slate-400">Available</p>
-              </div>
-            </div>
-            
-            <div className="pt-3 border-t border-slate-200 dark:border-slate-700">
-              <p className="text-sm text-slate-600 dark:text-slate-300">Latest: {data.certifications.recentCert}</p>
-              <button className="text-yellow-600 hover:text-yellow-700 text-sm font-medium flex items-center gap-1 mt-1">
-                View All Certs <ArrowRight className="h-3 w-3" />
-              </button>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
 
-        {/* Profile Completion */}
-        <Card className="border-l-4 border-l-orange-500 hover:shadow-lg transition-all duration-300 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm">
-          <CardHeader className="pb-3">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-orange-100 dark:bg-orange-900/30 rounded-lg">
-                <User className="h-5 w-5 text-orange-600" />
+          {/* Course In Progress Card */}
+          <Card className="group relative overflow-hidden bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-l-4 border-l-blue-500 hover:shadow-lg transition-all duration-300">
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-base font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                  <BookOpen className="h-4 w-4 text-blue-500" />
+                  Course In Progress
+                </CardTitle>
               </div>
-              <CardTitle className="text-slate-900 dark:text-white">Profile Completion</CardTitle>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="text-center">
-              <div className="relative inline-flex items-center justify-center w-20 h-20">
-                <svg className="w-20 h-20 transform -rotate-90" viewBox="0 0 36 36">
-                  <path
-                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeDasharray={`${data.profileCompletion.percentage}, 100`}
-                    className="text-orange-500"
-                  />
-                  <path
-                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    className="text-slate-200 dark:text-slate-700"
-                  />
-                </svg>
-                <span className="absolute text-xl font-bold text-orange-600">{data.profileCompletion.percentage}%</span>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div>
+                <p className="text-sm font-medium text-gray-900 dark:text-white">
+                  {data.courseInProgress.title}
+                </p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  Module {data.courseInProgress.currentModule}
+                </p>
               </div>
-            </div>
-            
-            <div>
-              <p className="text-sm text-slate-600 dark:text-slate-300 mb-2">Missing:</p>
+              <div className="space-y-2">
+                <div className="flex justify-between text-xs">
+                  <span className="text-gray-600 dark:text-gray-400">Progress</span>
+                  <span className="font-semibold text-blue-600">{data.courseInProgress.progress}%</span>
+                </div>
+                <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                  <div 
+                    className="bg-gradient-to-r from-blue-500 to-blue-600 h-2 rounded-full transition-all duration-300"
+                    style={{ width: `${data.courseInProgress.progress}%` }}
+                  />
+                </div>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  {data.courseInProgress.lessonsRemaining} lessons remaining
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Job Opportunities Card */}
+          <Card className="group relative overflow-hidden bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-l-4 border-l-purple-500 hover:shadow-lg transition-all duration-300">
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-base font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                  <Briefcase className="h-4 w-4 text-purple-500" />
+                  Job Opportunities
+                </CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="grid grid-cols-2 gap-3 text-center">
+                <div>
+                  <p className="text-lg font-bold text-purple-600">{data.jobOpportunities.newMatches}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">New Matches</p>
+                </div>
+                <div>
+                  <p className="text-lg font-bold text-gray-900 dark:text-white">{data.jobOpportunities.totalMatches}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Total Matches</p>
+                </div>
+              </div>
+              <div className="pt-2 border-t border-gray-200 dark:border-gray-700">
+                <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">Top Match</p>
+                <p className="text-sm font-medium text-gray-900 dark:text-white">{data.jobOpportunities.topMatch.title}</p>
+                <p className="text-xs text-purple-600 font-semibold">{data.jobOpportunities.topMatch.matchPercentage}% Match</p>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Certifications Card */}
+          <Card className="group relative overflow-hidden bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-l-4 border-l-orange-500 hover:shadow-lg transition-all duration-300">
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-base font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                  <Award className="h-4 w-4 text-orange-500" />
+                  Certifications
+                </CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="grid grid-cols-2 gap-3 text-center">
+                <div>
+                  <p className="text-lg font-bold text-orange-600">{data.certifications.earned}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Earned</p>
+                </div>
+                <div>
+                  <p className="text-lg font-bold text-gray-900 dark:text-white">{data.certifications.inProgress}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">In Progress</p>
+                </div>
+              </div>
+              <div className="pt-2 border-t border-gray-200 dark:border-gray-700">
+                <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">Next Certification</p>
+                <p className="text-sm font-medium text-gray-900 dark:text-white">{data.certifications.nextCertification}</p>
+                <p className="text-xs text-orange-600 font-semibold">{data.certifications.nextProgress}% Complete</p>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Profile Completion Card */}
+          <Card className="group relative overflow-hidden bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-l-4 border-l-red-500 hover:shadow-lg transition-all duration-300">
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-base font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                  <User className="h-4 w-4 text-red-500" />
+                  Profile Completion
+                </CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="text-center">
+                <p className="text-2xl font-bold text-red-600 mb-1">{data.profileCompletion.percentage}%</p>
+                <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mb-2">
+                  <div 
+                    className="bg-gradient-to-r from-red-500 to-red-600 h-2 rounded-full transition-all duration-300"
+                    style={{ width: `${data.profileCompletion.percentage}%` }}
+                  />
+                </div>
+              </div>
               <div className="space-y-1">
-                {data.profileCompletion.missingFields.map((field, index) => (
-                  <div key={index} className="flex items-center gap-2 text-xs">
-                    <div className="w-1.5 h-1.5 bg-orange-500 rounded-full"></div>
-                    <span className="text-slate-500 dark:text-slate-400">{field}</span>
-                  </div>
+                <p className="text-xs text-gray-600 dark:text-gray-400">Missing fields:</p>
+                {data.profileCompletion.missingFields.slice(0, 2).map((field, index) => (
+                  <p key={index} className="text-xs text-gray-500 dark:text-gray-400">• {field}</p>
                 ))}
+                {data.profileCompletion.missingFields.length > 2 && (
+                  <p className="text-xs text-gray-400">+{data.profileCompletion.missingFields.length - 2} more</p>
+                )}
               </div>
-              <button className="text-orange-600 hover:text-orange-700 text-sm font-medium flex items-center gap-1 mt-2">
-                Complete Profile <ArrowRight className="h-3 w-3" />
-              </button>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
 
-        {/* Career Pathway Progress */}
-        <Card className="border-l-4 border-l-indigo-500 hover:shadow-lg transition-all duration-300 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm">
-          <CardHeader className="pb-3">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg">
-                <Target className="h-5 w-5 text-indigo-600" />
+          {/* Career Pathway Card */}
+          <Card className="group relative overflow-hidden bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-l-4 border-l-indigo-500 hover:shadow-lg transition-all duration-300">
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-base font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                  <Target className="h-4 w-4 text-indigo-500" />
+                  Career Pathway
+                </CardTitle>
               </div>
-              <CardTitle className="text-slate-900 dark:text-white">Career Pathway</CardTitle>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <h3 className="font-medium text-slate-900 dark:text-white">{data.careerPathway.currentPath}</h3>
-              <p className="text-sm text-slate-500 dark:text-slate-400">Current Phase: {data.careerPathway.currentPhase}</p>
-            </div>
-            
-            <div className="space-y-2">
-              <div className="flex justify-between text-sm">
-                <span className="text-slate-600 dark:text-slate-300">Overall Progress</span>
-                <span className="font-semibold text-indigo-600">{data.careerPathway.overallProgress}%</span>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div>
+                <p className="text-sm font-medium text-gray-900 dark:text-white">
+                  {data.careerPathway.currentPathway}
+                </p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  Step {data.careerPathway.currentStep} of {data.careerPathway.totalSteps}
+                </p>
               </div>
-              <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2">
-                <div 
-                  className="bg-gradient-to-r from-indigo-500 to-indigo-600 h-2 rounded-full transition-all duration-300"
-                  style={{ width: `${data.careerPathway.overallProgress}%` }}
-                />
+              <div className="space-y-2">
+                <div className="flex justify-between text-xs">
+                  <span className="text-gray-600 dark:text-gray-400">Progress</span>
+                  <span className="font-semibold text-indigo-600">{data.careerPathway.completionPercentage}%</span>
+                </div>
+                <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                  <div 
+                    className="bg-gradient-to-r from-indigo-500 to-indigo-600 h-2 rounded-full transition-all duration-300"
+                    style={{ width: `${data.careerPathway.completionPercentage}%` }}
+                  />
+                </div>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  {data.careerPathway.estimatedCompletion}
+                </p>
               </div>
-            </div>
-            
-            <div className="pt-2 border-t border-slate-200 dark:border-slate-700">
-              <p className="text-sm text-slate-600 dark:text-slate-300">Next: {data.careerPathway.nextMilestone}</p>
-              <button className="text-indigo-600 hover:text-indigo-700 text-sm font-medium flex items-center gap-1 mt-1">
-                View Pathway <ArrowRight className="h-3 w-3" />
-              </button>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
 
+        </div>
       </div>
     </div>
   );
