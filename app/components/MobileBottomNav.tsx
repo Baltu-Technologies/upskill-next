@@ -24,7 +24,9 @@ import {
   Sun,
   Moon,
   Monitor,
-  LogOut
+  LogOut,
+  Search,
+  Target
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTheme } from '../contexts/ThemeContext';
@@ -90,8 +92,18 @@ export default function MobileBottomNav({ className }: MobileBottomNavProps) {
     }
   ];
 
-  // Profile submenu items
+  // Profile submenu items - now includes Career Explorer and My Pathways
   const profileMenuItems: ProfileMenuItem[] = [
+    {
+      title: 'Career Explorer',
+      icon: Search,
+      href: '/career-exploration'
+    },
+    {
+      title: 'My Pathways',
+      icon: Target,
+      href: '/career-exploration/pathways'
+    },
     {
       title: 'Study Hub',
       icon: GraduationCap,
@@ -121,7 +133,8 @@ export default function MobileBottomNav({ className }: MobileBottomNavProps) {
 
   const isProfileActive = pathname.startsWith('/profile') || 
                          pathname.startsWith('/study-hub/study-list') || 
-                         pathname.startsWith('/stats-goals');
+                         pathname.startsWith('/stats-goals') ||
+                         pathname.startsWith('/career-exploration');
 
   return (
     <div     className={cn(

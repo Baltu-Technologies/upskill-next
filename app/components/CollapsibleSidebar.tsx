@@ -371,28 +371,6 @@ export default function CollapsibleSidebar({ isCollapsed, onToggle }: SidebarPro
       color: 'text-blue-500'
     },
     
-    // Career Explorer with submenu
-    {
-      title: 'Career Explorer',
-      icon: Search,
-      color: 'text-emerald-500',
-      href: '/career-exploration',
-      submenu: [
-        {
-          title: 'Industries',
-          href: '/career-exploration/industries'
-        },
-        {
-          title: 'Technologies',
-          href: '/career-exploration/technologies'
-        },
-        {
-          title: 'Career Pathways',
-          href: '/career-exploration/pathways'
-        }
-      ]
-    },
-    
     // Courses with submenu
     {
       title: 'Courses',
@@ -447,11 +425,19 @@ export default function CollapsibleSidebar({ isCollapsed, onToggle }: SidebarPro
     return pathname.startsWith(item.href || '');
   };
 
-  // Define profile submenu items
+  // Define profile submenu items - now includes Career Explorer and My Pathways
   const profileSubmenuItems = [
     {
       title: 'My Profile',
       href: '/profile'
+    },
+    {
+      title: 'Career Explorer',
+      href: '/career-exploration'
+    },
+    {
+      title: 'My Pathways',
+      href: '/career-exploration/pathways'
     },
     {
       title: 'Stats & Goals',
@@ -474,14 +460,12 @@ export default function CollapsibleSidebar({ isCollapsed, onToggle }: SidebarPro
   useEffect(() => {
     const newExpandedMenus = new Set<string>();
     
-    // Profile-related pages
-    if (pathname === '/profile' || pathname === '/stats-goals' || pathname === '/study-hub') {
+    // Profile-related pages - now includes career exploration
+    if (pathname === '/profile' || 
+        pathname === '/stats-goals' || 
+        pathname === '/study-hub' ||
+        pathname.startsWith('/career-exploration')) {
       newExpandedMenus.add('Profile');
-    }
-    
-    // Career Explorer pages
-    if (pathname.startsWith('/career-exploration')) {
-      newExpandedMenus.add('Career Explorer');
     }
     
     // Courses pages

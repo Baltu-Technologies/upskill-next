@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { 
   Flame,
   Zap,
@@ -13,7 +14,8 @@ import {
   Bell,
   MessageSquare,
   Bot,
-  X
+  X,
+  Search
 } from 'lucide-react';
 import CollapsibleSidebar from './CollapsibleSidebar';
 import MobileBottomNav from './MobileBottomNav';
@@ -31,6 +33,8 @@ export default function PersistentLayout({ children }: PersistentLayoutProps) {
   const [isMobile, setIsMobile] = useState(true); // Start as mobile to prevent sidebar flash
   const [showStatsPanel, setShowStatsPanel] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [showSearchBar, setShowSearchBar] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
   
   // Refs for click outside detection
@@ -121,6 +125,34 @@ export default function PersistentLayout({ children }: PersistentLayoutProps) {
                   <div className="flex items-center gap-1 px-2 py-1 rounded-lg bg-slate-200/60 dark:bg-[hsl(222,84%,12%)] hover:scale-105 transition-all duration-200">
                     <Zap className="h-3 w-3 text-purple-600" />
                     <span className="text-xs font-bold text-purple-600">1.8k</span>
+                  </div>
+                </div>
+
+                {/* Expandable Search Bar */}
+                <div className="flex items-center overflow-hidden transition-all duration-500 ease-in-out">
+                  {/* Search Button */}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-10 px-3 hover:bg-gradient-to-r hover:from-blue-500/10 hover:to-purple-500/10 dark:hover:from-blue-400/10 dark:hover:to-purple-400/10 rounded-xl transition-all duration-300 hover:scale-105 border border-transparent hover:border-blue-200/30 dark:hover:border-blue-400/20 bg-slate-200/40 dark:bg-[hsl(222,84%,12%)] flex-shrink-0"
+                    onClick={() => setShowSearchBar(!showSearchBar)}
+                  >
+                    <Search className="h-4 w-4 text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-300" />
+                  </Button>
+
+                  {/* Expandable Search Input */}
+                  <div 
+                    className={`transition-all duration-500 ease-in-out overflow-hidden ${
+                      showSearchBar ? 'w-64 ml-2 opacity-100' : 'w-0 ml-0 opacity-0'
+                    }`}
+                  >
+                    <Input
+                      placeholder="Search Upskill..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="w-full bg-slate-200/60 dark:bg-[hsl(222,84%,12%)] border border-slate-300/50 dark:border-[hsl(217,33%,17%)]/30 rounded-xl h-10 text-sm placeholder-slate-500 dark:placeholder-slate-400 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-300 dark:focus:border-blue-600 transition-all duration-300"
+                      autoFocus={showSearchBar}
+                    />
                   </div>
                 </div>
 
