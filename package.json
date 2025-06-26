@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@aws-amplify/ui-react": "^6.11.2",
+    "@aws-sdk/types": "^3.821.0",
     "@better-auth/cli": "^1.2.9",
     "@opentelemetry/api": "^1.9.0",
     "@radix-ui/react-dialog": "^1.1.14",

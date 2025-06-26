@@ -433,7 +433,7 @@ export default function AuthTestPage() {
                         }
                         className="text-xs"
                       >
-                        {result.severity.toUpperCase()}
+                        {result.severity?.toUpperCase() || 'UNKNOWN'}
                       </Badge>
                     </div>
                     <p className="text-sm text-muted-foreground">{result.details}</p>

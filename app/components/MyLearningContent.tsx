@@ -486,7 +486,7 @@ export default function MyLearningContent() {
                 <Card key={course.id} className="group cursor-pointer overflow-hidden border-2 border-slate-700 bg-slate-800/50 hover:border-blue-400/50 transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/10 flex flex-col h-full">
                   {/* Course Banner */}
                   <div className="relative h-48 overflow-hidden">
-                    <div className="absolute inset-0 transition-transform duration-[4000ms] ease-out group-hover:scale-125 group-hover:translate-x-3 group-hover:-translate-y-2">
+                    <div className="absolute inset-0 transition-transform duration-&lsqb;4000ms&rsqb; ease-out group-hover:scale-125 group-hover:translate-x-3 group-hover:-translate-y-2">
                       <Image
                         src={course.image}
                         alt={course.title}

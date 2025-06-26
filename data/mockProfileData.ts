@@ -11,6 +11,9 @@ import {
   ProfileCompletionStatus
 } from '../types/profile';
 
+// Type alias for backward compatibility with src/ components
+export type UserProfile = CompleteProfile;
+
 // ===================================================================
 // MOCK CORE CANDIDATE DATA (Shared with Employers)
 // ===================================================================
@@ -373,4 +376,119 @@ export const getRequiredCoreFields = (profile: CompleteProfile): string[] => {
       return value === null || value === undefined || value === '';
     })
     .map(field => field.label);
+};
+
+// ===================================================================
+// SKILLS UTILITY FUNCTIONS & TYPES (for src/ components compatibility)
+// ===================================================================
+
+export type SkillConfidenceLevel = 1 | 2 | 3 | 4 | 5;
+
+export interface UserSkill {
+  id: string;
+  skillTemplateId: string;
+  userId: string;
+  confidenceLevel: SkillConfidenceLevel;
+  sourceType: 'self_reported' | 'verified' | 'assessed';
+  verificationStatus: 'none' | 'pending' | 'verified' | 'expired';
+  acquiredDate: string;
+  isHidden: boolean;
+  evidence?: any[];
+}
+
+export interface SkillTemplate {
+  id: string;
+  name: string;
+  description: string;
+  domainId: string;
+  aliases: string[];
+  isCore: boolean;
+}
+
+export interface SkillDomain {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  color: string;
+  skills: SkillTemplate[];
+}
+
+export const mockSkillDomains: SkillDomain[] = [
+  {
+    id: 'electronics',
+    name: 'Electronics & Electrical',
+    description: 'Circuit analysis, component testing, electrical safety',
+    icon: '⚡',
+    color: 'bg-yellow-500',
+    skills: [
+      { id: 'multimeter', name: 'Multimeter Usage', description: 'Voltage, current, and resistance measurement', domainId: 'electronics', aliases: ['DMM', 'voltmeter'], isCore: true },
+      { id: 'soldering', name: 'Soldering', description: 'Through-hole and SMD component soldering', domainId: 'electronics', aliases: ['solder'], isCore: true }
+    ]
+  }
+];
+
+export const getConfidenceLevelText = (level: SkillConfidenceLevel): string => {
+  const texts = {
+    1: 'Beginner',
+    2: 'Novice', 
+    3: 'Intermediate',
+    4: 'Advanced',
+    5: 'Expert'
+  };
+  return texts[level];
+};
+
+export const getConfidenceLevelEmoji = (level: SkillConfidenceLevel): string => {
+  const emojis = {
+    1: '🌱',
+    2: '🌿',
+    3: '🌳',
+    4: '🏆',
+    5: '⭐'
+  };
+  return emojis[level];
+};
+
+export const getConfidenceLevelColor = (level: SkillConfidenceLevel): string => {
+  const colors = {
+    1: 'bg-gray-100 text-gray-800',
+    2: 'bg-blue-100 text-blue-800',
+    3: 'bg-green-100 text-green-800',
+    4: 'bg-orange-100 text-orange-800',
+    5: 'bg-purple-100 text-purple-800'
+  };
+  return colors[level];
+};
+
+export const getVerificationStatusText = (status: UserSkill['verificationStatus']): string => {
+  const texts = {
+    none: 'Not Verified',
+    pending: 'Verification Pending',
+    verified: 'Verified',
+    expired: 'Verification Expired'
+  };
+  return texts[status];
+};
+
+export const getVerificationStatusColor = (status: UserSkill['verificationStatus']): string => {
+  const colors = {
+    none: 'bg-gray-100 text-gray-800',
+    pending: 'bg-yellow-100 text-yellow-800',
+    verified: 'bg-green-100 text-green-800',
+    expired: 'bg-red-100 text-red-800'
+  };
+  return colors[status];
+};
+
+export const getSkillTemplate = (templateId: string): SkillTemplate | undefined => {
+  for (const domain of mockSkillDomains) {
+    const skill = domain.skills.find(s => s.id === templateId);
+    if (skill) return skill;
+  }
+  return undefined;
+};
+
+export const getSkillDomain = (domainId: string): SkillDomain | undefined => {
+  return mockSkillDomains.find(d => d.id === domainId);
 }; 

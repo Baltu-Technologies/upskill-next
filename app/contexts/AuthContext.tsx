@@ -7,6 +7,7 @@ interface AuthContextType {
   user: any;
   isLoading: boolean;
   error: string | null;
+  isAuthenticated: boolean;
   signOut: () => Promise<void>;
   refreshUser: () => Promise<void>;
   showAuthModal: () => void;
@@ -17,6 +18,7 @@ const AuthContext = createContext<AuthContextType>({
   user: null,
   isLoading: true,
   error: null,
+  isAuthenticated: false,
   signOut: async () => {},
   refreshUser: async () => {},
   showAuthModal: () => {},
@@ -77,7 +79,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     <AuthContext.Provider value={{ 
       user, 
       isLoading, 
-      error, 
+      error,
+      isAuthenticated: !isLoading && !!user,
       signOut: handleSignOut,
       refreshUser: checkUser,
       showAuthModal,

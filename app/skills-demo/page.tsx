@@ -534,19 +534,12 @@ export default function SkillsDemoPage() {
               "flex items-center justify-center w-10 h-10 rounded-full border-2 font-semibold",
               currentStep === 'informal' 
                 ? "bg-blue-600 border-blue-600 text-white"
-                : currentStep === 'completed'
-                ? "bg-green-600 border-green-600 text-white"
                 : "bg-white border-gray-300 text-gray-500"
             )}>
               2
             </div>
             <div className="w-16 h-0.5 bg-gray-300 dark:bg-gray-600"></div>
-            <div className={cn(
-              "flex items-center justify-center w-10 h-10 rounded-full border-2 font-semibold",
-              currentStep === 'completed'
-                ? "bg-green-600 border-green-600 text-white"
-                : "bg-white border-gray-300 text-gray-500"
-            )}>
+            <div className="flex items-center justify-center w-10 h-10 rounded-full border-2 font-semibold bg-white border-gray-300 text-gray-500">
               ✓
             </div>
           </div>
