@@ -381,7 +381,7 @@ export default function CollapsibleSidebar({ isCollapsed, onToggle }: SidebarPro
       href: '/courses',
       submenu: [
         {
-          title: 'My Learning',
+          title: 'My Courses',
           href: '/courses/my-learning'
         },
         {
@@ -390,7 +390,7 @@ export default function CollapsibleSidebar({ isCollapsed, onToggle }: SidebarPro
         },
         {
           title: 'Certifications',
-          href: '/courses/certifications'
+          href: '/certifications'
         }
       ]
     },

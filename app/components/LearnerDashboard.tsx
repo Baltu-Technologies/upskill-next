@@ -257,7 +257,7 @@ export default function LearnerDashboard() {
                 <p className="text-slate-600 dark:text-slate-400">Joined {data.user.joinedDate}</p>
               </div>
             </div>
-
+            
             <div className="flex-1 lg:ml-8">
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 <div className="bg-white dark:bg-slate-800 rounded-xl p-4 text-center shadow-sm">
@@ -340,7 +340,7 @@ export default function LearnerDashboard() {
               <CardTitle className="flex items-center gap-2">
                 <Target className="h-5 w-5 text-blue-600" />
                 Career Pathway
-              </CardTitle>
+                </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="relative p-6 rounded-lg border border-blue-200 dark:border-blue-800 overflow-hidden">
@@ -499,8 +499,8 @@ export default function LearnerDashboard() {
                   <Activity className="h-5 w-5 text-green-600" />
                   Recent Activity
                 </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
+            </CardHeader>
+            <CardContent className="space-y-3">
                 {/* Today's Summary */}
                 <div className="grid grid-cols-2 gap-2 sm:gap-4 text-center mb-4">
                   <div className="p-2 sm:p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
@@ -510,7 +510,7 @@ export default function LearnerDashboard() {
                   <div className="p-2 sm:p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
                     <div className="text-lg sm:text-xl font-bold text-yellow-600">{data.recentActivity.xpEarnedToday}</div>
                     <div className="text-xs text-gray-600 dark:text-gray-400">XP Earned</div>
-                  </div>
+              </div>
                 </div>
 
                 {/* Activity Timeline */}
@@ -554,9 +554,9 @@ export default function LearnerDashboard() {
                     View All Activity
                     <ChevronRight className="h-4 w-4 ml-1" />
                   </Button>
-                </div>
-              </CardContent>
-            </Card>
+              </div>
+            </CardContent>
+          </Card>
 
             {/* Job Opportunities */}
             <Card className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm shadow-xl border-2 border-purple-200/60 dark:border-purple-400/30 hover:border-purple-300/80 dark:hover:border-purple-300/50 transition-all duration-300 hover:shadow-2xl hover:shadow-purple-500/10 w-full min-w-0">
@@ -575,23 +575,23 @@ export default function LearnerDashboard() {
                   <div className="p-2 sm:p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
                     <div className="text-lg sm:text-xl font-bold text-purple-600">{data.jobOpportunities.totalMatches}</div>
                     <div className="text-xs text-gray-600 dark:text-gray-400">Total Matches</div>
-                  </div>
+              </div>
                 </div>
                 
                 <div className="p-3 border border-purple-200 dark:border-purple-800 rounded-lg">
                   <div className="flex items-center justify-between">
-                    <div>
+                <div>
                       <p className="text-sm font-medium text-gray-900 dark:text-white">{data.jobOpportunities.topMatch.title}</p>
                       <p className="text-xs text-gray-500 dark:text-gray-400">{data.jobOpportunities.topMatch.company}</p>
-                      <p className="text-xs text-purple-600 font-semibold">{data.jobOpportunities.topMatch.matchPercentage}% Match</p>
+                <p className="text-xs text-purple-600 font-semibold">{data.jobOpportunities.topMatch.matchPercentage}% Match</p>
                     </div>
                     <Button size="sm" variant="outline">
                       <ExternalLink className="h-4 w-4" />
                     </Button>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
+              </div>
+            </CardContent>
+          </Card>
           </div>
 
           {/* 3. Badges, Achievements, and Referrals - 3 Column Layout */}
@@ -618,7 +618,7 @@ export default function LearnerDashboard() {
                   <div className="p-2 sm:p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
                     <div className="text-lg sm:text-xl font-bold text-gray-600 dark:text-gray-400">{data.certifications.available}</div>
                     <div className="text-xs text-gray-600 dark:text-gray-400">Available</div>
-                  </div>
+              </div>
                 </div>
                 
                 <div className="p-3 border border-orange-200 dark:border-orange-800 rounded-lg">
@@ -634,9 +634,9 @@ export default function LearnerDashboard() {
                       <span className="text-xs text-orange-600 font-semibold">{data.certifications.nextProgress}%</span>
                     </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
+              </div>
+            </CardContent>
+          </Card>
 
             {/* Achievements */}
             <Card className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm shadow-xl border-2 border-yellow-200/60 dark:border-yellow-400/30 hover:border-yellow-300/80 dark:hover:border-yellow-300/50 transition-all duration-300 hover:shadow-2xl hover:shadow-yellow-500/10 w-full min-w-0">
@@ -645,8 +645,8 @@ export default function LearnerDashboard() {
                   <Medal className="h-5 w-5 text-yellow-600" />
                   Achievements
                 </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
+            </CardHeader>
+            <CardContent className="space-y-3">
                 {data.achievements.map((achievement) => (
                   <div key={achievement.id} className="relative">
                     <div className={cn(
@@ -681,17 +681,17 @@ export default function LearnerDashboard() {
                                 <div 
                                   className="bg-white h-1 rounded-full transition-all duration-300"
                                   style={{ width: `${(achievement.progress / achievement.maxProgress) * 100}%` }}
-                                />
-                              </div>
-                            </div>
-                          )}
-                        </div>
+                  />
+                </div>
+              </div>
+                )}
+              </div>
                       </div>
                     </div>
                   </div>
                 ))}
-              </CardContent>
-            </Card>
+            </CardContent>
+          </Card>
 
             {/* Invite Friends (Referrals) */}
             <Card className="bg-gradient-to-br from-green-100 to-emerald-100 dark:from-green-900/20 dark:to-emerald-900/20 shadow-lg border border-green-200/50">
@@ -709,11 +709,11 @@ export default function LearnerDashboard() {
                   <div className="p-2 sm:p-3 bg-green-200/50 dark:bg-green-800/30 rounded-lg">
                     <div className="text-lg sm:text-xl font-bold text-green-800 dark:text-green-300">{data.inviteRewards.successfulInvites}</div>
                     <div className="text-xs text-green-700 dark:text-green-400">Friends</div>
-                  </div>
+              </div>
                   <div className="p-2 sm:p-3 bg-green-200/50 dark:bg-green-800/30 rounded-lg">
                     <div className="text-lg sm:text-xl font-bold text-green-800 dark:text-green-300">{data.inviteRewards.totalXpEarned}</div>
                     <div className="text-xs text-green-700 dark:text-green-400">XP Earned</div>
-                  </div>
+              </div>
                 </div>
                 
                 <div className="space-y-2">
@@ -742,8 +742,8 @@ export default function LearnerDashboard() {
                   <Share2 className="h-3 w-3 mr-1" />
                   Invite Friends
                 </Button>
-              </CardContent>
-            </Card>
+            </CardContent>
+          </Card>
           </div>
         </div>
       </div>
