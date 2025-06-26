@@ -33,6 +33,7 @@ import { cn } from '@/lib/utils';
 import { useTheme } from '../contexts/ThemeContext';
 import { useAuth } from '../contexts/AuthContext';
 import Image from 'next/image';
+import MyAccountPopup from './MyAccountPopup';
 
 interface SidebarProps {
   isCollapsed: boolean;
@@ -360,6 +361,7 @@ export default function CollapsibleSidebar({ isCollapsed, onToggle }: SidebarPro
 
   const [expandedMenus, setExpandedMenus] = useState<Set<string>>(new Set());
   const [isMobile, setIsMobile] = useState(false);
+  const [isAccountPopupOpen, setIsAccountPopupOpen] = useState(false);
 
   // Define navigation items (active state will be calculated dynamically)
   const mainNavItems: NavItem[] = [
@@ -519,24 +521,19 @@ export default function CollapsibleSidebar({ isCollapsed, onToggle }: SidebarPro
     <div 
         className={cn(
           "fixed left-0 top-0 flex flex-col h-screen transition-all duration-300 ease-in-out shrink-0",
-          "bg-gradient-to-b from-slate-200/95 via-slate-300/90 to-slate-200/95",
-          "dark:bg-gradient-to-b dark:from-[hsl(222,84%,8%)] dark:via-[hsl(222,84%,6%)] dark:to-[hsl(222,84%,8%)]",
+          "bg-slate-200/95",
+          "dark:bg-[hsl(222,84%,8%)]",
           "backdrop-blur-xl border-r border-slate-300/80 dark:border-[hsl(217,33%,17%)]/20",
           "shadow-[0_0_30px_rgba(0,0,0,0.08)] shadow-slate-200/50",
           "dark:shadow-[0_0_50px_rgba(0,0,0,0.5)] dark:shadow-black/20",
-          // Enhanced shadow with right-side glow
-          "shadow-[8px_0_32px_rgba(148,163,184,0.15),0_0_30px_rgba(0,0,0,0.08)]",
-          "dark:shadow-[8px_0_32px_rgba(59,130,246,0.08),0_0_50px_rgba(0,0,0,0.5)]",
+          // Simple shadow without glow
+          "shadow-lg",
           "font-['Inter_Variable',system-ui,sans-serif]",
           // Responsive width: extra wide to accommodate longer menu text
           isCollapsed ? "w-16" : isMobile ? "w-72" : "w-80",
           // Ensure sidebar doesn't overflow on small screens
           "max-w-[90vw] sm:max-w-none",
-          // Add subtle glow effect on the right edge
-          "after:content-[''] after:absolute after:top-0 after:right-0 after:h-full after:w-1",
-          "after:bg-gradient-to-r after:from-transparent after:via-slate-400/30 after:to-transparent",
-          "dark:after:bg-gradient-to-r dark:after:from-transparent dark:after:via-[hsl(217,91%,60%)]/20 dark:after:to-transparent",
-          "after:blur-sm after:pointer-events-none"
+
         )}
         style={{ 
           fontFamily: "'Inter Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
@@ -544,17 +541,18 @@ export default function CollapsibleSidebar({ isCollapsed, onToggle }: SidebarPro
         }}
       >
       {/* Logo Section with Toggle Button */}
-      <div className="px-4 py-6 border-b border-slate-300/50 dark:border-[hsl(217,33%,17%)]/30 bg-gradient-to-r from-slate-300/80 to-slate-200/80 dark:from-[hsl(222,84%,10%)] dark:to-[hsl(222,84%,12%)] backdrop-blur-sm">
+      <div className="px-4 py-6 border-b border-slate-300/50 dark:border-[hsl(217,33%,17%)]/30 bg-slate-200/95 dark:bg-[hsl(222,84%,8%)] backdrop-blur-sm">
         {isCollapsed ? (
-          /* Collapsed State - Show logo icon and toggle button */
+          /* Collapsed State - Show flower logo and toggle button */
           <div className="flex flex-col items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-white p-1 shadow-lg">
+            <div className="w-10 h-10">
               <Image 
-                src="/media/baltu_technologies_logo_long_upskill_white.png" 
-                alt="Upskill Logo" 
-                width={24} 
-                height={24}
+                src="/media/baltu_technologies_logo_flower_only.png" 
+                alt="Upskill Flower Logo" 
+                width={40} 
+                height={40}
                 className="w-full h-full object-contain"
+                priority
               />
             </div>
             <Button
@@ -571,24 +569,15 @@ export default function CollapsibleSidebar({ isCollapsed, onToggle }: SidebarPro
         ) : (
           /* Expanded State - Show full logo with toggle button on the right */
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-white p-2 shadow-lg">
-                <Image 
-                  src="/media/baltu_technologies_logo_long_upskill_white.png" 
-                  alt="Upskill Logo" 
-                  width={40} 
-                  height={40}
-                  className="w-full h-full object-contain"
-                />
-              </div>
-              <div>
-                <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                  Upskill
-                </h1>
-                <p className="text-xs text-slate-500 dark:text-[hsl(210,40%,98%)]/60">
-                  Learn. Grow. Succeed.
-                </p>
-              </div>
+            <div className="w-60 h-16">
+              <Image 
+                src="/media/baltu_technologies_logo_long_upskill_white.png" 
+                alt="Upskill Full Logo" 
+                width={240} 
+                height={64}
+                className="w-full h-full object-contain"
+                priority
+              />
             </div>
             <Button
               variant="ghost"
@@ -703,6 +692,26 @@ export default function CollapsibleSidebar({ isCollapsed, onToggle }: SidebarPro
       {/* Bottom Navigation */}
       <div className="p-3 space-y-3 mt-auto border-t border-slate-300/50 dark:border-[hsl(217,33%,17%)]/30">
         <div className="space-y-2">
+          {/* My Account Button */}
+          <Button 
+            variant="ghost" 
+            size={isCollapsed ? "icon" : "default"}
+            className={cn(
+              "transition-all duration-300 hover:scale-105",
+              isCollapsed 
+                ? "w-10 h-10 p-0" 
+                : "w-full justify-start h-10 px-3",
+              "bg-transparent hover:bg-slate-300/40 text-slate-600 hover:text-[hsl(217,91%,60%)]",
+              "dark:bg-transparent dark:hover:bg-[hsl(222,84%,10%)] dark:text-[hsl(210,40%,98%)]/80 dark:hover:text-[hsl(217,91%,60%)]"
+            )}
+            onClick={() => {
+              setIsAccountPopupOpen(true);
+            }}
+          >
+            <User className="h-4 w-4 fill-current" />
+            {!isCollapsed && <span className="ml-2">My Account</span>}
+          </Button>
+
           {/* Settings Button */}
           <Button 
             variant="ghost" 
@@ -746,6 +755,12 @@ export default function CollapsibleSidebar({ isCollapsed, onToggle }: SidebarPro
           </Button>
         </div>
       </div>
+
+      {/* My Account Popup */}
+      <MyAccountPopup 
+        isOpen={isAccountPopupOpen}
+        onClose={() => setIsAccountPopupOpen(false)}
+      />
     </div>
   );
 } 

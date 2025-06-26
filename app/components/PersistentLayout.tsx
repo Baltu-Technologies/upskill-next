@@ -6,6 +6,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import Image from 'next/image';
 import { 
   Flame,
   Zap,
@@ -71,7 +72,7 @@ export default function PersistentLayout({ children }: PersistentLayoutProps) {
   }, []);
 
   return (
-    <div className="flex h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-[hsl(222,84%,5%)] dark:via-[hsl(222,84%,8%)] dark:to-[hsl(222,84%,12%)]">
+    <div className="flex h-screen bg-black dark:from-[hsl(222,84%,5%)] dark:via-[hsl(222,84%,8%)] dark:to-[hsl(222,84%,12%)]">
       {/* Sidebar - Hidden on Mobile */}
       {!isMobile && (
         <CollapsibleSidebar 
@@ -83,16 +84,25 @@ export default function PersistentLayout({ children }: PersistentLayoutProps) {
       {/* Main Content */}
       <div className={cn(
         "flex flex-col flex-1 transition-all duration-300 ease-in-out",
-        !isMobile && (isSidebarCollapsed ? "tablet:ml-16" : "tablet:ml-72")
+        !isMobile && (isSidebarCollapsed ? "ml-16" : "ml-80")
       )}>
         {/* Top Navigation - Mobile Only */}
         {isMobile && (
           <div className="fixed top-0 left-0 right-0 z-40">
             <nav className="bg-white/95 dark:bg-[hsl(222,84%,8%)]/95 backdrop-blur-xl border-b border-slate-300/50 dark:border-[hsl(217,33%,17%)]/30 px-4 py-3 shadow-lg">
               <div className="flex items-center justify-between">
-                {/* Navigation Rules Space (Left) */}
-                <div className="flex-1">
-                  {/* Reserved for navigation rules */}
+                {/* Baltu Logo (Left) */}
+                <div className="flex-1 flex justify-start">
+                  <div className="w-30 h-8">
+                    <Image 
+                      src="/media/baltu_technologies_logo_long_upskill_white.png" 
+                      alt="Upskill Logo" 
+                      width={120} 
+                      height={32}
+                      className="w-full h-full object-contain"
+                      priority
+                    />
+                  </div>
                 </div>
 
                 {/* Points Display (Right) */}
@@ -113,7 +123,7 @@ export default function PersistentLayout({ children }: PersistentLayoutProps) {
 
         {/* Floating Navigation Bar - Desktop/Tablet Only */}
         {!isMobile && (
-          <div className="fixed top-6 right-6 z-40">
+          <div className="fixed top-6 right-4 xl:right-6 z-40" style={{ width: 'fit-content', maxWidth: '380px' }}>
             <nav className="bg-white/80 dark:bg-[hsl(222,84%,8%)]/80 backdrop-blur-xl rounded-2xl border border-slate-300/50 dark:border-[hsl(217,33%,17%)]/30 hover:shadow-xl transition-all duration-300 hover:scale-[1.02] shadow-lg before:content-[''] before:absolute before:inset-0 before:bg-gradient-to-b before:from-white/20 before:via-transparent before:to-transparent before:backdrop-blur-[2px] before:z-[-1] before:rounded-2xl dark:before:from-black/20">
               <div className="flex items-center gap-4 px-4 py-3">
                 {/* Points Display */}
@@ -193,7 +203,7 @@ export default function PersistentLayout({ children }: PersistentLayoutProps) {
         {/* Page Content */}
         <main className={cn(
           "flex-1 overflow-auto",
-          isMobile ? "pt-[68px] pb-20 px-6" : "pt-4"
+          isMobile ? "pt-[68px] pb-20 px-6" : "pt-0"
         )}>
           {children}
         </main>

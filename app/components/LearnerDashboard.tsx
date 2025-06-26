@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { 
   Target,
   CheckCircle,
@@ -23,41 +24,113 @@ import {
   ArrowRight,
   ChevronRight,
   Flame,
-  Shield
+  Shield,
+  Users,
+  Crown,
+  Gift,
+  Share2,
+  Copy,
+  ExternalLink,
+  Plus,
+  Medal,
+  Sword,
+  Sparkles,
+  Rocket
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
 
-// Mock data - in a real app, this would come from your backend
+// Enhanced mock data with gamification elements
 const mockDashboardData = {
   user: {
     name: "Peter Costa",
     firstName: "Peter",
+    username: "pcosta.upskill",
     level: 42,
-    title: "Fiber Technician Apprentice",
-    avatar: "/media/Peter_Costa_Bio_2024.jpg" // Using the actual bio image
+    title: "Data Center Technician Apprentice",
+    avatar: "/media/Peter_Costa_Bio_2024.jpg",
+    joinedDate: "July 2022",
+    following: 12,
+    followers: 8
+  },
+  stats: {
+    currentStreak: 15,
+    longestStreak: 28,
+    totalXP: 2847,
+    weeklyXP: 487,
+    crowns: 23,
+    achievements: 8,
+    league: "Bronze",
+    leaguePosition: 3
   },
   recentActivity: {
-    lastAction: "Completed Fiber Splicing Module",
+    lastAction: "Completed Server Hardware Module",
     timeAgo: "2 hours ago",
     actionsToday: 5,
-    dayStreak: 12
+    xpEarnedToday: 85
   },
   courseInProgress: {
-    title: "Advanced Fiber Optic Installation",
+    title: "Advanced Data Center Operations",
     progress: 68,
     currentModule: 3,
     totalLessons: 24,
     completedLessons: 16,
     lessonsRemaining: 8,
-    nextLesson: "Fusion Splicing Techniques"
+    nextLesson: "Cooling System Management",
+    xpPerLesson: 15,
+    totalHours: 120,
+    completedHours: 82
   },
+  achievements: [
+    {
+      id: 'wildfire',
+      title: 'Wildfire',
+      description: 'Reach a 7 day streak',
+      icon: 'flame',
+      level: 1,
+      progress: 15,
+      maxProgress: 7,
+      completed: true,
+      color: 'from-orange-400 to-red-500'
+    },
+    {
+      id: 'sage',
+      title: 'Sage',
+      description: 'Earn 1000 XP',
+      icon: 'award',
+      level: 4,
+      progress: 847,
+      maxProgress: 1000,
+      completed: false,
+      color: 'from-green-400 to-emerald-500'
+    },
+    {
+      id: 'scholar',
+      title: 'Scholar',
+      description: 'Complete 50 lessons',
+      icon: 'book',
+      progress: 38,
+      maxProgress: 50,
+      completed: false,
+      color: 'from-blue-400 to-indigo-500'
+    },
+    {
+      id: 'champion',
+      title: 'Champion',
+      description: 'Reach Bronze League',
+      icon: 'trophy',
+      progress: 1,
+      maxProgress: 1,
+      completed: true,
+      color: 'from-yellow-400 to-orange-500'
+    }
+  ],
   jobOpportunities: {
     newMatches: 3,
     totalMatches: 18,
     topMatch: {
-      title: "Senior Fiber Technician",
-      company: "TechCorp Solutions",
+      title: "Senior Data Center Technician",
+      company: "CloudTech Solutions",
       matchPercentage: 92,
       location: "Boston, MA"
     }
@@ -66,278 +139,674 @@ const mockDashboardData = {
     earned: 4,
     inProgress: 2,
     available: 12,
-    nextCertification: "FOA CFOT Certification",
+    nextCertification: "CompTIA Server+ Certification",
     nextProgress: 75,
-    recentCert: "Fiber Optic Safety"
+    recentCert: "Data Center Safety"
   },
-  profileCompletion: {
-    percentage: 78,
-    missingFields: [
-      "Professional Experience",
-      "Skills Assessment",
-      "Portfolio Projects",
-      "References"
-    ]
-  },
-  careerPathway: {
-    currentPathway: "Fiber Optic Technician Track",
-    currentPath: "Fiber Optic Technician Track",
-    currentStep: 3,
-    totalSteps: 5,
-    completionPercentage: 68,
-    overallProgress: 68,
-    estimatedCompletion: "2 months remaining",
-    currentPhase: "Advanced Installation",
-    nextMilestone: "Certification Exam"
+  inviteRewards: {
+    totalInvites: 3,
+    successfulInvites: 2,
+    xpPerInvite: 50,
+    totalXpEarned: 100,
+    referralCode: "PETER-UPSKILL-2024"
   }
 };
 
 export default function LearnerDashboard() {
+  const [showInviteModal, setShowInviteModal] = useState(false);
+  const [copiedCode, setCopiedCode] = useState(false);
+  const [showCourses, setShowCourses] = useState(false);
   const data = mockDashboardData;
 
+  const copyReferralCode = () => {
+    navigator.clipboard.writeText(data.inviteRewards.referralCode);
+    setCopiedCode(true);
+    setTimeout(() => setCopiedCode(false), 2000);
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-slate-100 to-slate-200 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 p-4 md:p-6">
+    <div className="min-h-screen bg-black dark:from-gray-900 dark:via-slate-800 dark:to-gray-900 overflow-x-hidden w-full" style={{ maxWidth: '100vw', boxSizing: 'border-box' }}>
       {/* Floating background elements */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-blue-500/5 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-1/3 right-1/4 w-96 h-96 bg-purple-500/5 rounded-full blur-3xl animate-pulse delay-1000" />
+        <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-1/3 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl animate-pulse delay-1000" />
+        <div className="absolute top-1/2 right-1/3 w-48 h-48 bg-green-500/10 rounded-full blur-3xl animate-pulse delay-500" />
       </div>
 
-      <div className="relative z-10 max-w-7xl mx-auto">
-        {/* Welcome Section - More space and better positioning */}
-        <div className="mb-8 md:mb-12">
-          <div className="flex flex-col md:flex-row md:items-center gap-4 md:gap-6">
-            {/* Avatar */}
-            <div className="w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 p-1 shadow-lg">
-              <div className="w-full h-full rounded-xl overflow-hidden">
+      {/* Top Profile Bar - Completely flush with window top */}
+      <div className="relative z-10 bg-gradient-to-r from-slate-900 via-blue-900 to-slate-900 shadow-2xl shadow-blue-900/50 -mx-0 xs:-mx-1 sm:-mx-2 md:-mx-4 lg:-mx-6 xl:-mx-0 -mt-0">
+        {/* Glow effect behind the bar */}
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 via-indigo-600/30 to-blue-600/20 blur-xl"></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/20"></div>
+        
+        <div className="relative max-w-7xl mx-auto px-1 xs:px-2 sm:px-4 md:px-6 lg:px-8 xl:px-6 py-4 sm:py-6 md:py-8">
+          <div className="flex flex-col items-center sm:items-start gap-4">
+            {/* Avatar and Name Section */}
+            <div className="flex items-center gap-4">
+              <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full overflow-hidden ring-2 ring-blue-400/50 shadow-lg shadow-blue-500/25 flex-shrink-0">
                 <Image 
                   src={data.user.avatar} 
-                  alt="Peter Costa" 
-                  width={80} 
-                  height={80} 
-                  className="w-full h-full object-cover rounded-xl" 
+                  alt={data.user.name} 
+                  width={64} 
+                  height={64} 
+                  className="w-full h-full object-cover" 
                 />
+              </div>
+              
+              <div className="min-w-0">
+                <h1 className="text-xl sm:text-2xl font-bold text-white drop-shadow-lg truncate">
+                  {data.user.name}
+                </h1>
+                <p className="text-blue-200/80 text-sm">Member since {data.user.joinedDate}</p>
               </div>
             </div>
             
-            {/* Welcome Text */}
-            <div className="flex-1">
-              <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent mb-2">
-                Welcome, {data.user.firstName}!
-              </h1>
-              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
-                <p className="text-sm md:text-base text-gray-600 dark:text-gray-400">
-                  {data.user.title}
-                </p>
-                <div className="flex items-center gap-2 text-xs md:text-sm">
-                  <span className="px-2 py-1 bg-gradient-to-r from-yellow-400 to-orange-500 text-white rounded-full font-semibold">
-                    Level {data.user.level}
-                  </span>
+            {/* Gamification Stats - Always below profile */}
+            <div className="flex items-center gap-2 sm:gap-3 flex-wrap justify-center sm:justify-start">
+              <div className="flex items-center gap-1.5 sm:gap-2 bg-gradient-to-r from-orange-500/90 to-red-500/90 text-white px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-full shadow-lg shadow-orange-500/25 backdrop-blur-sm">
+                <Flame className="h-3.5 w-3.5 sm:h-4 sm:w-4 drop-shadow-sm" />
+                <span className="font-semibold text-sm sm:text-base">{data.stats.currentStreak}</span>
+                <span className="text-xs opacity-90 hidden sm:inline">day streak</span>
+              </div>
+              
+              <div className="flex items-center gap-1.5 sm:gap-2 bg-gradient-to-r from-yellow-500/90 to-amber-500/90 text-white px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-full shadow-lg shadow-yellow-500/25 backdrop-blur-sm">
+                <Zap className="h-3.5 w-3.5 sm:h-4 sm:w-4 drop-shadow-sm" />
+                <span className="font-semibold text-sm sm:text-base">{data.stats.totalXP}</span>
+                <span className="text-xs opacity-90 hidden sm:inline">XP</span>
+              </div>
+              
+              <div className="flex items-center gap-1.5 sm:gap-2 bg-gradient-to-r from-purple-500/90 to-indigo-500/90 text-white px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-full shadow-lg shadow-purple-500/25 backdrop-blur-sm">
+                <Crown className="h-3.5 w-3.5 sm:h-4 sm:w-4 drop-shadow-sm" />
+                <span className="font-semibold text-sm sm:text-base">{data.certifications.earned}</span>
+                <span className="text-xs opacity-90 hidden sm:inline">badges</span>
+              </div>
+              
+              <div className="flex items-center gap-1.5 sm:gap-2 bg-gradient-to-r from-emerald-500/90 to-green-500/90 text-white px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-full shadow-lg shadow-emerald-500/25 backdrop-blur-sm">
+                <Medal className="h-3.5 w-3.5 sm:h-4 sm:w-4 drop-shadow-sm" />
+                <span className="font-semibold text-sm sm:text-base">{data.stats.achievements}</span>
+                <span className="text-xs opacity-90 hidden sm:inline">achievements</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div 
+        className="relative z-10 w-full max-w-7xl mx-auto px-0 xs:px-1 sm:px-2 md:px-4 lg:px-6 xl:px-6 py-2 sm:py-4 md:py-6 space-y-3 sm:space-y-4 md:space-y-6 lg:space-y-8 overflow-x-hidden" 
+        style={{ maxWidth: '100vw', width: '100%', boxSizing: 'border-box' }}
+      >
+
+        {/* VARIATION 2: Card-Based Layout (Commented out - uncomment to try) */}
+        {/* 
+        <div className="bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-slate-800 dark:to-slate-900 px-4 md:px-6 py-8 rounded-2xl mb-6">
+          <div className="flex flex-col lg:flex-row items-start lg:items-center gap-6">
+            <div className="flex items-center gap-4">
+              <div className="w-20 h-20 rounded-2xl overflow-hidden shadow-lg">
+                <Image 
+                  src={data.user.avatar} 
+                  alt={data.user.name} 
+                  width={80} 
+                  height={80} 
+                  className="w-full h-full object-cover" 
+                />
+              </div>
+              <div>
+                <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-1">
+                  {data.user.name}
+                </h1>
+                <p className="text-slate-600 dark:text-slate-400">Joined {data.user.joinedDate}</p>
+              </div>
+            </div>
+
+            <div className="flex-1 lg:ml-8">
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="bg-white dark:bg-slate-800 rounded-xl p-4 text-center shadow-sm">
+                  <Flame className="h-6 w-6 text-orange-500 mx-auto mb-2" />
+                  <div className="text-xl font-bold text-slate-900 dark:text-white">{data.stats.currentStreak}</div>
+                  <div className="text-xs text-slate-600 dark:text-slate-400">Day Streak</div>
+                </div>
+                
+                <div className="bg-white dark:bg-slate-800 rounded-xl p-4 text-center shadow-sm">
+                  <Zap className="h-6 w-6 text-yellow-500 mx-auto mb-2" />
+                  <div className="text-xl font-bold text-slate-900 dark:text-white">{data.stats.totalXP}</div>
+                  <div className="text-xs text-slate-600 dark:text-slate-400">Total XP</div>
+                </div>
+                
+                <div className="bg-white dark:bg-slate-800 rounded-xl p-4 text-center shadow-sm">
+                  <Crown className="h-6 w-6 text-purple-500 mx-auto mb-2" />
+                  <div className="text-xl font-bold text-slate-900 dark:text-white">{data.stats.crowns}</div>
+                  <div className="text-xs text-slate-600 dark:text-slate-400">Crowns</div>
+                </div>
+                
+                <div className="bg-white dark:bg-slate-800 rounded-xl p-4 text-center shadow-sm">
+                  <Trophy className="h-6 w-6 text-amber-500 mx-auto mb-2" />
+                  <div className="text-lg font-bold text-slate-900 dark:text-white">#{data.stats.leaguePosition}</div>
+                  <div className="text-xs text-slate-600 dark:text-slate-400">Bronze League</div>
                 </div>
               </div>
             </div>
           </div>
         </div>
+        */}
 
-        {/* Dashboard Metrics Grid - Smaller, more compact boxes */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+        {/* VARIATION 3: Sidebar Style (Commented out - uncomment to try) */}
+        {/* 
+        <div className="flex items-center justify-between bg-slate-50 dark:bg-slate-800/50 px-6 py-4 rounded-xl border border-slate-200 dark:border-slate-700">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-full overflow-hidden">
+              <Image 
+                src={data.user.avatar} 
+                alt={data.user.name} 
+                width={48} 
+                height={48} 
+                className="w-full h-full object-cover" 
+              />
+            </div>
+            <div>
+              <h1 className="text-xl font-semibold text-slate-900 dark:text-white">
+                {data.user.name}
+              </h1>
+              <p className="text-slate-500 dark:text-slate-400 text-sm">Level 12 • {data.user.joinedDate}</p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-6">
+            <div className="text-center">
+              <div className="text-lg font-bold text-orange-600">{data.stats.currentStreak}</div>
+              <div className="text-xs text-slate-500">Streak</div>
+            </div>
+            <div className="text-center">
+              <div className="text-lg font-bold text-yellow-600">{data.stats.totalXP}</div>
+              <div className="text-xs text-slate-500">XP</div>
+            </div>
+            <div className="text-center">
+              <div className="text-lg font-bold text-purple-600">{data.stats.crowns}</div>
+              <div className="text-xs text-slate-500">Crowns</div>
+            </div>
+            <div className="text-center">
+              <div className="text-lg font-bold text-amber-600">#{data.stats.leaguePosition}</div>
+              <div className="text-xs text-slate-500">Rank</div>
+            </div>
+          </div>
+        </div>
+        */}
+
+        {/* Main Content - Reorganized by Priority */}
+        <div className="space-y-6">
           
-          {/* Recent Activity Card */}
-          <Card className="group relative overflow-hidden bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-l-4 border-l-green-500 hover:shadow-lg transition-all duration-300">
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-base font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-                  <Activity className="h-4 w-4 text-green-500" />
+          {/* 1. Career Pathway - MOST IMPORTANT (Full Width) */}
+          <Card className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm shadow-xl border-2 border-blue-200/60 dark:border-blue-400/30 hover:border-blue-300/80 dark:hover:border-blue-300/50 transition-all duration-300 hover:shadow-2xl hover:shadow-blue-500/10 w-full min-w-0">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Target className="h-5 w-5 text-blue-600" />
+                Career Pathway
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="relative p-6 rounded-lg border border-blue-200 dark:border-blue-800 overflow-hidden">
+                {/* Data Center Background Image */}
+                <div 
+                  className="absolute inset-0 bg-cover bg-center opacity-30"
+                  style={{
+                    backgroundImage: `url('/media/peterbaltutech_A_massive_cutting_edge_data_center_that_shows__0e591871-e0a2-4fdd-8856-3e839b1c35ba_1.png')`
+                  }}
+                ></div>
+                {/* Dark overlay for better text contrast */}
+                <div className="absolute inset-0 bg-gradient-to-br from-slate-900/80 via-blue-900/70 to-indigo-900/80"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 via-transparent to-purple-600/20"></div>
+                
+                {/* Content with improved contrast */}
+                <div className="relative z-10 flex flex-col items-center text-center md:flex-row md:items-center md:text-left md:gap-6">
+                  <div className="flex-1 mb-4 md:mb-0">
+                    <h3 className="font-bold text-white text-xl md:text-2xl mb-2">Data Center Technician</h3>
+                    <p className="text-blue-100 text-sm md:text-base mb-4">Server Hardware & Infrastructure Track</p>
+                    
+                    {/* Progress info - responsive layout */}
+                    <div className="flex flex-col items-center md:flex-row md:items-center gap-3 md:gap-6">
+                      <div className="flex items-center gap-2">
+                        <div className="text-3xl font-bold text-white">68%</div>
+                        <span className="text-sm text-blue-100">pathway complete</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm text-blue-100">
+                        <Clock className="h-4 w-4" />
+                        <span>82/120 hours</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Continue button - responsive positioning */}
+                  <div className="flex-shrink-0">
+                    <Button className="bg-white/20 hover:bg-white/30 text-white border border-white/30 backdrop-blur-sm px-6 py-3">
+                      <Play className="h-4 w-4 mr-2" />
+                      Continue
+                    </Button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Courses Button - positioned below the main pathway card */}
+              <div className="flex justify-start">
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  onClick={() => setShowCourses(!showCourses)}
+                  className="flex items-center gap-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-300 px-4 py-2 rounded-lg font-medium transition-all duration-200"
+                >
+                  <BookOpen className="h-4 w-4" />
+                  Courses
+                  <ChevronRight className={cn("h-4 w-4 transition-transform", showCourses && "rotate-90")} />
+                </Button>
+              </div>
+
+              {/* Accordion Courses List */}
+              {showCourses && (
+                <div className="space-y-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+                  <h4 className="font-medium text-gray-900 dark:text-white mb-3">Pathway Courses</h4>
+                  
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-3 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
+                      <CheckCircle className="h-5 w-5 text-green-600" />
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between">
+                          <p className="font-medium text-gray-900 dark:text-white">Data Center Fundamentals</p>
+                          <span className="text-xs text-gray-500 bg-white dark:bg-gray-800 px-2 py-1 rounded">24 hours</span>
+                        </div>
+                        <div className="flex items-center gap-2 mt-1">
+                          <div className="w-32 bg-green-200 dark:bg-green-800 rounded-full h-2">
+                            <div className="bg-green-600 h-2 rounded-full w-full" />
+                          </div>
+                          <span className="text-sm font-semibold text-green-600">100%</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                      <Clock className="h-5 w-5 text-blue-600" />
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between">
+                          <p className="font-medium text-gray-900 dark:text-white">Server Hardware & Maintenance</p>
+                          <span className="text-xs text-gray-500 bg-white dark:bg-gray-800 px-2 py-1 rounded">32 hours</span>
+                        </div>
+                        <div className="flex items-center gap-2 mt-1">
+                          <div className="w-32 bg-blue-200 dark:bg-blue-800 rounded-full h-2">
+                            <div className="bg-blue-600 h-2 rounded-full" style={{ width: '75%' }} />
+                          </div>
+                          <span className="text-sm font-semibold text-blue-600">75%</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                      <div className="h-5 w-5 rounded-full border-2 border-gray-400" />
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between">
+                          <p className="font-medium text-gray-900 dark:text-white">Network Infrastructure</p>
+                          <span className="text-xs text-gray-500 bg-white dark:bg-gray-800 px-2 py-1 rounded">28 hours</span>
+                        </div>
+                        <div className="flex items-center gap-2 mt-1">
+                          <div className="w-32 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                            <div className="bg-gray-400 h-2 rounded-full" style={{ width: '0%' }} />
+                          </div>
+                          <span className="text-sm font-semibold text-gray-500">0%</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                      <div className="h-5 w-5 rounded-full border-2 border-gray-400" />
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between">
+                          <p className="font-medium text-gray-900 dark:text-white">Power & Cooling Systems</p>
+                          <span className="text-xs text-gray-500 bg-white dark:bg-gray-800 px-2 py-1 rounded">20 hours</span>
+                        </div>
+                        <div className="flex items-center gap-2 mt-1">
+                          <div className="w-32 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                            <div className="bg-gray-400 h-2 rounded-full" style={{ width: '0%' }} />
+                          </div>
+                          <span className="text-sm font-semibold text-gray-500">0%</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                      <div className="h-5 w-5 rounded-full border-2 border-gray-400" />
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between">
+                          <p className="font-medium text-gray-900 dark:text-white">Safety & Compliance</p>
+                          <span className="text-xs text-gray-500 bg-white dark:bg-gray-800 px-2 py-1 rounded">16 hours</span>
+                        </div>
+                        <div className="flex items-center gap-2 mt-1">
+                          <div className="w-32 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                            <div className="bg-gray-400 h-2 rounded-full" style={{ width: '0%' }} />
+                          </div>
+                          <span className="text-sm font-semibold text-gray-500">0%</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* 2. Today's Progress and Job Opportunities */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-4 md:gap-6 w-full min-w-0">
+            
+            {/* Recent Activity */}
+            <Card className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm shadow-xl border-2 border-green-200/60 dark:border-green-400/30 hover:border-green-300/80 dark:hover:border-green-300/50 transition-all duration-300 hover:shadow-2xl hover:shadow-green-500/10 w-full min-w-0">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Activity className="h-5 w-5 text-green-600" />
                   Recent Activity
                 </CardTitle>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div>
-                <p className="text-sm font-medium text-gray-900 dark:text-white">
-                  {data.recentActivity.lastAction}
-                </p>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
-                  {data.recentActivity.timeAgo}
-                </p>
-              </div>
-              <div className="flex justify-between text-xs">
-                <span className="text-gray-600 dark:text-gray-400">
-                  Actions today: <span className="font-semibold text-green-600">{data.recentActivity.actionsToday}</span>
-                </span>
-                <span className="text-gray-600 dark:text-gray-400">
-                  Streak: <span className="font-semibold text-orange-600">{data.recentActivity.dayStreak} days</span>
-                </span>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Course In Progress Card */}
-          <Card className="group relative overflow-hidden bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-l-4 border-l-blue-500 hover:shadow-lg transition-all duration-300">
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-base font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-                  <BookOpen className="h-4 w-4 text-blue-500" />
-                  Course In Progress
-                </CardTitle>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div>
-                <p className="text-sm font-medium text-gray-900 dark:text-white">
-                  {data.courseInProgress.title}
-                </p>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
-                  Module {data.courseInProgress.currentModule}
-                </p>
-              </div>
-              <div className="space-y-2">
-                <div className="flex justify-between text-xs">
-                  <span className="text-gray-600 dark:text-gray-400">Progress</span>
-                  <span className="font-semibold text-blue-600">{data.courseInProgress.progress}%</span>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {/* Today's Summary */}
+                <div className="grid grid-cols-2 gap-2 sm:gap-4 text-center mb-4">
+                  <div className="p-2 sm:p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                    <div className="text-lg sm:text-xl font-bold text-green-600">{data.recentActivity.actionsToday}</div>
+                    <div className="text-xs text-gray-600 dark:text-gray-400">Actions Today</div>
+                  </div>
+                  <div className="p-2 sm:p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
+                    <div className="text-lg sm:text-xl font-bold text-yellow-600">{data.recentActivity.xpEarnedToday}</div>
+                    <div className="text-xs text-gray-600 dark:text-gray-400">XP Earned</div>
+                  </div>
                 </div>
-                <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                  <div 
-                    className="bg-gradient-to-r from-blue-500 to-blue-600 h-2 rounded-full transition-all duration-300"
-                    style={{ width: `${data.courseInProgress.progress}%` }}
-                  />
-                </div>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
-                  {data.courseInProgress.lessonsRemaining} lessons remaining
-                </p>
-              </div>
-            </CardContent>
-          </Card>
 
-          {/* Job Opportunities Card */}
-          <Card className="group relative overflow-hidden bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-l-4 border-l-purple-500 hover:shadow-lg transition-all duration-300">
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-base font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-                  <Briefcase className="h-4 w-4 text-purple-500" />
+                {/* Activity Timeline */}
+                <div className="space-y-2">
+                  <div className="flex items-start gap-3 p-2 hover:bg-gray-50 dark:hover:bg-gray-800/50 rounded-lg transition-colors">
+                    <div className="w-2 h-2 bg-green-500 rounded-full mt-1.5 flex-shrink-0"></div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-gray-900 dark:text-white">Completed "Server Hardware Basics" lesson</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">2 hours ago • +50 XP</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start gap-3 p-2 hover:bg-gray-50 dark:hover:bg-gray-800/50 rounded-lg transition-colors">
+                    <div className="w-2 h-2 bg-blue-500 rounded-full mt-1.5 flex-shrink-0"></div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-gray-900 dark:text-white">Started "Network Infrastructure" course</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">5 hours ago • +25 XP</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start gap-3 p-2 hover:bg-gray-50 dark:hover:bg-gray-800/50 rounded-lg transition-colors">
+                    <div className="w-2 h-2 bg-purple-500 rounded-full mt-1.5 flex-shrink-0"></div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-gray-900 dark:text-white">Earned "First Week" badge</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">Yesterday • +100 XP</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start gap-3 p-2 hover:bg-gray-50 dark:hover:bg-gray-800/50 rounded-lg transition-colors">
+                    <div className="w-2 h-2 bg-orange-500 rounded-full mt-1.5 flex-shrink-0"></div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-gray-900 dark:text-white">Applied to Data Center Technician job</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">2 days ago</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* View All Button */}
+                <div className="pt-2 border-t border-gray-200 dark:border-gray-700">
+                  <Button variant="ghost" size="sm" className="w-full text-green-600 hover:text-green-700 hover:bg-green-50 dark:hover:bg-green-900/20">
+                    View All Activity
+                    <ChevronRight className="h-4 w-4 ml-1" />
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Job Opportunities */}
+            <Card className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm shadow-xl border-2 border-purple-200/60 dark:border-purple-400/30 hover:border-purple-300/80 dark:hover:border-purple-300/50 transition-all duration-300 hover:shadow-2xl hover:shadow-purple-500/10 w-full min-w-0">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Briefcase className="h-5 w-5 text-purple-600" />
                   Job Opportunities
                 </CardTitle>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="grid grid-cols-2 gap-3 text-center">
-                <div>
-                  <p className="text-lg font-bold text-purple-600">{data.jobOpportunities.newMatches}</p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">New Matches</p>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-2 gap-2 sm:gap-4 text-center">
+                  <div className="p-2 sm:p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
+                    <div className="text-lg sm:text-xl font-bold text-purple-600">{data.jobOpportunities.newMatches}</div>
+                    <div className="text-xs text-gray-600 dark:text-gray-400">New Matches</div>
+                  </div>
+                  <div className="p-2 sm:p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
+                    <div className="text-lg sm:text-xl font-bold text-purple-600">{data.jobOpportunities.totalMatches}</div>
+                    <div className="text-xs text-gray-600 dark:text-gray-400">Total Matches</div>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-lg font-bold text-gray-900 dark:text-white">{data.jobOpportunities.totalMatches}</p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">Total Matches</p>
+                
+                <div className="p-3 border border-purple-200 dark:border-purple-800 rounded-lg">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-gray-900 dark:text-white">{data.jobOpportunities.topMatch.title}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">{data.jobOpportunities.topMatch.company}</p>
+                      <p className="text-xs text-purple-600 font-semibold">{data.jobOpportunities.topMatch.matchPercentage}% Match</p>
+                    </div>
+                    <Button size="sm" variant="outline">
+                      <ExternalLink className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
-              </div>
-              <div className="pt-2 border-t border-gray-200 dark:border-gray-700">
-                <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">Top Match</p>
-                <p className="text-sm font-medium text-gray-900 dark:text-white">{data.jobOpportunities.topMatch.title}</p>
-                <p className="text-xs text-purple-600 font-semibold">{data.jobOpportunities.topMatch.matchPercentage}% Match</p>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </div>
 
-          {/* Certifications Card */}
-          <Card className="group relative overflow-hidden bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-l-4 border-l-orange-500 hover:shadow-lg transition-all duration-300">
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-base font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-                  <Award className="h-4 w-4 text-orange-500" />
-                  Certifications
+          {/* 3. Badges, Achievements, and Referrals - 3 Column Layout */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-4 md:gap-6 w-full min-w-0">
+            
+            {/* Badges */}
+            <Card className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm shadow-xl border-2 border-orange-200/60 dark:border-orange-400/30 hover:border-orange-300/80 dark:hover:border-orange-300/50 transition-all duration-300 hover:shadow-2xl hover:shadow-orange-500/10 w-full min-w-0">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Award className="h-5 w-5 text-orange-600" />
+                  Badges
                 </CardTitle>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="grid grid-cols-2 gap-3 text-center">
-                <div>
-                  <p className="text-lg font-bold text-orange-600">{data.certifications.earned}</p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">Earned</p>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-3 gap-1 sm:gap-2 text-center">
+                  <div className="p-2 sm:p-3 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
+                    <div className="text-lg sm:text-xl font-bold text-orange-600">{data.certifications.earned}</div>
+                    <div className="text-xs text-gray-600 dark:text-gray-400">Earned</div>
+                  </div>
+                  <div className="p-2 sm:p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                    <div className="text-lg sm:text-xl font-bold text-blue-600">{data.certifications.inProgress}</div>
+                    <div className="text-xs text-gray-600 dark:text-gray-400">In Progress</div>
+                  </div>
+                  <div className="p-2 sm:p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                    <div className="text-lg sm:text-xl font-bold text-gray-600 dark:text-gray-400">{data.certifications.available}</div>
+                    <div className="text-xs text-gray-600 dark:text-gray-400">Available</div>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-lg font-bold text-gray-900 dark:text-white">{data.certifications.inProgress}</p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">In Progress</p>
+                
+                <div className="p-3 border border-orange-200 dark:border-orange-800 rounded-lg">
+                  <div className="text-center">
+                    <p className="text-sm font-medium text-gray-900 dark:text-white mb-2">Next: {data.certifications.nextCertification}</p>
+                    <div className="flex items-center justify-center gap-2">
+                      <div className="w-20 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                        <div 
+                          className="bg-orange-500 h-2 rounded-full"
+                          style={{ width: `${data.certifications.nextProgress}%` }}
+                        />
+                      </div>
+                      <span className="text-xs text-orange-600 font-semibold">{data.certifications.nextProgress}%</span>
+                    </div>
+                  </div>
                 </div>
-              </div>
-              <div className="pt-2 border-t border-gray-200 dark:border-gray-700">
-                <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">Next Certification</p>
-                <p className="text-sm font-medium text-gray-900 dark:text-white">{data.certifications.nextCertification}</p>
-                <p className="text-xs text-orange-600 font-semibold">{data.certifications.nextProgress}% Complete</p>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
 
-          {/* Profile Completion Card */}
-          <Card className="group relative overflow-hidden bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-l-4 border-l-red-500 hover:shadow-lg transition-all duration-300">
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-base font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-                  <User className="h-4 w-4 text-red-500" />
-                  Profile Completion
+            {/* Achievements */}
+            <Card className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm shadow-xl border-2 border-yellow-200/60 dark:border-yellow-400/30 hover:border-yellow-300/80 dark:hover:border-yellow-300/50 transition-all duration-300 hover:shadow-2xl hover:shadow-yellow-500/10 w-full min-w-0">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Medal className="h-5 w-5 text-yellow-600" />
+                  Achievements
                 </CardTitle>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="text-center">
-                <p className="text-2xl font-bold text-red-600 mb-1">{data.profileCompletion.percentage}%</p>
-                <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mb-2">
-                  <div 
-                    className="bg-gradient-to-r from-red-500 to-red-600 h-2 rounded-full transition-all duration-300"
-                    style={{ width: `${data.profileCompletion.percentage}%` }}
-                  />
-                </div>
-              </div>
-              <div className="space-y-1">
-                <p className="text-xs text-gray-600 dark:text-gray-400">Missing fields:</p>
-                {data.profileCompletion.missingFields.slice(0, 2).map((field, index) => (
-                  <p key={index} className="text-xs text-gray-500 dark:text-gray-400">• {field}</p>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {data.achievements.map((achievement) => (
+                  <div key={achievement.id} className="relative">
+                    <div className={cn(
+                      "p-3 rounded-lg transition-all duration-300",
+                      achievement.completed 
+                        ? `bg-gradient-to-r ${achievement.color} text-white shadow-md` 
+                        : "bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600"
+                    )}>
+                      <div className="flex items-center gap-2">
+                        <div className={cn(
+                          "p-1 rounded",
+                          achievement.completed ? "bg-white/20" : "bg-white dark:bg-gray-600"
+                        )}>
+                          {achievement.icon === 'flame' && <Flame className="h-3 w-3" />}
+                          {achievement.icon === 'award' && <Award className="h-3 w-3" />}
+                          {achievement.icon === 'book' && <BookOpen className="h-3 w-3" />}
+                          {achievement.icon === 'trophy' && <Trophy className="h-3 w-3" />}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-1">
+                            <h3 className="font-semibold text-sm truncate">{achievement.title}</h3>
+                            {achievement.level && (
+                              <span className="text-xs px-1 py-0.5 rounded bg-white/20 flex-shrink-0">
+                                L{achievement.level}
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-xs opacity-90 truncate">{achievement.description}</p>
+                          {!achievement.completed && (
+                            <div className="mt-1">
+                              <div className="w-full bg-white/30 rounded-full h-1">
+                                <div 
+                                  className="bg-white h-1 rounded-full transition-all duration-300"
+                                  style={{ width: `${(achievement.progress / achievement.maxProgress) * 100}%` }}
+                                />
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 ))}
-                {data.profileCompletion.missingFields.length > 2 && (
-                  <p className="text-xs text-gray-400">+{data.profileCompletion.missingFields.length - 2} more</p>
-                )}
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
 
-          {/* Career Pathway Card */}
-          <Card className="group relative overflow-hidden bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-l-4 border-l-indigo-500 hover:shadow-lg transition-all duration-300">
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-base font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-                  <Target className="h-4 w-4 text-indigo-500" />
-                  Career Pathway
+            {/* Invite Friends (Referrals) */}
+            <Card className="bg-gradient-to-br from-green-100 to-emerald-100 dark:from-green-900/20 dark:to-emerald-900/20 shadow-lg border border-green-200/50">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-green-800 dark:text-green-300">
+                  <Users className="h-5 w-5" />
+                  Referrals
                 </CardTitle>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div>
-                <p className="text-sm font-medium text-gray-900 dark:text-white">
-                  {data.careerPathway.currentPathway}
-                </p>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
-                  Step {data.careerPathway.currentStep} of {data.careerPathway.totalSteps}
-                </p>
-              </div>
-              <div className="space-y-2">
-                <div className="flex justify-between text-xs">
-                  <span className="text-gray-600 dark:text-gray-400">Progress</span>
-                  <span className="font-semibold text-indigo-600">{data.careerPathway.completionPercentage}%</span>
+                <CardDescription className="text-green-700 dark:text-green-400 text-sm">
+                  +{data.inviteRewards.xpPerInvite} XP per invite
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-2 gap-2 sm:gap-3 text-center">
+                  <div className="p-2 sm:p-3 bg-green-200/50 dark:bg-green-800/30 rounded-lg">
+                    <div className="text-lg sm:text-xl font-bold text-green-800 dark:text-green-300">{data.inviteRewards.successfulInvites}</div>
+                    <div className="text-xs text-green-700 dark:text-green-400">Friends</div>
+                  </div>
+                  <div className="p-2 sm:p-3 bg-green-200/50 dark:bg-green-800/30 rounded-lg">
+                    <div className="text-lg sm:text-xl font-bold text-green-800 dark:text-green-300">{data.inviteRewards.totalXpEarned}</div>
+                    <div className="text-xs text-green-700 dark:text-green-400">XP Earned</div>
+                  </div>
                 </div>
-                <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                  <div 
-                    className="bg-gradient-to-r from-indigo-500 to-indigo-600 h-2 rounded-full transition-all duration-300"
-                    style={{ width: `${data.careerPathway.completionPercentage}%` }}
-                  />
+                
+                <div className="space-y-2">
+                  <label className="text-xs font-medium text-green-800 dark:text-green-300">Referral Code:</label>
+                  <div className="flex gap-1">
+                    <input 
+                      type="text" 
+                      value={data.inviteRewards.referralCode}
+                      readOnly
+                      className="flex-1 px-2 py-1 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded text-xs"
+                    />
+                    <Button 
+                      onClick={copyReferralCode}
+                      size="sm"
+                      className="bg-green-600 hover:bg-green-700 text-white px-2"
+                    >
+                      {copiedCode ? <CheckCircle className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
+                    </Button>
+                  </div>
                 </div>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
-                  {data.careerPathway.estimatedCompletion}
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-
+                
+                <Button 
+                  className="w-full bg-green-600 hover:bg-green-700 text-white text-sm py-2"
+                  onClick={() => setShowInviteModal(true)}
+                >
+                  <Share2 className="h-3 w-3 mr-1" />
+                  Invite Friends
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </div>
+
+      {/* Invite Modal */}
+      {showInviteModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 max-w-md w-full shadow-2xl">
+            <div className="text-center mb-6">
+              <div className="w-16 h-16 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Users className="h-8 w-8 text-white" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Invite Friends</h3>
+              <p className="text-gray-600 dark:text-gray-400">Share your referral code and earn XP when friends join!</p>
+            </div>
+            
+            <div className="space-y-4">
+              <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg text-center">
+                <p className="text-2xl font-bold text-green-600 mb-1">+{data.inviteRewards.xpPerInvite} XP</p>
+                <p className="text-sm text-green-700 dark:text-green-400">per successful invite</p>
+              </div>
+              
+              <div className="flex gap-2">
+                <input 
+                  type="text" 
+                  value={`Join me on Upskill! Use code: ${data.inviteRewards.referralCode}`}
+                  readOnly
+                  className="flex-1 px-3 py-2 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-sm"
+                />
+                <Button onClick={copyReferralCode} size="sm" className="bg-green-600 hover:bg-green-700 text-white">
+                  {copiedCode ? <CheckCircle className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                </Button>
+              </div>
+              
+              <div className="flex gap-2">
+                <Button 
+                  className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+                  onClick={() => {
+                    // Implement share functionality
+                    if (navigator.share) {
+                      navigator.share({
+                        title: 'Join me on Upskill!',
+                        text: `Use my referral code: ${data.inviteRewards.referralCode}`,
+                        url: 'https://upskill.com'
+                      });
+                    }
+                  }}
+                >
+                  <Share2 className="h-4 w-4 mr-2" />
+                  Share
+                </Button>
+                <Button 
+                  variant="outline" 
+                  onClick={() => setShowInviteModal(false)}
+                  className="flex-1"
+                >
+                  Close
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 } 
