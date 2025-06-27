@@ -43,7 +43,7 @@ import {
 // Hero gallery images
 const heroImages = [
   {
-    url: 'https://images.unsplash.com/photo-1569629985277-9cb0eb11c2e0?w=1920&h=1080&fit=crop&crop=center',
+    url: '/media/honeywell_aerospace_employerimage1.jpg',
     title: 'Advanced Avionics Systems',
     subtitle: 'Pioneering the future of flight technology'
   },
@@ -240,7 +240,7 @@ export default function HoneywellPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedDepartment, setSelectedDepartment] = useState('all');
   const [selectedLocation, setSelectedLocation] = useState('all');
-  const [showVideoModal, setShowVideoModal] = useState(false);
+
   const [currentHeroImage, setCurrentHeroImage] = useState(0);
   const [currentInnovationImage, setCurrentInnovationImage] = useState(0);
   const [currentCultureImage, setCurrentCultureImage] = useState(0);
@@ -495,13 +495,13 @@ export default function HoneywellPage() {
                   {/* CTA Buttons */}
                   <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 md:gap-6 pt-4 sm:pt-6 md:pt-8">
                     <button 
-                      onClick={() => navigateToSlide(4)}
+                      onClick={() => navigateToSlide(5)}
                       className="px-4 sm:px-6 md:px-8 py-2.5 sm:py-3 md:py-4 bg-white text-black font-semibold rounded-lg hover:bg-gray-100 transition-all duration-300 transform hover:scale-105 text-center text-sm sm:text-base"
                     >
                       Explore Careers
                     </button>
                     <button 
-                      onClick={() => setShowVideoModal(true)}
+                      onClick={() => navigateToSlide(1)}
                       className="flex items-center justify-center gap-2 sm:gap-3 px-4 sm:px-6 md:px-8 py-2.5 sm:py-3 md:py-4 border border-white/30 text-white rounded-lg hover:bg-white/10 transition-all duration-300 backdrop-blur-md text-sm sm:text-base"
                     >
                       <Play className="h-3 w-3 sm:h-4 sm:w-4 md:h-5 md:w-5" />
@@ -529,8 +529,44 @@ export default function HoneywellPage() {
           </div>
         </section>
 
-        {/* Slide 2: Company Stats */}
+        {/* Slide 2: Company Video */}
         <section className="snap-start min-h-screen w-full relative overflow-hidden pt-16 sm:pt-0" data-slide-index="1">
+          {/* Background */}
+          <div className="absolute inset-0 z-0 bg-black">
+            <div className="absolute inset-0 bg-gradient-to-br from-slate-900/20 via-black/60 to-black/90" />
+          </div>
+          
+          <div className="relative z-10 w-full h-full flex items-center justify-center py-8 sm:py-12 md:py-16">
+            <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+              <div className="text-center mb-8 sm:mb-12">
+                <h2 className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-light text-white mb-4 sm:mb-6">
+                  Our
+                  <span className="block font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+                    Story
+                  </span>
+                </h2>
+                <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-300 max-w-3xl mx-auto">
+                  Discover what makes Honeywell Aerospace a leader in innovation
+                </p>
+              </div>
+              
+              {/* Video Container */}
+              <div className="relative w-full aspect-video bg-black rounded-2xl overflow-hidden border border-white/20 shadow-2xl">
+                <iframe
+                  src="https://www.youtube.com/embed/VPdIeoFRmxw?si=va_M-zyprTsGlcan"
+                  title="Honeywell Aerospace Story"
+                  className="w-full h-full"
+                  frameBorder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Slide 3: Company Stats */}
+        <section className="snap-start min-h-screen w-full relative overflow-hidden pt-16 sm:pt-0" data-slide-index="2">
           {/* Background Image */}
           <div className="absolute inset-0 z-0">
             <Image
@@ -594,8 +630,8 @@ export default function HoneywellPage() {
           </div>
         </section>
 
-        {/* Slide 3: Innovation */}
-        <section className="snap-start min-h-screen w-full relative flex items-center overflow-hidden pt-16 sm:pt-0" data-slide-index="2">
+        {/* Slide 4: Innovation */}
+        <section className="snap-start min-h-screen w-full relative flex items-center overflow-hidden pt-16 sm:pt-0" data-slide-index="3">
           {/* Background Image */}
           <div className="absolute inset-0 z-0">
             <Image
@@ -682,8 +718,8 @@ export default function HoneywellPage() {
           </div>
         </section>
 
-        {/* Slide 4: Culture & Values */}
-        <section className="snap-start min-h-screen w-full relative flex items-center overflow-hidden pt-16 sm:pt-0" data-slide-index="3">
+        {/* Slide 5: Culture & Values */}
+        <section className="snap-start min-h-screen w-full relative flex items-center overflow-hidden pt-16 sm:pt-0" data-slide-index="4">
           {/* Background Image */}
           <div className="absolute inset-0 z-0">
             <Image
@@ -764,8 +800,8 @@ export default function HoneywellPage() {
           </div>
         </section>
 
-        {/* Slide 5: Job Opportunities */}
-        <section className="snap-start min-h-screen w-full relative overflow-hidden pt-16 sm:pt-0" data-slide-index="4">
+        {/* Slide 6: Job Opportunities */}
+        <section className="snap-start min-h-screen w-full relative overflow-hidden pt-16 sm:pt-0" data-slide-index="5">
           {/* Background Image */}
           <div className="absolute inset-0 z-0">
             <Image
@@ -1038,27 +1074,7 @@ export default function HoneywellPage() {
         </section>
       </div>
 
-      {/* Video Modal */}
-      {showVideoModal && (
-        <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4 backdrop-blur-md">
-          <div className="relative w-full max-w-6xl aspect-video bg-black rounded-3xl overflow-hidden border border-white/20">
-            <button
-              onClick={() => setShowVideoModal(false)}
-              className="absolute top-6 right-6 z-10 p-3 bg-black/50 hover:bg-black/70 rounded-full transition-colors duration-200 backdrop-blur-md"
-            >
-              <X className="h-6 w-6 text-white" />
-            </button>
-            <iframe
-              src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1"
-              title="Honeywell Aerospace Culture Video"
-              className="w-full h-full"
-              frameBorder="0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-            />
-          </div>
-        </div>
-      )}
+
 
       <style jsx>{`
         @keyframes fadeIn {

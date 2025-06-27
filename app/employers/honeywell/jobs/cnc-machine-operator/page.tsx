@@ -74,7 +74,7 @@ const slides = [
     type: 'hero',
     title: 'CNC Machine Operator',
     subtitle: 'Join Honeywell Aerospace',
-    backgroundImage: 'https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=1920&h=1080&fit=crop&crop=center',
+    backgroundImage: '/media/job_opportunity_images/operator-working-with-milling-machine-in-factory-2024-12-10-03-24-00-utc_web.webp',
     content: {
       salary: '$48,000 - $62,000',
       location: 'Phoenix, AZ',
@@ -92,7 +92,7 @@ const slides = [
     type: 'day-in-life',
     title: 'A Day in Your Life',
     subtitle: 'See what your workday looks like',
-    backgroundImage: 'https://images.unsplash.com/photo-1563200424-2F6196024328?w=1920&h=1080&fit=crop&crop=center',
+    backgroundImage: '/media/job_opportunity_images/young-female-worker-using-cnc-machine-2025-02-10-09-49-32-utc_web.webp',
     content: {
       timeline: [
         { time: '7:00 AM', activity: 'Safety briefing and machine setup', description: 'Start your day with team safety protocols and prepare your CNC machine for production' },
@@ -105,10 +105,61 @@ const slides = [
   },
   {
     id: 3,
+    type: 'stories',
+    title: 'Stories from the Floor',
+    subtitle: 'Hear from our CNC operators',
+    backgroundImage: '/media/job_opportunity_images/woman-operating-control-panel-in-industrial-factor-2024-09-22-22-29-19-utc_web.webp',
+    content: {
+      videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ', // Replace with actual video
+      stories: [
+        {
+          name: 'Michael Rodriguez',
+          role: 'Senior CNC Operator & Training Specialist',
+          quote: 'I started here 5 years ago with just a high school diploma. Through Honeywell\'s training programs, I became certified in advanced CNC operations and now I help train the next generation of operators.',
+          image: '/media/Peter_Costa_Bio_2024.jpg'
+        },
+        {
+          name: 'Maria Rodriguez',
+          role: 'CNC Operator',
+          quote: 'The precision required here is incredible. Every part we make goes into aircraft that people trust with their lives. It\'s rewarding knowing my work contributes to aerospace innovation.',
+          image: '/media/job_opportunity_images/young-female-worker-using-cnc-machine-2025-02-10-09-49-32-utc_web.webp'
+        }
+      ]
+    }
+  },
+  {
+    id: 4,
+    type: 'job-carousel',
+    title: 'See Yourself in Action',
+    subtitle: 'What your workspace looks like',
+    backgroundImage: '',
+    content: {
+      images: [
+        {
+          url: '/media/job_opportunity_images/operator-working-with-milling-machine-in-factory-2024-12-10-03-24-00-utc_web.webp',
+          caption: 'State-of-the-art CNC machining centers'
+        },
+        {
+          url: '/media/job_opportunity_images/measuring-width-2025-03-14-11-20-01-utc_web.webp',
+          caption: 'Precision measurement and quality control'
+        },
+        {
+          url: '/media/job_opportunity_images/female-engineer-uses-cmm-coordinate-measuring-mach-2024-10-21-23-08-17-utc (1)_web.webp',
+          caption: 'Advanced manufacturing facility'
+        },
+        {
+          url: '/media/job_opportunity_images/young-female-worker-using-cnc-machine-2025-02-10-09-49-32-utc_web.webp',
+          caption: 'Team collaboration and problem-solving'
+        }
+      ]
+    }
+  },
+  {
+    id: 5,
     type: 'reality-check',
     title: 'Before You Apply',
     subtitle: 'What you need to know',
-    backgroundImage: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=1920&h=1080&fit=crop&crop=center',
+    backgroundImage: '/media/job_opportunity_images/woman-operating-control-panel-in-industrial-factor-2024-09-22-22-29-19-utc_web.webp',
     content: {
       challenges: [
         'Physical work environment with standing for extended periods',
@@ -132,17 +183,20 @@ const slides = [
     }
   },
   {
-    id: 4,
-    type: 'ready-to-start',
-    title: 'Ready to Get Started?',
-    subtitle: 'Your pathway to success begins here',
-    backgroundImage: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=1920&h=1080&fit=crop&crop=center',
+    id: 6,
+    type: 'skills-required',
+    title: 'Skills Required for the Job',
+    subtitle: 'What you need to succeed',
+    backgroundImage: '/media/job_opportunity_images/technician-working-with-three-dimensional-verifica-2024-12-10-03-24-01-utc (1)_web.webp',
     content: {
-      description: 'Complete our specialized training courses to build the skills needed for this position and unlock direct application to Honeywell.'
+      description: 'This position requires a combination of technical skills, attention to detail, and the ability to work in a fast-paced manufacturing environment.',
+      requirements: jobData.requirements,
+      responsibilities: jobData.responsibilities,
+      benefits: jobData.benefits
     }
   },
   {
-    id: 5,
+    id: 7,
     type: 'courses',
     title: 'Required Training Courses',
     subtitle: 'Master these skills to qualify for the position',
@@ -206,6 +260,7 @@ export default function CNCMachineOperatorJob() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [scrollY, setScrollY] = useState(0);
   const [favoriteCourses, setFavoriteCourses] = useState<number[]>([]);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   // Handle scroll for parallax effect
   useEffect(() => {
@@ -278,14 +333,35 @@ export default function CNCMachineOperatorJob() {
 
   const nextSlide = () => {
     setCurrentSlide((prev) => prev < slides.length - 1 ? prev + 1 : prev);
+    setCurrentImageIndex(0); // Reset image carousel when changing slides
   };
 
   const prevSlide = () => {
     setCurrentSlide((prev) => prev > 0 ? prev - 1 : prev);
+    setCurrentImageIndex(0); // Reset image carousel when changing slides
   };
 
   const goToSlide = (index: number) => {
     setCurrentSlide(index);
+    setCurrentImageIndex(0); // Reset image carousel when changing slides
+  };
+
+  const nextImage = () => {
+    const currentSlideData = slides[currentSlide];
+    if (currentSlideData?.content?.images && Array.isArray(currentSlideData.content.images)) {
+      setCurrentImageIndex((prev) => 
+        prev < currentSlideData.content.images!.length - 1 ? prev + 1 : 0
+      );
+    }
+  };
+
+  const prevImage = () => {
+    const currentSlideData = slides[currentSlide];
+    if (currentSlideData?.content?.images && Array.isArray(currentSlideData.content.images)) {
+      setCurrentImageIndex((prev) => 
+        prev > 0 ? prev - 1 : currentSlideData.content.images!.length - 1
+      );
+    }
   };
 
   return (
@@ -302,20 +378,26 @@ export default function CNCMachineOperatorJob() {
           >
             {/* Background Image */}
             <div className="absolute inset-0 z-0">
-              <Image
-                src={slide.backgroundImage}
-                alt={slide.title}
-                fill
-                className="object-cover"
-                priority={index === 0}
-              />
-              <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/60 to-black/30" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+              {slide.backgroundImage ? (
+                <>
+                  <Image
+                    src={slide.backgroundImage}
+                    alt={slide.title}
+                    fill
+                    className="object-cover"
+                    priority={index === 0}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/60 to-black/30" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+                </>
+              ) : (
+                <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-black to-gray-900" />
+              )}
             </div>
 
             {/* Slide Content */}
             <div className={`relative z-10 ${slide.type === 'courses' ? 'h-auto min-h-full' : 'h-full flex items-center'} overflow-y-auto`}>
-              <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full ${slide.type === 'courses' ? 'py-8' : 'py-20'}`}>
+              <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full ${slide.type === 'courses' ? 'py-8' : 'pt-12 sm:pt-16 md:pt-20 lg:pt-24 pb-8 sm:pb-12 md:pb-16 lg:pb-20'}`}>
                 
                 {/* Hero Slide */}
                 {slide.type === 'hero' && (
@@ -385,11 +467,11 @@ export default function CNCMachineOperatorJob() {
                 {/* Day in Life Slide */}
                 {slide.type === 'day-in-life' && (
                   <div className="max-w-5xl mx-auto">
-                    <div className="text-center mb-16">
-                      <h1 className="text-5xl md:text-7xl font-light text-white leading-tight mb-6">
+                    <div className="text-center mb-8 sm:mb-12 md:mb-16 mt-4 sm:mt-6 md:mt-8">
+                      <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-light text-white leading-tight mb-4 sm:mb-6">
                         {slide.title}
                       </h1>
-                      <p className="text-2xl text-gray-300">
+                      <p className="text-lg sm:text-xl md:text-2xl text-gray-300">
                         {slide.subtitle}
                       </p>
                     </div>
@@ -411,14 +493,133 @@ export default function CNCMachineOperatorJob() {
                   </div>
                 )}
 
+                {/* Stories from the Floor Slide */}
+                {slide.type === 'stories' && (
+                  <div className="max-w-6xl mx-auto">
+                    <div className="text-center mb-8 sm:mb-12 md:mb-16 mt-4 sm:mt-6 md:mt-8">
+                      <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-light text-white leading-tight mb-4 sm:mb-6">
+                        {slide.title}
+                      </h1>
+                      <p className="text-lg sm:text-xl md:text-2xl text-gray-300">
+                        {slide.subtitle}
+                      </p>
+                    </div>
+
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                      {/* Main Video */}
+                      <div className="relative aspect-video rounded-2xl overflow-hidden bg-black/50 backdrop-blur-md border border-white/10">
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <div className="text-center">
+                            <Play className="h-20 w-20 text-white/80 mx-auto mb-4" />
+                            <p className="text-white/80 text-lg">Featured Story</p>
+                            <p className="text-white/60 text-sm">Sarah's Journey: From Training to Team Lead</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Story Cards */}
+                      <div className="space-y-6">
+                        {slide.content.stories?.map((story, idx) => (
+                          <div key={idx} className="p-6 bg-gradient-to-br from-blue-600/20 to-purple-600/20 backdrop-blur-md border border-white/10 rounded-xl hover:scale-105 transition-all duration-300 cursor-pointer group">
+                            <div className="flex items-start gap-4">
+                              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center flex-shrink-0">
+                                <Users className="h-6 w-6 text-white" />
+                              </div>
+                              <div className="flex-1">
+                                <h3 className="text-xl font-semibold text-white mb-2">{story.name}</h3>
+                                <p className="text-blue-400 text-sm mb-3">{story.role}</p>
+                                <p className="text-gray-300 leading-relaxed">{story.quote}</p>
+                                <div className="flex items-center gap-2 mt-4 text-white/60 group-hover:text-white/80 transition-colors">
+                                  <Play className="h-4 w-4" />
+                                  <span className="text-sm">Watch Story</span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Job Carousel Slide */}
+                {slide.type === 'job-carousel' && (
+                  <div className="max-w-6xl mx-auto">
+                    <div className="text-center mb-8 sm:mb-12 md:mb-16 mt-4 sm:mt-6 md:mt-8">
+                      <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-light text-white leading-tight mb-4 sm:mb-6">
+                        {slide.title}
+                      </h1>
+                      <p className="text-lg sm:text-xl md:text-2xl text-gray-300">
+                        {slide.subtitle}
+                      </p>
+                    </div>
+
+                    {/* Large Image Carousel */}
+                    <div className="relative">
+                      <div className="relative aspect-[16/10] rounded-2xl overflow-hidden bg-black/50 backdrop-blur-md border border-white/10">
+                        {slide.content.images && slide.content.images[currentImageIndex] && (
+                          <Image
+                            src={slide.content.images[currentImageIndex].url}
+                            alt={slide.content.images[currentImageIndex].caption}
+                            fill
+                            className="object-cover transition-all duration-700"
+                          />
+                        )}
+                        
+                        {/* Gradient Overlay */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+                        
+                        {/* Caption */}
+                        <div className="absolute bottom-0 left-0 right-0 p-8">
+                          <div className="max-w-2xl">
+                            <h3 className="text-3xl font-bold text-white mb-4">Your Workspace</h3>
+                            {slide.content.images && slide.content.images[currentImageIndex] && (
+                              <p className="text-xl text-gray-300">{slide.content.images[currentImageIndex].caption}</p>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Navigation Arrows */}
+                        <button
+                          onClick={prevImage}
+                          className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-black/50 backdrop-blur-md border border-white/20 rounded-full flex items-center justify-center text-white hover:bg-black/70 transition-all duration-300"
+                        >
+                          <ChevronLeft className="h-6 w-6" />
+                        </button>
+                        <button
+                          onClick={nextImage}
+                          className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-black/50 backdrop-blur-md border border-white/20 rounded-full flex items-center justify-center text-white hover:bg-black/70 transition-all duration-300"
+                        >
+                          <ChevronRight className="h-6 w-6" />
+                        </button>
+                      </div>
+
+                      {/* Carousel Indicators */}
+                      <div className="flex justify-center mt-8 gap-3">
+                        {slide.content.images?.map((_, idx) => (
+                          <button
+                            key={idx}
+                            onClick={() => setCurrentImageIndex(idx)}
+                            className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                              idx === currentImageIndex 
+                                ? 'bg-white scale-125' 
+                                : 'bg-white/30 hover:bg-white/50'
+                            }`}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 {/* Reality Check Slide */}
                 {slide.type === 'reality-check' && (
                   <div className="max-w-6xl mx-auto">
-                    <div className="text-center mb-16">
-                      <h1 className="text-5xl md:text-7xl font-light text-white leading-tight mb-6">
+                    <div className="text-center mb-8 sm:mb-12 md:mb-16 mt-4 sm:mt-6 md:mt-8">
+                      <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-light text-white leading-tight mb-4 sm:mb-6">
                         {slide.title}
                       </h1>
-                      <p className="text-2xl text-gray-300">
+                      <p className="text-lg sm:text-xl md:text-2xl text-gray-300">
                         {slide.subtitle}
                       </p>
                     </div>
@@ -427,13 +628,15 @@ export default function CNCMachineOperatorJob() {
                       {/* Challenges */}
                       <div className="p-8 bg-gradient-to-br from-red-600/20 to-orange-600/20 backdrop-blur-md border border-red-400/30 rounded-2xl">
                         <h3 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
-                          <Shield className="h-8 w-8 text-red-400" />
+                          <div className="w-6 h-6 rounded-full bg-red-400/20 flex items-center justify-center">
+                            <div className="w-2 h-2 bg-red-400 rounded-full"></div>
+                          </div>
                           The Reality
                         </h3>
                         <div className="space-y-4">
                           {slide.content.challenges?.map((challenge, idx) => (
                             <div key={idx} className="flex items-start gap-3">
-                              <div className="w-2 h-2 bg-red-400 rounded-full mt-3 flex-shrink-0"></div>
+                              <div className="w-1.5 h-1.5 bg-red-400/60 rounded-full mt-2.5 flex-shrink-0"></div>
                               <p className="text-gray-300">{challenge}</p>
                             </div>
                           ))}
@@ -443,13 +646,15 @@ export default function CNCMachineOperatorJob() {
                       {/* Rewards */}
                       <div className="p-8 bg-gradient-to-br from-green-600/20 to-blue-600/20 backdrop-blur-md border border-green-400/30 rounded-2xl">
                         <h3 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
-                          <Star className="h-8 w-8 text-green-400" />
+                          <div className="w-6 h-6 rounded-full bg-green-400/20 flex items-center justify-center">
+                            <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                          </div>
                           The Rewards
                         </h3>
                         <div className="space-y-4">
                           {slide.content.rewards?.map((reward, idx) => (
                             <div key={idx} className="flex items-start gap-3">
-                              <CheckCircle className="h-5 w-5 text-green-400 mt-1 flex-shrink-0" />
+                              <div className="w-1.5 h-1.5 bg-green-400/60 rounded-full mt-2.5 flex-shrink-0"></div>
                               <p className="text-gray-300">{reward}</p>
                             </div>
                           ))}
@@ -460,13 +665,15 @@ export default function CNCMachineOperatorJob() {
                     {/* Perfect For */}
                     <div className="mt-12 p-8 bg-gradient-to-br from-blue-600/20 to-purple-600/20 backdrop-blur-md border border-blue-400/30 rounded-2xl">
                       <h3 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
-                        <Target className="h-8 w-8 text-blue-400" />
+                        <div className="w-6 h-6 rounded-full bg-blue-400/20 flex items-center justify-center">
+                          <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
+                        </div>
                         You'll Love This If
                       </h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {slide.content.perfectFor?.map((item, idx) => (
                           <div key={idx} className="flex items-start gap-3">
-                            <Heart className="h-5 w-5 text-purple-400 mt-1 flex-shrink-0" />
+                            <div className="w-1.5 h-1.5 bg-purple-400/60 rounded-full mt-2.5 flex-shrink-0"></div>
                             <p className="text-gray-300">{item}</p>
                           </div>
                         ))}
@@ -475,13 +682,97 @@ export default function CNCMachineOperatorJob() {
                   </div>
                 )}
 
+                {/* Skills Required Slide */}
+                {slide.type === 'skills-required' && (
+                  <div className="max-w-6xl mx-auto">
+                    <div className="text-center mb-8 sm:mb-12 md:mb-16 mt-4 sm:mt-6 md:mt-8">
+                      <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-light text-white leading-tight mb-4 sm:mb-6">
+                        {slide.title}
+                      </h1>
+                      <p className="text-lg sm:text-xl md:text-2xl text-gray-300 mb-6 sm:mb-8">
+                        {slide.subtitle}
+                      </p>
+                      <p className="text-lg text-gray-400 max-w-3xl mx-auto">
+                        {slide.content.description}
+                      </p>
+                    </div>
+
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                      {/* Requirements */}
+                      <div className="p-8 bg-gradient-to-br from-blue-600/20 to-purple-600/20 backdrop-blur-md border border-blue-400/30 rounded-2xl">
+                        <h3 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
+                          <div className="w-6 h-6 rounded-full bg-blue-400/20 flex items-center justify-center">
+                            <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
+                          </div>
+                          Requirements
+                        </h3>
+                        <div className="space-y-3">
+                          {slide.content.requirements?.map((req, idx) => (
+                            <div key={idx} className="flex items-start gap-3">
+                              <div className="w-1.5 h-1.5 bg-blue-400/60 rounded-full mt-2.5 flex-shrink-0"></div>
+                              <p className="text-gray-300 text-sm">{req}</p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Responsibilities */}
+                      <div className="p-8 bg-gradient-to-br from-green-600/20 to-teal-600/20 backdrop-blur-md border border-green-400/30 rounded-2xl">
+                        <h3 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
+                          <div className="w-6 h-6 rounded-full bg-green-400/20 flex items-center justify-center">
+                            <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                          </div>
+                          Responsibilities
+                        </h3>
+                        <div className="space-y-3">
+                          {slide.content.responsibilities?.map((resp, idx) => (
+                            <div key={idx} className="flex items-start gap-3">
+                              <div className="w-1.5 h-1.5 bg-green-400/60 rounded-full mt-2.5 flex-shrink-0"></div>
+                              <p className="text-gray-300 text-sm">{resp}</p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Benefits */}
+                      <div className="p-8 bg-gradient-to-br from-purple-600/20 to-pink-600/20 backdrop-blur-md border border-purple-400/30 rounded-2xl">
+                        <h3 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
+                          <div className="w-6 h-6 rounded-full bg-purple-400/20 flex items-center justify-center">
+                            <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
+                          </div>
+                          Benefits
+                        </h3>
+                        <div className="space-y-3">
+                          {slide.content.benefits?.map((benefit, idx) => (
+                            <div key={idx} className="flex items-start gap-3">
+                              <div className="w-1.5 h-1.5 bg-purple-400/60 rounded-full mt-2.5 flex-shrink-0"></div>
+                              <p className="text-gray-300 text-sm">{benefit}</p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* CTA */}
+                    <div className="text-center mt-16">
+                      <Button 
+                        onClick={() => goToSlide(slides.length - 1)}
+                        className="px-8 py-4 bg-white text-black font-semibold rounded-lg hover:bg-gray-100 transition-all duration-300 transform hover:scale-105"
+                      >
+                        Start Training Pathway
+                      </Button>
+                    </div>
+                  </div>
+                )}
+
                 {/* Ready to Start Slide */}
                 {slide.type === 'ready-to-start' && (
                   <div className="max-w-5xl mx-auto text-center">
-                    <h1 className="text-5xl md:text-7xl font-light text-white leading-tight mb-8">
-                      {slide.title}
-                    </h1>
-                    <p className="text-2xl text-gray-300 mb-16">
+                    <div className="mt-4 sm:mt-6 md:mt-8">
+                      <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-light text-white leading-tight mb-6 sm:mb-8">
+                        {slide.title}
+                      </h1>
+                    <p className="text-lg sm:text-xl md:text-2xl text-gray-300 mb-8 sm:mb-12 md:mb-16">
                       {slide.subtitle}
                     </p>
                     
@@ -524,6 +815,7 @@ export default function CNCMachineOperatorJob() {
                         </Button>
                       </div>
                     </div>
+                    </div>
                   </div>
                 )}
 
@@ -533,7 +825,7 @@ export default function CNCMachineOperatorJob() {
                     {/* Full Page Background */}
                     <div className="absolute inset-0 z-0">
                       <Image
-                        src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=1920&h=1080&fit=crop&crop=center"
+                        src="/media/job_opportunity_images/female-engineer-uses-cmm-coordinate-measuring-mach-2024-10-21-23-08-17-utc (1)_web.webp"
                         alt="Training and Education"
                         fill
                         className="object-cover"
