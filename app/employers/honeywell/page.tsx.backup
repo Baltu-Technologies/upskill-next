@@ -1,0 +1,785 @@
+'use client';
+
+import React, { useState } from 'react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { 
+  MapPin, 
+  Star, 
+  Users, 
+  Calendar, 
+  Clock, 
+  DollarSign, 
+  ChevronRight, 
+  Play, 
+  Bookmark, 
+  BookmarkCheck, 
+  Search, 
+  Filter, 
+  Building2, 
+  Award, 
+  Shield, 
+  Zap, 
+  Globe, 
+  Heart,
+  ArrowLeft,
+  ExternalLink,
+  Phone,
+  Mail,
+  X,
+  ChevronDown,
+  ChevronUp,
+  Briefcase,
+  Target,
+  TrendingUp,
+  CheckCircle,
+  Plane,
+  Wrench,
+  Cog,
+  Rocket
+} from 'lucide-react';
+
+// Mock job data for Honeywell
+const mockJobs = [
+  {
+    id: 1,
+    title: "Avionics Systems Technician",
+    department: "Aerospace Engineering",
+    locations: [
+      { city: "Tempe", state: "AZ", openings: 8 },
+      { city: "Phoenix", state: "AZ", openings: 3 },
+      { city: "Scottsdale", state: "AZ", openings: 2 }
+    ],
+    salaryRange: "$70,000 - $85,000",
+    type: "Full-time",
+    experience: "2-4 years",
+    urgent: true,
+    requirements: [
+      "Associate degree in Electronics or Avionics",
+      "FAA certification preferred",
+      "Experience with aircraft electrical systems",
+      "Knowledge of avionics troubleshooting procedures",
+      "Ability to read technical schematics and manuals"
+    ],
+    description: "Install, maintain, and repair avionics systems in commercial and military aircraft. Work with cutting-edge flight control systems, navigation equipment, and communication systems."
+  },
+  {
+    id: 2,
+    title: "Aerospace Manufacturing Engineer",
+    department: "Manufacturing",
+    locations: [
+      { city: "Tempe", state: "AZ", openings: 5 },
+      { city: "Mesa", state: "AZ", openings: 2 }
+    ],
+    salaryRange: "$80,000 - $95,000",
+    type: "Full-time",
+    experience: "3-5 years",
+    urgent: false,
+    requirements: [
+      "Bachelor's degree in Aerospace or Mechanical Engineering",
+      "Experience with lean manufacturing principles",
+      "Knowledge of aerospace quality standards (AS9100)",
+      "Proficiency in CAD software (SolidWorks, CATIA)",
+      "Understanding of composite materials and processes"
+    ],
+    description: "Design and optimize manufacturing processes for aerospace components. Lead continuous improvement initiatives and ensure compliance with stringent aerospace quality standards."
+  },
+  {
+    id: 3,
+    title: "Flight Test Engineer",
+    department: "Flight Operations",
+    locations: [
+      { city: "Phoenix", state: "AZ", openings: 3 },
+      { city: "Tempe", state: "AZ", openings: 1 }
+    ],
+    salaryRange: "$90,000 - $110,000",
+    type: "Full-time",
+    experience: "5+ years",
+    urgent: true,
+    requirements: [
+      "Bachelor's degree in Aerospace Engineering",
+      "Flight test experience required",
+      "Knowledge of flight test instrumentation",
+      "Understanding of aircraft performance analysis",
+      "Strong analytical and problem-solving skills"
+    ],
+    description: "Plan and execute flight test programs for new aircraft systems. Analyze flight data and provide recommendations for system improvements and certification."
+  },
+  {
+    id: 4,
+    title: "Propulsion Systems Specialist",
+    department: "Propulsion",
+    locations: [
+      { city: "Tempe", state: "AZ", openings: 4 },
+      { city: "Chandler", state: "AZ", openings: 2 }
+    ],
+    salaryRange: "$85,000 - $100,000",
+    type: "Full-time",
+    experience: "4-6 years",
+    urgent: false,
+    requirements: [
+      "Bachelor's degree in Aerospace or Mechanical Engineering",
+      "Experience with gas turbine engines",
+      "Knowledge of propulsion system design",
+      "Familiarity with engine testing procedures",
+      "Understanding of thermodynamics and fluid mechanics"
+    ],
+    description: "Design and test propulsion systems for commercial and military aircraft. Work on next-generation engine technologies and fuel efficiency improvements."
+  },
+  {
+    id: 5,
+    title: "Quality Assurance Inspector",
+    department: "Quality",
+    locations: [
+      { city: "Tempe", state: "AZ", openings: 6 },
+      { city: "Phoenix", state: "AZ", openings: 4 },
+      { city: "Mesa", state: "AZ", openings: 3 }
+    ],
+    salaryRange: "$55,000 - $70,000",
+    type: "Full-time",
+    experience: "1-3 years",
+    urgent: false,
+    requirements: [
+      "High school diploma or equivalent",
+      "Knowledge of aerospace quality standards",
+      "Experience with inspection tools and equipment",
+      "Attention to detail and accuracy",
+      "Ability to read technical drawings"
+    ],
+    description: "Inspect aerospace components and assemblies to ensure compliance with quality standards. Use precision measurement tools and document inspection results."
+  },
+  {
+    id: 6,
+    title: "Composite Materials Technician",
+    department: "Materials Engineering",
+    locations: [
+      { city: "Tempe", state: "AZ", openings: 7 },
+      { city: "Chandler", state: "AZ", openings: 3 }
+    ],
+    salaryRange: "$65,000 - $80,000",
+    type: "Full-time",
+    experience: "2-4 years",
+    urgent: true,
+    requirements: [
+      "Associate degree in Materials Science or related field",
+      "Experience with composite manufacturing processes",
+      "Knowledge of autoclave operations",
+      "Understanding of fiber reinforced plastics",
+      "Ability to work in cleanroom environments"
+    ],
+    description: "Manufacture and test composite materials for aircraft structures. Work with advanced carbon fiber and other lightweight materials used in modern aircraft."
+  }
+];
+
+export default function HoneywellPage() {
+  const [savedJobs, setSavedJobs] = useState<number[]>([]);
+  const [expandedJob, setExpandedJob] = useState<number | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedDepartment, setSelectedDepartment] = useState('all');
+  const [selectedLocation, setSelectedLocation] = useState('all');
+  const [showVideoModal, setShowVideoModal] = useState(false);
+  const [activeTab, setActiveTab] = useState('overview');
+  const [hoveredStat, setHoveredStat] = useState<string | null>(null);
+  const [scrollY, setScrollY] = useState(0);
+
+  // Handle scroll for parallax effect
+  React.useEffect(() => {
+    const handleScroll = () => setScrollY(window.scrollY);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const toggleSaveJob = (jobId: number) => {
+    setSavedJobs(prev => 
+      prev.includes(jobId) 
+        ? prev.filter(id => id !== jobId)
+        : [...prev, jobId]
+    );
+  };
+
+  const toggleJobExpansion = (jobId: number) => {
+    setExpandedJob(expandedJob === jobId ? null : jobId);
+  };
+
+  // Get unique departments and locations for filters
+  const departments = Array.from(new Set(mockJobs.map(job => job.department)));
+  const locations = Array.from(new Set(mockJobs.flatMap(job => job.locations.map(loc => `${loc.city}, ${loc.state}`))));
+
+  // Filter jobs based on search and filters
+  const filteredJobs = mockJobs.filter(job => {
+    const matchesSearch = job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         job.department.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesDepartment = selectedDepartment === 'all' || job.department === selectedDepartment;
+    const matchesLocation = selectedLocation === 'all' || 
+                           job.locations.some(loc => `${loc.city}, ${loc.state}` === selectedLocation);
+    
+    return matchesSearch && matchesDepartment && matchesLocation;
+  });
+
+  return (
+    <div className="min-h-screen bg-black text-white">
+      {/* Back Button */}
+      <div className="absolute top-6 left-6 z-20">
+        <Link
+          href="/employers"
+          className="flex items-center gap-2 px-4 py-2 bg-black/50 hover:bg-black/70 rounded-lg transition-all duration-200 backdrop-blur-sm border border-white/10"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          <span className="text-sm">Back to Employers</span>
+        </Link>
+      </div>
+
+      {/* Hero Section */}
+      <div className="relative h-[500px] overflow-hidden">
+        {/* Animated Background */}
+        <div 
+          className="absolute inset-0 bg-gradient-to-r from-blue-900 via-slate-800 to-gray-900"
+          style={{ transform: `translateY(${scrollY * 0.5}px)` }}
+        >
+          {/* Floating particles animation */}
+          <div className="absolute inset-0">
+            {[...Array(20)].map((_, i) => (
+              <div
+                key={i}
+                className="absolute w-2 h-2 bg-white/20 rounded-full animate-pulse"
+                style={{
+                  left: `${Math.random() * 100}%`,
+                  top: `${Math.random() * 100}%`,
+                  animationDelay: `${Math.random() * 3}s`,
+                  animationDuration: `${2 + Math.random() * 3}s`
+                }}
+              />
+            ))}
+          </div>
+        </div>
+        
+        {/* Gradient Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+        
+        {/* Content */}
+        <div className="relative z-10 h-full flex items-center">
+          <div className="max-w-7xl mx-auto px-6 w-full">
+            <div className="flex items-center gap-8">
+              {/* Company Logo */}
+              <div className="w-28 h-28 bg-white rounded-3xl p-4 flex items-center justify-center shadow-2xl transform hover:scale-105 transition-transform duration-300 group">
+                <div className="text-3xl font-bold text-red-600 group-hover:text-red-700 transition-colors">HON</div>
+              </div>
+              
+              {/* Company Info */}
+              <div className="flex-1">
+                <div className="flex items-center gap-4 mb-2">
+                  <h1 className="text-6xl font-bold text-white hover:text-blue-200 transition-colors duration-300">
+                    Honeywell Aerospace
+                  </h1>
+                  <div className="px-4 py-2 bg-green-500/20 text-green-400 rounded-full text-sm font-medium animate-pulse">
+                    ✨ Actively Hiring
+                  </div>
+                </div>
+                <p className="text-2xl text-gray-200 mb-6 font-light">
+                  Pioneering the Future of Flight
+                </p>
+                <div className="flex items-center gap-8 text-gray-300">
+                  <div className="flex items-center gap-2 hover:text-white transition-colors cursor-pointer">
+                    <MapPin className="h-5 w-5" />
+                    <span>Tempe, Arizona</span>
+                  </div>
+                  <div className="flex items-center gap-2 hover:text-white transition-colors cursor-pointer">
+                    <Star className="h-5 w-5 fill-yellow-400 text-yellow-400" />
+                    <span className="font-semibold">4.5</span>
+                    <span className="text-sm text-gray-400">(2,847 reviews)</span>
+                  </div>
+                  <div className="flex items-center gap-2 hover:text-white transition-colors cursor-pointer">
+                    <Users className="h-5 w-5" />
+                    <span>10,000+ employees</span>
+                  </div>
+                </div>
+                
+                {/* Quick Action Buttons */}
+                <div className="flex gap-4 mt-6">
+                  <button className="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-blue-500/25">
+                    View All Jobs
+                  </button>
+                  <button className="px-6 py-3 border border-white/20 text-white rounded-xl font-semibold hover:bg-white/10 transition-all duration-300 backdrop-blur-sm">
+                    Follow Company
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Company Stats Bar */}
+      <div className="bg-gradient-to-r from-slate-900 to-slate-800 border-y border-slate-700">
+        <div className="max-w-7xl mx-auto px-6 py-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            <div 
+              className="text-center group cursor-pointer transform hover:scale-105 transition-all duration-300"
+              onMouseEnter={() => setHoveredStat('years')}
+              onMouseLeave={() => setHoveredStat(null)}
+            >
+              <div className={`text-3xl font-bold transition-all duration-300 ${hoveredStat === 'years' ? 'text-blue-300 scale-110' : 'text-blue-400'}`}>
+                130+
+              </div>
+              <div className="text-sm text-gray-400 group-hover:text-gray-300 transition-colors">Years of Innovation</div>
+              {hoveredStat === 'years' && (
+                <div className="absolute mt-2 p-2 bg-black/80 text-white text-xs rounded-lg backdrop-blur-sm border border-white/10">
+                  Since 1885, pioneering aerospace technology
+                </div>
+              )}
+            </div>
+            <div 
+              className="text-center group cursor-pointer transform hover:scale-105 transition-all duration-300"
+              onMouseEnter={() => setHoveredStat('positions')}
+              onMouseLeave={() => setHoveredStat(null)}
+            >
+              <div className={`text-3xl font-bold transition-all duration-300 ${hoveredStat === 'positions' ? 'text-green-300 scale-110' : 'text-green-400'}`}>
+                33
+              </div>
+              <div className="text-sm text-gray-400 group-hover:text-gray-300 transition-colors">Open Positions</div>
+              {hoveredStat === 'positions' && (
+                <div className="absolute mt-2 p-2 bg-black/80 text-white text-xs rounded-lg backdrop-blur-sm border border-white/10">
+                  Actively hiring across all departments
+                </div>
+              )}
+            </div>
+            <div 
+              className="text-center group cursor-pointer transform hover:scale-105 transition-all duration-300"
+              onMouseEnter={() => setHoveredStat('countries')}
+              onMouseLeave={() => setHoveredStat(null)}
+            >
+              <div className={`text-3xl font-bold transition-all duration-300 ${hoveredStat === 'countries' ? 'text-purple-300 scale-110' : 'text-purple-400'}`}>
+                50+
+              </div>
+              <div className="text-sm text-gray-400 group-hover:text-gray-300 transition-colors">Countries Served</div>
+              {hoveredStat === 'countries' && (
+                <div className="absolute mt-2 p-2 bg-black/80 text-white text-xs rounded-lg backdrop-blur-sm border border-white/10">
+                  Global aerospace presence worldwide
+                </div>
+              )}
+            </div>
+            <div 
+              className="text-center group cursor-pointer transform hover:scale-105 transition-all duration-300"
+              onMouseEnter={() => setHoveredStat('revenue')}
+              onMouseLeave={() => setHoveredStat(null)}
+            >
+              <div className={`text-3xl font-bold transition-all duration-300 ${hoveredStat === 'revenue' ? 'text-orange-300 scale-110' : 'text-orange-400'}`}>
+                $15B+
+              </div>
+              <div className="text-sm text-gray-400 group-hover:text-gray-300 transition-colors">Annual Revenue</div>
+              {hoveredStat === 'revenue' && (
+                <div className="absolute mt-2 p-2 bg-black/80 text-white text-xs rounded-lg backdrop-blur-sm border border-white/10">
+                  Leading aerospace technology revenue
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-6 py-12">
+        
+        {/* Navigation Tabs */}
+        <div className="flex justify-center mb-12">
+          <div className="bg-slate-800/50 p-2 rounded-2xl border border-slate-700">
+            <div className="flex gap-2">
+              {[
+                { id: 'overview', label: 'Overview', icon: Building2 },
+                { id: 'jobs', label: 'Jobs', icon: Briefcase },
+                { id: 'culture', label: 'Culture', icon: Heart },
+                { id: 'benefits', label: 'Benefits', icon: Award }
+              ].map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`flex items-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all duration-300 ${
+                    activeTab === tab.id
+                      ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg'
+                      : 'text-gray-400 hover:text-white hover:bg-slate-700/50'
+                  }`}
+                >
+                  <tab.icon className="h-4 w-4" />
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Tab Content */}
+        <div className="space-y-16">
+          {activeTab === 'overview' && (
+            <>
+              {/* What We Do Section */}
+        <section>
+          <h2 className="text-3xl font-bold text-white mb-8">What We Do</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="bg-slate-800/50 rounded-2xl p-6 border border-slate-700">
+              <div className="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center mb-4">
+                <Plane className="h-6 w-6 text-blue-400" />
+              </div>
+              <h3 className="text-xl font-semibold text-white mb-3">Avionics Systems</h3>
+              <p className="text-gray-300 mb-4">
+                Advanced flight management systems, navigation equipment, and cockpit displays that power modern commercial and military aircraft worldwide.
+              </p>
+              <div className="relative h-32 rounded-lg overflow-hidden bg-gradient-to-br from-blue-600 to-blue-800">
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <Plane className="h-16 w-16 text-white/30" />
+                </div>
+              </div>
+            </div>
+            
+            <div className="bg-slate-800/50 rounded-2xl p-6 border border-slate-700">
+              <div className="w-12 h-12 bg-orange-500/20 rounded-xl flex items-center justify-center mb-4">
+                <Rocket className="h-6 w-6 text-orange-400" />
+              </div>
+              <h3 className="text-xl font-semibold text-white mb-3">Propulsion Systems</h3>
+              <p className="text-gray-300 mb-4">
+                High-performance engines and propulsion technologies that deliver exceptional fuel efficiency and reliability for aerospace applications.
+              </p>
+              <div className="relative h-32 rounded-lg overflow-hidden bg-gradient-to-br from-orange-600 to-red-800">
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <Rocket className="h-16 w-16 text-white/30" />
+                </div>
+              </div>
+            </div>
+            
+            <div className="bg-slate-800/50 rounded-2xl p-6 border border-slate-700">
+              <div className="w-12 h-12 bg-green-500/20 rounded-xl flex items-center justify-center mb-4">
+                <Cog className="h-6 w-6 text-green-400" />
+              </div>
+              <h3 className="text-xl font-semibold text-white mb-3">Aircraft Systems</h3>
+              <p className="text-gray-300 mb-4">
+                Comprehensive aircraft systems including environmental controls, landing gear, and flight control systems for enhanced safety and performance.
+              </p>
+              <div className="relative h-32 rounded-lg overflow-hidden bg-gradient-to-br from-green-600 to-emerald-800">
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <Cog className="h-16 w-16 text-white/30" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+              </>
+            )}
+
+            {activeTab === 'culture' && (
+              <section>
+                <h2 className="text-3xl font-bold text-white mb-8">Culture & Values</h2>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                  <div>
+                    <h3 className="text-2xl font-semibold text-white mb-4">Our Mission</h3>
+                    <p className="text-gray-300 text-lg leading-relaxed mb-6">
+                      At Honeywell Aerospace, we're committed to making flight safer, more efficient, and more sustainable. 
+                      Our innovative technologies and solutions help airlines, aircraft manufacturers, and operators around the world 
+                      achieve their goals while pushing the boundaries of what's possible in aviation.
+                    </p>
+                    
+                    <div className="space-y-4">
+                      <div className="flex items-start gap-3">
+                        <CheckCircle className="h-6 w-6 text-green-400 mt-1 flex-shrink-0" />
+                        <div>
+                          <h4 className="font-semibold text-white">Innovation First</h4>
+                          <p className="text-gray-300">Pioneering cutting-edge aerospace technologies</p>
+                        </div>
+                      </div>
+                      <div className="flex items-start gap-3">
+                        <CheckCircle className="h-6 w-6 text-green-400 mt-1 flex-shrink-0" />
+                        <div>
+                          <h4 className="font-semibold text-white">Safety Excellence</h4>
+                          <p className="text-gray-300">Uncompromising commitment to aviation safety</p>
+                        </div>
+                      </div>
+                      <div className="flex items-start gap-3">
+                        <CheckCircle className="h-6 w-6 text-green-400 mt-1 flex-shrink-0" />
+                        <div>
+                          <h4 className="font-semibold text-white">Sustainability Focus</h4>
+                          <p className="text-gray-300">Developing eco-friendly aviation solutions</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-6">
+                    {/* Video Preview */}
+                    <div className="relative h-64 rounded-2xl overflow-hidden cursor-pointer group bg-gradient-to-br from-slate-700 to-slate-900" onClick={() => setShowVideoModal(true)}>
+                      <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-colors duration-300" />
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="w-16 h-16 bg-white/90 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                          <Play className="h-8 w-8 text-black ml-1" />
+                        </div>
+                      </div>
+                      <div className="absolute bottom-4 left-4 right-4">
+                        <h4 className="text-white font-semibold text-lg">Life at Honeywell Aerospace</h4>
+                        <p className="text-white/80 text-sm">Discover what makes our team extraordinary</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </section>
+            )}
+
+            {activeTab === 'jobs' && (
+              <section>
+          <div className="flex items-center justify-between mb-8">
+            <h2 className="text-3xl font-bold text-white">Job Opportunities</h2>
+            <div className="text-sm text-gray-400">
+              {filteredJobs.length} of {mockJobs.length} positions
+            </div>
+          </div>
+
+          {/* Search and Filters */}
+          <div className="bg-slate-800/50 rounded-2xl p-6 mb-8 border border-slate-700">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder="Search jobs..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500"
+                />
+              </div>
+              
+              <select
+                value={selectedDepartment}
+                onChange={(e) => setSelectedDepartment(e.target.value)}
+                className="px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-blue-500"
+              >
+                <option value="all">All Departments</option>
+                {departments.map(dept => (
+                  <option key={dept} value={dept}>{dept}</option>
+                ))}
+              </select>
+              
+              <select
+                value={selectedLocation}
+                onChange={(e) => setSelectedLocation(e.target.value)}
+                className="px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-blue-500"
+              >
+                <option value="all">All Locations</option>
+                {locations.map(location => (
+                  <option key={location} value={location}>{location}</option>
+                ))}
+              </select>
+              
+              <button className="flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors duration-200">
+                <Filter className="h-4 w-4" />
+                <span>Filter</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Jobs List */}
+          <div className="space-y-4">
+            {filteredJobs.map((job) => (
+              <div key={job.id} className="bg-slate-800/50 rounded-2xl border border-slate-700 overflow-hidden hover:border-slate-600 transition-colors duration-200">
+                <div className="p-6">
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-2">
+                        <h3 className="text-xl font-semibold text-white">{job.title}</h3>
+                        {job.urgent && (
+                          <span className="px-2 py-1 bg-red-500/20 text-red-400 text-xs font-medium rounded-full">
+                            Urgent Hiring
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-4 text-sm text-gray-400 mb-3">
+                        <span className="flex items-center gap-1">
+                          <Building2 className="h-4 w-4" />
+                          {job.department}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Clock className="h-4 w-4" />
+                          {job.type}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Target className="h-4 w-4" />
+                          {job.experience}
+                        </span>
+                      </div>
+                      
+                      {/* Locations with opening counts */}
+                      <div className="flex flex-wrap gap-2 mb-3">
+                        {job.locations.map((location, index) => (
+                          <span key={index} className="flex items-center gap-1 px-3 py-1 bg-slate-700 rounded-full text-sm">
+                            <MapPin className="h-3 w-3" />
+                            {location.city}, {location.state}
+                            <span className="ml-1 px-2 py-0.5 bg-blue-500/20 text-blue-400 text-xs rounded-full">
+                              {location.openings} openings
+                            </span>
+                          </span>
+                        ))}
+                      </div>
+                      
+                      <div className="flex items-center gap-1 text-green-400 font-semibold">
+                        <DollarSign className="h-4 w-4" />
+                        {job.salaryRange}
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => toggleSaveJob(job.id)}
+                        className="p-2 rounded-lg bg-slate-700 hover:bg-slate-600 transition-colors duration-200"
+                      >
+                        {savedJobs.includes(job.id) ? (
+                          <BookmarkCheck className="h-5 w-5 text-blue-400" />
+                        ) : (
+                          <Bookmark className="h-5 w-5 text-gray-400" />
+                        )}
+                      </button>
+                      <button
+                        onClick={() => toggleJobExpansion(job.id)}
+                        className="p-2 rounded-lg bg-slate-700 hover:bg-slate-600 transition-colors duration-200"
+                      >
+                        {expandedJob === job.id ? (
+                          <ChevronUp className="h-5 w-5 text-gray-400" />
+                        ) : (
+                          <ChevronDown className="h-5 w-5 text-gray-400" />
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                  
+                  {/* Expanded Job Details */}
+                  {expandedJob === job.id && (
+                    <div className="border-t border-slate-700 pt-4 mt-4 space-y-4">
+                      <div>
+                        <h4 className="font-semibold text-white mb-2">Job Description</h4>
+                        <p className="text-gray-300">{job.description}</p>
+                      </div>
+                      
+                      <div>
+                        <h4 className="font-semibold text-white mb-2">Requirements</h4>
+                        <ul className="space-y-1">
+                          {job.requirements.map((req, index) => (
+                            <li key={index} className="flex items-start gap-2 text-gray-300">
+                              <CheckCircle className="h-4 w-4 text-green-400 mt-0.5 flex-shrink-0" />
+                              {req}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                      
+                      <div className="flex gap-3 pt-4">
+                        <button className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white py-3 rounded-lg font-semibold transition-all duration-200">
+                          Apply Now
+                        </button>
+                        <button className="px-6 py-3 border border-slate-600 text-gray-300 rounded-lg hover:bg-slate-700 transition-colors duration-200">
+                          Learn More
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+              </section>
+            )}
+
+            {activeTab === 'benefits' && (
+              <section>
+          <h2 className="text-3xl font-bold text-white mb-8">Benefits & Perks</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="bg-slate-800/50 rounded-xl p-6 border border-slate-700">
+              <Shield className="h-8 w-8 text-blue-400 mb-3" />
+              <h3 className="font-semibold text-white mb-2">Comprehensive Health Coverage</h3>
+              <p className="text-gray-300 text-sm">Medical, dental, vision, and mental health support</p>
+            </div>
+            <div className="bg-slate-800/50 rounded-xl p-6 border border-slate-700">
+              <DollarSign className="h-8 w-8 text-green-400 mb-3" />
+              <h3 className="font-semibold text-white mb-2">Competitive Compensation</h3>
+              <p className="text-gray-300 text-sm">Market-leading salaries plus performance bonuses</p>
+            </div>
+            <div className="bg-slate-800/50 rounded-xl p-6 border border-slate-700">
+              <TrendingUp className="h-8 w-8 text-purple-400 mb-3" />
+              <h3 className="font-semibold text-white mb-2">Stock Options</h3>
+              <p className="text-gray-300 text-sm">Employee stock purchase plan and equity participation</p>
+            </div>
+            <div className="bg-slate-800/50 rounded-xl p-6 border border-slate-700">
+              <Calendar className="h-8 w-8 text-orange-400 mb-3" />
+              <h3 className="font-semibold text-white mb-2">Flexible Time Off</h3>
+              <p className="text-gray-300 text-sm">Generous PTO policy and flexible work arrangements</p>
+            </div>
+            <div className="bg-slate-800/50 rounded-xl p-6 border border-slate-700">
+              <Award className="h-8 w-8 text-yellow-400 mb-3" />
+              <h3 className="font-semibold text-white mb-2">Professional Development</h3>
+              <p className="text-gray-300 text-sm">Training programs, certifications, and career advancement</p>
+            </div>
+            <div className="bg-slate-800/50 rounded-xl p-6 border border-slate-700">
+              <Globe className="h-8 w-8 text-indigo-400 mb-3" />
+              <h3 className="font-semibold text-white mb-2">Global Opportunities</h3>
+              <p className="text-gray-300 text-sm">International assignments and cross-cultural experiences</p>
+            </div>
+          </div>
+              </section>
+            )}
+          </div>
+        </div>
+
+        {/* Awards & Recognition */}
+        <section>
+          <h2 className="text-3xl font-bold text-white mb-8">Awards & Recognition</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="text-center">
+              <div className="w-16 h-16 bg-yellow-500/20 rounded-full flex items-center justify-center mx-auto mb-3">
+                <Award className="h-8 w-8 text-yellow-400" />
+              </div>
+              <h3 className="font-semibold text-white mb-1">Fortune 100</h3>
+              <p className="text-gray-400 text-sm">Ranked in Fortune 100 companies</p>
+            </div>
+            <div className="text-center">
+              <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-3">
+                <CheckCircle className="h-8 w-8 text-green-400" />
+              </div>
+              <h3 className="font-semibold text-white mb-1">Safety Excellence</h3>
+              <p className="text-gray-400 text-sm">Industry-leading safety record</p>
+            </div>
+            <div className="text-center">
+              <div className="w-16 h-16 bg-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-3">
+                <Zap className="h-8 w-8 text-blue-400" />
+              </div>
+              <h3 className="font-semibold text-white mb-1">Innovation Leader</h3>
+              <p className="text-gray-400 text-sm">Top aerospace technology innovator</p>
+            </div>
+            <div className="text-center">
+              <div className="w-16 h-16 bg-purple-500/20 rounded-full flex items-center justify-center mx-auto mb-3">
+                <Users className="h-8 w-8 text-purple-400" />
+              </div>
+              <h3 className="font-semibold text-white mb-1">Best Employer</h3>
+              <p className="text-gray-400 text-sm">Top workplace recognition</p>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      {/* Video Modal */}
+      {showVideoModal && (
+        <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
+          <div className="relative w-full max-w-4xl aspect-video bg-black rounded-2xl overflow-hidden">
+            <button
+              onClick={() => setShowVideoModal(false)}
+              className="absolute top-4 right-4 z-10 p-2 bg-black/50 hover:bg-black/70 rounded-full transition-colors duration-200"
+            >
+              <X className="h-6 w-6 text-white" />
+            </button>
+            <iframe
+              src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+              title="Honeywell Aerospace Culture Video"
+              className="w-full h-full"
+              frameBorder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            />
+          </div>
+        </div>
+      )}
+    </div>
+  );
+} 

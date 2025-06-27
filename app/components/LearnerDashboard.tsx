@@ -489,8 +489,8 @@ export default function LearnerDashboard() {
             </CardContent>
           </Card>
 
-          {/* 2. Today's Progress and Job Opportunities */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-4 md:gap-6 w-full min-w-0">
+          {/* 2. Today's Progress, Job Opportunities, and My Submissions */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-4 md:gap-6 w-full min-w-0">
             
             {/* Recent Activity */}
             <Card className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm shadow-xl border-2 border-green-200/60 dark:border-green-400/30 hover:border-green-300/80 dark:hover:border-green-300/50 transition-all duration-300 hover:shadow-2xl hover:shadow-green-500/10 w-full min-w-0">
@@ -589,6 +589,68 @@ export default function LearnerDashboard() {
                       <ExternalLink className="h-4 w-4" />
                     </Button>
                   </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* My Submissions */}
+          <Card className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm shadow-xl border-2 border-orange-200/60 dark:border-orange-400/30 hover:border-orange-300/80 dark:hover:border-orange-300/50 transition-all duration-300 hover:shadow-2xl hover:shadow-orange-500/10 w-full min-w-0">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <FileText className="h-5 w-5 text-orange-600" />
+                My Submissions
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-2 gap-2 sm:gap-4 text-center">
+                <div className="p-2 sm:p-3 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
+                  <div className="text-lg sm:text-xl font-bold text-orange-600">5</div>
+                  <div className="text-xs text-gray-600 dark:text-gray-400">Active</div>
+                </div>
+                <div className="p-2 sm:p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                  <div className="text-lg sm:text-xl font-bold text-green-600">1</div>
+                  <div className="text-xs text-gray-600 dark:text-gray-400">Offer</div>
+                </div>
+              </div>
+              
+              {/* Recent Submissions */}
+              <div className="space-y-2">
+                <div className="flex items-center gap-3 p-2 hover:bg-gray-50 dark:hover:bg-gray-800/50 rounded-lg transition-colors">
+                  <div className="w-2 h-2 bg-green-500 rounded-full mt-1.5 flex-shrink-0"></div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-gray-900 dark:text-white truncate">TSMC Process Engineer</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">Offer Extended • $95K</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-center gap-3 p-2 hover:bg-gray-50 dark:hover:bg-gray-800/50 rounded-lg transition-colors">
+                  <div className="w-2 h-2 bg-blue-500 rounded-full mt-1.5 flex-shrink-0"></div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-gray-900 dark:text-white truncate">Honeywell Avionics Tech</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">Interview Complete • Pending</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-center gap-3 p-2 hover:bg-gray-50 dark:hover:bg-gray-800/50 rounded-lg transition-colors">
+                  <div className="w-2 h-2 bg-yellow-500 rounded-full mt-1.5 flex-shrink-0"></div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-gray-900 dark:text-white truncate">Phoenix Data Center</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">Technical Assessment • Due Jan 30</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* View All Button */}
+              <div className="pt-2 border-t border-gray-200 dark:border-gray-700">
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="w-full text-orange-600 hover:text-orange-700 hover:bg-orange-50 dark:hover:bg-orange-900/20"
+                  onClick={() => window.location.href = '/employers/submissions'}
+                >
+                  View All Submissions
+                  <ChevronRight className="h-4 w-4 ml-1" />
+                </Button>
               </div>
             </CardContent>
           </Card>

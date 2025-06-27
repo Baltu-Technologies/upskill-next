@@ -403,12 +403,12 @@ export default function CollapsibleSidebar({ isCollapsed, onToggle }: SidebarPro
       href: '/employers',
       submenu: [
         {
-          title: 'Employers',
+          title: 'All Employers',
           href: '/employers'
         },
         {
-          title: 'Job Matches',
-          href: '/employers/job-matches'
+          title: 'My Career Matches',
+          href: '/employers/career-matches'
         },
         {
           title: 'My Submissions',
