@@ -63,3 +63,31 @@ tasks.json
 tasks/ 
 # MCP credentials
 .cursor/mcp.json
+
+# Additional cleanup patterns (prevent organizational issues)
+# Backup files
+*.backup
+*.bak
+*.old
+*.orig
+*.tmp
+*~
+
+# Test/debug files
+*cookies*.txt
+debug-*.txt
+
+# Large binary files that shouldn't be committed
+*.pkg
+*.dmg
+*.iso
+*.exe
+
+# Build artifacts from other projects
+/upskill-react/
+build/
+dist/
+
+# System files
+Thumbs.db
+*.DS_Store
