@@ -27,7 +27,8 @@ import {
   FileText,
   Clock,
   Star,
-  Gamepad2
+  Gamepad2,
+  Play
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTheme } from '../contexts/ThemeContext';
@@ -415,6 +416,36 @@ export default function CollapsibleSidebar({ isCollapsed, onToggle }: SidebarPro
           href: '/employers/submissions'
         }
       ]
+    },
+    
+    // MicroLessons - Interactive learning content
+    {
+      title: 'MicroLessons',
+      icon: Play,
+      color: 'text-green-500',
+      href: '/microlessons'
+    },
+    
+    // Course Test - Prototype course structure
+    {
+      title: 'Course Test',
+      icon: GraduationCap,
+      color: 'text-blue-600',
+      href: '/courses/test',
+      submenu: [
+        {
+          title: 'Course Overview',
+          href: '/courses/test'
+        },
+        {
+          title: 'Lessons',
+          href: '/courses/test/lessons'
+        },
+        {
+          title: 'Progress',
+          href: '/courses/test/progress'
+        }
+      ]
     }
   ];
 
@@ -478,6 +509,11 @@ export default function CollapsibleSidebar({ isCollapsed, onToggle }: SidebarPro
     // Career Opportunities pages
     if (pathname.startsWith('/employers')) {
       newExpandedMenus.add('Career Opportunities');
+    }
+    
+    // Course Test pages
+    if (pathname.startsWith('/courses/test')) {
+      newExpandedMenus.add('Course Test');
     }
     
     setExpandedMenus(newExpandedMenus);

@@ -20,7 +20,7 @@ import {
 import { 
   User, 
   Brain, 
-  Route, 
+  Navigation, 
   FolderOpen, 
   Award, 
   Target,
@@ -76,7 +76,7 @@ const tabs = [
   { id: 'education', label: 'Education & Credentials', icon: GraduationCap, badge: '8' },
   { id: 'portfolio', label: 'Portfolio & Projects', icon: FolderOpen, badge: '3' },
   { id: 'skills', label: 'Skills & Proficiency', icon: Brain },
-  { id: 'pathways', label: 'Career Interests & Pathways', icon: Route },
+  { id: 'pathways', label: 'Career Interests & Pathways', icon: Navigation },
 ];
 
 function ProfilePageContent() {
@@ -2705,7 +2705,7 @@ function CareerInterestsPathwaysTab() {
   if (!ProfileMyPathwaysComponent) {
     return (
       <div className="text-center py-12">
-        <Route className="h-16 w-16 text-slate-400 mx-auto mb-4 animate-spin" />
+                        <Navigation className="h-16 w-16 text-slate-400 mx-auto mb-4 animate-spin" />
         <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-2">Loading Career Pathways</h3>
         <p className="text-slate-600 dark:text-slate-400">Preparing your pathway management interface...</p>
       </div>

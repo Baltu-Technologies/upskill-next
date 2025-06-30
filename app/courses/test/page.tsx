@@ -1,0 +1,508 @@
+'use client';
+
+import React from 'react';
+import { motion } from 'framer-motion';
+import { Clock, Award, BookOpen, Target, CheckCircle2, Play, GraduationCap, ArrowRight, Zap, Shield, Building2, MapPin, Briefcase, Users, Trophy, TrendingUp } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
+import { sampleCourse } from '@/data/microlesson/sampleConfig';
+import { useRouter } from 'next/navigation';
+import Image from 'next/image';
+
+export default function CourseTestPage() {
+  const router = useRouter();
+  const course = sampleCourse;
+
+  // Calculate total lessons and microlessons
+  const totalLessons = course.lessons.length;
+  const totalMicrolessons = course.lessons.reduce((total, lesson) => total + lesson.microlessons.length, 0);
+
+  const handleStartCourse = () => {
+    router.push('/courses/test/lessons');
+  };
+
+  const handleViewLessons = () => {
+    router.push('/courses/test/lessons');
+  };
+
+  return (
+    <div className="min-h-screen bg-black">
+      {/* Large Hero Section - Similar to Lessons Page */}
+      <div className="relative min-h-screen flex items-center justify-center overflow-hidden">
+        {/* Background Image */}
+        <div className="absolute inset-0 z-0">
+          <Image
+            src="/media/semiconductor/Technician-with-wafer-in-semiconductor-FAB.jpg"
+            alt="Technician with wafer in semiconductor fabrication facility"
+            fill
+            className="object-cover"
+            priority
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/60 to-black/30" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+        </div>
+
+        {/* Hero Content */}
+        <div className="relative z-10 container mx-auto px-4">
+          <div className="max-w-6xl">
+            {/* Course Badge */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+              className="flex items-center gap-3 mb-8"
+            >
+              <div className="relative w-20 h-20 md:w-24 md:h-24 rounded-2xl overflow-hidden shadow-2xl shadow-blue-500/25">
+                <Image
+                  src="https://images.unsplash.com/photo-1518186285589-2f7649de83e0?w=100&h=100&fit=crop&crop=center"
+                  alt="Course"
+                  fill
+                  className="object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-500/80 to-purple-600/80" />
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="text-white font-bold text-2xl md:text-3xl">SC</span>
+                </div>
+              </div>
+            </motion.div>
+            
+            {/* Title */}
+            <motion.h1
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight"
+            >
+              <span className="bg-gradient-to-r from-white via-blue-100 to-purple-100 bg-clip-text text-transparent">
+                Basics of{" "}
+              </span>
+              <span className="bg-gradient-to-r from-blue-400 via-purple-400 to-blue-300 bg-clip-text text-transparent">
+                Semiconductor
+              </span>
+            </motion.h1>
+            
+            {/* Description */}
+            <motion.p
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.4 }}
+              className="text-xl md:text-2xl text-gray-300 leading-relaxed max-w-4xl mb-12"
+            >
+              {course.description}
+            </motion.p>
+            
+            {/* Course Meta */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.6 }}
+              className="flex flex-wrap items-center gap-8 text-gray-300 mb-16"
+            >
+              <div className="flex items-center gap-3 bg-black/30 backdrop-blur-sm px-6 py-3 rounded-full">
+                <Clock className="w-6 h-6 text-blue-400" />
+                <span className="text-lg font-medium">{course.duration}</span>
+              </div>
+              <div className="flex items-center gap-3 bg-black/30 backdrop-blur-sm px-6 py-3 rounded-full">
+                <BookOpen className="w-6 h-6 text-purple-400" />
+                <span className="text-lg font-medium">{totalLessons} Lessons</span>
+              </div>
+              <div className="flex items-center gap-3 bg-black/30 backdrop-blur-sm px-6 py-3 rounded-full">
+                <Target className="w-6 h-6 text-green-400" />
+                <span className="text-lg font-medium">{totalMicrolessons} Microlessons</span>
+              </div>
+            </motion.div>
+
+            {/* CTA Buttons */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.8 }}
+              className="flex flex-col sm:flex-row gap-6"
+            >
+              <Button
+                onClick={handleStartCourse}
+                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold px-12 py-6 text-lg rounded-2xl transition-all duration-300 shadow-2xl hover:shadow-blue-500/25 hover:scale-105 group"
+              >
+                <Play className="w-6 h-6 mr-3 group-hover:scale-110 transition-transform" />
+                Start Course
+                <ArrowRight className="w-6 h-6 ml-3 group-hover:translate-x-1 transition-transform" />
+              </Button>
+              <Button
+                onClick={handleViewLessons}
+                variant="outline"
+                className="border-2 border-white/20 text-white hover:bg-white/10 backdrop-blur-sm font-bold px-12 py-6 text-lg rounded-2xl transition-all duration-300 hover:scale-105"
+              >
+                <BookOpen className="w-6 h-6 mr-3" />
+                View Curriculum
+              </Button>
+            </motion.div>
+          </div>
+        </div>
+
+        {/* Decorative Elements */}
+        <div className="absolute top-20 right-20 w-32 h-32 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-full blur-3xl" />
+        <div className="absolute bottom-20 left-20 w-40 h-40 bg-gradient-to-r from-purple-500/20 to-blue-500/20 rounded-full blur-3xl" />
+      </div>
+
+      <div className="container mx-auto px-4 py-16">
+        {/* Main Content Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
+          {/* Left Column - What You'll Learn */}
+          <div className="lg:col-span-2 space-y-8">
+            {/* What You'll Learn Section - Condensed */}
+            <Card className="group overflow-hidden border-slate-700 bg-slate-800/50 hover:bg-slate-800/70 transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/10">
+              <CardHeader>
+                <CardTitle className="text-2xl font-bold text-white flex items-center gap-3">
+                  <Target className="w-6 h-6 text-blue-400" />
+                  What You'll Learn
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  {course.learningOutcomes.map((objective: string, index: number) => (
+                    <motion.div
+                      key={index}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.1 }}
+                      className="flex items-start gap-3 p-3 rounded-lg bg-slate-900/50 hover:bg-slate-900/70 transition-all duration-200"
+                    >
+                      <CheckCircle2 className="w-5 h-5 text-green-400 mt-0.5 flex-shrink-0" />
+                      <span className="text-gray-300 leading-relaxed">{objective}</span>
+                    </motion.div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Course Curriculum */}
+            <Card className="group overflow-hidden border-slate-700 bg-slate-800/50 hover:bg-slate-800/70 transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/10">
+              <CardHeader>
+                <CardTitle className="text-2xl font-bold text-white flex items-center gap-3">
+                  <BookOpen className="w-6 h-6 text-purple-400" />
+                  Course Curriculum
+                </CardTitle>
+                <CardDescription className="text-gray-400">
+                  {totalLessons} lessons • {totalMicrolessons} microlessons
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {course.lessons.map((lesson, index) => (
+                    <motion.div
+                      key={lesson.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: index * 0.1 }}
+                      className="group/lesson border border-slate-600 rounded-lg p-6 bg-slate-900/30 hover:bg-slate-900/50 transition-all duration-300 hover:border-blue-400/50"
+                    >
+                      <div className="flex items-start justify-between mb-4">
+                        <div className="flex-1">
+                          <h3 className="text-white font-semibold text-lg mb-2 group-hover/lesson:text-blue-400 transition-colors">
+                            {lesson.title}
+                          </h3>
+                          <p className="text-slate-400 text-sm mb-3 leading-relaxed">
+                            {lesson.description}
+                          </p>
+                          <p className="text-slate-400 text-sm">
+                            {lesson.microlessons.length} Learning Objectives • {lesson.duration}
+                          </p>
+                        </div>
+                        <Play className="w-5 h-5 text-blue-400 mt-2 opacity-0 group-hover/lesson:opacity-100 transition-opacity" />
+                      </div>
+                      
+                      {/* Progress Bar */}
+                      <div className="mb-4">
+                        <div className="flex items-center justify-between text-sm text-slate-400 mb-2">
+                          <span>Progress</span>
+                          <span>{index * 15}% Complete</span>
+                        </div>
+                        <Progress value={index * 15} className="h-2 bg-slate-700" />
+                      </div>
+                      
+                      {/* Microlessons */}
+                      <div className="pl-4 border-l-2 border-slate-700 space-y-2">
+                        {lesson.microlessons.slice(0, 3).map((microlesson, mlIndex) => (
+                          <div key={mlIndex} className="flex items-center gap-3 text-sm">
+                            <div className="w-2 h-2 rounded-full bg-slate-600" />
+                            <span className="text-slate-300">{microlesson.title}</span>
+                          </div>
+                        ))}
+                        {lesson.microlessons.length > 3 && (
+                          <div className="flex items-center gap-3 text-sm">
+                            <div className="w-2 h-2 rounded-full bg-slate-600" />
+                            <span className="text-slate-400">+{lesson.microlessons.length - 3} more microlessons</span>
+                          </div>
+                        )}
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Right Column - Course Details & Features */}
+          <div className="space-y-6">
+            {/* Course Details Card */}
+            <Card className="group overflow-hidden border-slate-700 bg-slate-800/50 hover:bg-slate-800/70 transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/10">
+              <CardHeader>
+                <CardTitle className="text-xl font-bold text-white">Course Details</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center py-3 border-b border-slate-700">
+                    <span className="text-slate-400 font-medium">Duration</span>
+                    <span className="text-white font-medium">{course.duration}</span>
+                  </div>
+                  <div className="flex justify-between items-center py-3 border-b border-slate-700">
+                    <span className="text-slate-400 font-medium">Difficulty</span>
+                    <Badge className="bg-gradient-to-r from-yellow-600 to-orange-600 text-white">
+                      {course.skillLevel}
+                    </Badge>
+                  </div>
+                  <div className="flex justify-between items-center py-3 border-b border-slate-700">
+                    <span className="text-slate-400 font-medium">Lessons</span>
+                    <span className="text-white font-medium">{totalLessons}</span>
+                  </div>
+                  <div className="flex justify-between items-center py-3">
+                    <span className="text-slate-400 font-medium">Microlessons</span>
+                    <span className="text-white font-medium">{totalMicrolessons}</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Topics Covered */}
+            <Card className="group overflow-hidden border-slate-700 bg-slate-800/50 hover:bg-slate-800/70 transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/10">
+              <CardHeader>
+                <CardTitle className="text-xl font-bold text-white flex items-center gap-3">
+                  <Zap className="w-5 h-5 text-yellow-400" />
+                  Topics Covered
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-wrap gap-2">
+                  {['Wafer Processing', 'Photolithography', 'Etching', 'Deposition', 'Clean Room', 'Quality Control', 'Safety Protocols', 'Equipment Maintenance'].map((topic, index) => (
+                    <Badge key={index} variant="outline" className="border-blue-400/50 text-blue-400 bg-blue-400/5 hover:bg-blue-400/10 transition-colors">
+                      {topic}
+                    </Badge>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Badges Earned */}
+            <Card className="group overflow-hidden border-slate-700 bg-slate-800/50 hover:bg-slate-800/70 transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/10">
+              <CardHeader>
+                <CardTitle className="text-xl font-bold text-white flex items-center gap-3">
+                  <Award className="w-5 h-5 text-purple-400" />
+                  Badges Earned
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 gap-3">
+                  {[
+                    { name: 'Semiconductor Fundamentals', color: 'from-blue-500 to-blue-600' },
+                    { name: 'Clean Room Certified', color: 'from-green-500 to-green-600' },
+                    { name: 'Safety Specialist', color: 'from-red-500 to-red-600' },
+                    { name: 'Process Expert', color: 'from-purple-500 to-purple-600' }
+                  ].map((badge, index) => (
+                    <div key={index} className="flex flex-col items-center p-3 rounded-lg bg-slate-900/50 hover:bg-slate-900/70 transition-all duration-200">
+                      <div className={`w-8 h-8 rounded-full bg-gradient-to-r ${badge.color} flex items-center justify-center mb-2`}>
+                        <Trophy className="w-4 h-4 text-white" />
+                      </div>
+                      <span className="text-xs text-center text-slate-300 font-medium leading-tight">{badge.name}</span>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Action Button */}
+            <Card className="group overflow-hidden border-slate-700 bg-gradient-to-r from-blue-900/30 via-purple-900/20 to-blue-900/30 hover:from-blue-900/50 hover:to-purple-900/50 transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/20">
+              <CardContent className="p-6">
+                <Button
+                  onClick={handleStartCourse}
+                  className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-4 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 group"
+                >
+                  <Play className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" />
+                  Start Course
+                  <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+
+        {/* Industry Partners Section */}
+        <div className="mb-12">
+          <h2 className="text-3xl font-bold text-white mb-8 text-center">
+            Industry Partners
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[
+              {
+                name: 'Taiwan Semiconductor Manufacturing (TSMC)',
+                logo: '/media/organization_logo/Tsmc.svg.png',
+                description: 'Leading global semiconductor foundry providing advanced chip manufacturing.',
+                locations: ['Phoenix, AZ', 'Chandler, AZ'],
+                gradient: 'from-purple-600 to-blue-600'
+              },
+              {
+                name: 'Amkor Technology',
+                logo: '/media/organization_logo/amkor_technology.png',
+                description: 'Global leader in semiconductor assembly and test services.',
+                locations: ['Tempe, AZ', 'Chandler, AZ'],
+                gradient: 'from-blue-600 to-indigo-600'
+              },
+              {
+                name: 'Honeywell Aerospace',
+                logo: '/media/organization_logo/honeywell-aerospace.jpg',
+                description: 'Advanced aerospace technologies and manufacturing solutions.',
+                locations: ['Tempe, AZ'],
+                gradient: 'from-green-600 to-teal-600'
+              }
+            ].map((partner, index) => (
+              <Card key={index} className="group cursor-pointer overflow-hidden border-slate-700 bg-slate-800/50 hover:bg-slate-800/70 transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/10">
+                <div className="relative h-32 overflow-hidden">
+                  <div className="absolute inset-0 transition-transform duration-[4000ms] ease-out group-hover:scale-120 group-hover:translate-x-2 group-hover:-translate-y-1">
+                    <Image
+                      src="https://images.unsplash.com/photo-1518186285589-2f7649de83e0?w=800&h=400&fit=crop&crop=center"
+                      alt={partner.name}
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
+                  <div className={`absolute inset-0 bg-gradient-to-r ${partner.gradient} opacity-80`} />
+                  <div className="absolute inset-0 bg-black/20" />
+                </div>
+                <CardContent className="p-6">
+                  <div className="flex items-center gap-4 mb-4">
+                    <div className="w-12 h-12 bg-white rounded-lg p-2 flex items-center justify-center">
+                      <Image
+                        src={partner.logo}
+                        alt={partner.name}
+                        width={40}
+                        height={40}
+                        className="object-contain"
+                      />
+                    </div>
+                    <div>
+                      <h3 className="text-white font-semibold text-lg leading-tight">{partner.name}</h3>
+                      <div className="flex items-center gap-1 text-gray-400 text-sm">
+                        <MapPin className="h-3 w-3" />
+                        {partner.locations.join(', ')}
+                      </div>
+                    </div>
+                  </div>
+                  <p className="text-gray-300 text-sm leading-relaxed">{partner.description}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+
+        {/* Career Pathways Section */}
+        <div className="mb-12">
+          <h2 className="text-3xl font-bold text-white mb-8 text-center">
+            Career Pathways
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {[
+              {
+                title: 'Semiconductor Technician',
+                description: 'Work in clean room environments operating advanced manufacturing equipment for chip production.',
+                salary: '$65K - $95K',
+                growth: '+15% annually',
+                skills: ['Clean Room Operations', 'Equipment Maintenance', 'Quality Control', 'Safety Protocols'],
+                gradient: 'from-blue-600 to-purple-600'
+              },
+              {
+                title: 'Process Engineer',
+                description: 'Optimize manufacturing processes and troubleshoot production issues in semiconductor fabrication.',
+                salary: '$85K - $125K',
+                growth: '+12% annually',
+                skills: ['Process Optimization', 'Data Analysis', 'Problem Solving', 'Technical Documentation'],
+                gradient: 'from-green-600 to-teal-600'
+              }
+            ].map((pathway, index) => (
+              <Card key={index} className="group overflow-hidden border-slate-700 bg-slate-800/50 hover:bg-slate-800/70 transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/10">
+                <div className={`h-2 bg-gradient-to-r ${pathway.gradient}`} />
+                <CardContent className="p-6">
+                  <div className="flex items-start justify-between mb-4">
+                    <div>
+                      <h3 className="text-white font-bold text-xl mb-2">{pathway.title}</h3>
+                      <p className="text-gray-300 text-sm leading-relaxed mb-4">{pathway.description}</p>
+                    </div>
+                    <Briefcase className="w-6 h-6 text-blue-400 mt-1" />
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                      <div className="flex items-center gap-2 text-green-400 mb-1">
+                        <TrendingUp className="w-4 h-4" />
+                        <span className="text-sm font-medium">Salary Range</span>
+                      </div>
+                      <p className="text-white font-semibold">{pathway.salary}</p>
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2 text-purple-400 mb-1">
+                        <Award className="w-4 h-4" />
+                        <span className="text-sm font-medium">Job Growth</span>
+                      </div>
+                      <p className="text-white font-semibold">{pathway.growth}</p>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <p className="text-gray-400 text-sm font-medium mb-2">Key Skills</p>
+                    <div className="flex flex-wrap gap-2">
+                      {pathway.skills.map((skill, skillIndex) => (
+                        <Badge key={skillIndex} variant="outline" className="border-slate-600 text-slate-300 bg-slate-900/50 text-xs">
+                          {skill}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+
+        {/* CTA Section */}
+        <div className="text-center">
+          <Card className="group overflow-hidden border-slate-700 bg-gradient-to-r from-blue-900/30 via-purple-900/20 to-blue-900/30 hover:from-blue-900/50 hover:via-purple-900/30 hover:to-blue-900/50 transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/20">
+            <CardContent className="p-8">
+              <GraduationCap className="w-16 h-16 text-blue-400 mx-auto mb-4" />
+              <h3 className="text-2xl font-bold text-white mb-4">Ready to Start Your Journey?</h3>
+              <p className="text-gray-300 mb-6 max-w-2xl mx-auto">
+                Join thousands of professionals who have advanced their careers in semiconductor manufacturing through our comprehensive training program.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Button
+                  onClick={handleStartCourse}
+                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold px-8 py-3 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105"
+                >
+                  <Play className="w-5 h-5 mr-2" />
+                  Start Learning Now
+                </Button>
+                <Button
+                  onClick={handleViewLessons}
+                  variant="outline"
+                  className="border-slate-600 text-white hover:bg-slate-800 px-8 py-3 rounded-xl"
+                >
+                  <BookOpen className="w-5 h-5 mr-2" />
+                  View Curriculum
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    </div>
+  );
+} 
