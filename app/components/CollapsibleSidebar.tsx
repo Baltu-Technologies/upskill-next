@@ -421,7 +421,7 @@ export default function CollapsibleSidebar({ isCollapsed, onToggle }: SidebarPro
       ]
     },
     
-    // Course Test - Prototype course structure with MicroLessons
+    // Course Test - Prototype course structure with Microlessons
     {
       title: 'Course Test',
       icon: GraduationCap,
@@ -433,11 +433,11 @@ export default function CollapsibleSidebar({ isCollapsed, onToggle }: SidebarPro
           href: '/courses/test'
         },
         {
-          title: 'Lessons',
+          title: 'Course Page',
           href: '/courses/test/lessons'
         },
         {
-          title: 'MicroLessons',
+          title: 'Microlessons',
           href: '/microlessons'
         },
         {
