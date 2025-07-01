@@ -57,8 +57,8 @@
     "zod": "^3.25.67"
   },
   "devDependencies": {
-    "@aws-amplify/backend": "^0.15.0",
-    "@aws-amplify/backend-cli": "^0.15.0",
+    "@aws-amplify/backend": "^1.5.1",
+    "@aws-amplify/backend-cli": "^1.2.4",
     "@types/better-sqlite3": "^7.6.13",
     "@types/node": "20.17.50",
     "@types/pg": "^8.15.4",
