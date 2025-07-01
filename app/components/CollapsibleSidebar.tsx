@@ -421,15 +421,7 @@ export default function CollapsibleSidebar({ isCollapsed, onToggle }: SidebarPro
       ]
     },
     
-    // MicroLessons - Interactive learning content
-    {
-      title: 'MicroLessons',
-      icon: Play,
-      color: 'text-green-500',
-      href: '/microlessons'
-    },
-    
-    // Course Test - Prototype course structure
+    // Course Test - Prototype course structure with MicroLessons
     {
       title: 'Course Test',
       icon: GraduationCap,
@@ -443,6 +435,10 @@ export default function CollapsibleSidebar({ isCollapsed, onToggle }: SidebarPro
         {
           title: 'Lessons',
           href: '/courses/test/lessons'
+        },
+        {
+          title: 'MicroLessons',
+          href: '/microlessons'
         },
         {
           title: 'Progress',
@@ -596,8 +592,8 @@ export default function CollapsibleSidebar({ isCollapsed, onToggle }: SidebarPro
       newExpandedMenus.add('Career Opportunities');
     }
     
-    // Course Test pages
-    if (pathname.startsWith('/courses/test')) {
+    // Course Test pages and MicroLessons
+    if (pathname.startsWith('/courses/test') || pathname.startsWith('/microlessons')) {
       newExpandedMenus.add('Course Test');
     }
     
