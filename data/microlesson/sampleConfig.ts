@@ -8,6 +8,8 @@ const semiconductorMicrolessons: LessonConfig[] = [
     description: 'Learn essential clean room procedures, contamination control, and safety protocols required for semiconductor manufacturing.',
     totalSlides: 5,
     duration: '12 minutes',
+    course: 'Advanced Manufacturing',
+    lesson: 'Semiconductor Fundamentals',
     theme: {
       primaryColor: '#3B82F6',
       secondaryColor: '#1E40AF',
@@ -102,6 +104,8 @@ const semiconductorMicrolessons: LessonConfig[] = [
     description: 'Understanding the fundamental steps of wafer fabrication from silicon ingots to finished wafers.',
     totalSlides: 6,
     duration: '15 minutes',
+    course: 'Advanced Manufacturing',
+    lesson: 'Semiconductor Fundamentals',
     theme: {
       primaryColor: '#3B82F6',
       secondaryColor: '#1E40AF',
@@ -198,6 +202,8 @@ const semiconductorMicrolessons: LessonConfig[] = [
     description: 'Master the principles of photolithography, mask alignment, and pattern transfer techniques.',
     totalSlides: 6,
     duration: '18 minutes',
+    course: 'Advanced Manufacturing',
+    lesson: 'Semiconductor Fundamentals',
     theme: {
       primaryColor: '#3B82F6',
       secondaryColor: '#1E40AF',
@@ -293,10 +299,12 @@ const semiconductorMicrolessons: LessonConfig[] = [
 const roboticsMicrolessons: LessonConfig[] = [
   {
     id: 'industrial-robotics',
-    title: 'Industrial Robotics Fundamentals',
-    description: 'Understanding robotic systems in manufacturing environments.',
-    totalSlides: 3,
-    duration: '8 minutes',
+    title: 'Industrial Robotics Overview',
+    description: 'Introduction to industrial robots, their applications in manufacturing, and basic operational principles.',
+    totalSlides: 5,
+    duration: '14 minutes',
+    course: 'Advanced Manufacturing',
+    lesson: 'Robotics & Automation',
     theme: {
       primaryColor: '#EF4444',
       secondaryColor: '#DC2626',

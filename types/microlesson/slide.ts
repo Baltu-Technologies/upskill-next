@@ -137,6 +137,10 @@ export interface SlideRendererProps {
   onNext?: () => void;
   onPrevious?: () => void;
   onQuickCheckAnswered?: (correct: boolean) => void;
+  onDefineWord?: (word: string) => void;
+  onSaveToStudyList?: (word: string) => void;
+  onAddToNotes?: (text: string, slideId?: string) => void;
+  onAskAI?: (text: string) => void;
 }
 
 // Lesson contains multiple microlessons

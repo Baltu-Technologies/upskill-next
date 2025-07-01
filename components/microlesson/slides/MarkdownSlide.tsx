@@ -12,9 +12,11 @@ interface MarkdownSlideProps {
   slide: MarkdownSlideType;
   onNext?: () => void;
   onPrevious?: () => void;
+  onContextMenu?: (event: React.MouseEvent) => void;
+  style?: React.CSSProperties;
 }
 
-export const MarkdownSlide: React.FC<MarkdownSlideProps> = ({ slide, onNext }) => {
+export const MarkdownSlide: React.FC<MarkdownSlideProps> = ({ slide, onNext, onContextMenu, style }) => {
   const textAlignClass = slide.textAlign === 'center' ? 'text-center' : 
                         slide.textAlign === 'right' ? 'text-right' : 'text-left';
   
@@ -56,6 +58,7 @@ export const MarkdownSlide: React.FC<MarkdownSlideProps> = ({ slide, onNext }) =
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
           className={`prose prose-lg prose-invert max-w-none ${textAlignClass}`}
+          onContextMenu={onContextMenu}
           style={{
             '--tw-prose-headings': '#ffffff',
             '--tw-prose-body': '#e2e8f0',
@@ -71,6 +74,7 @@ export const MarkdownSlide: React.FC<MarkdownSlideProps> = ({ slide, onNext }) =
             '--tw-prose-th-borders': '#475569',
             '--tw-prose-td-borders': '#374151',
             '--tw-prose-links': '#60a5fa',
+            ...style
           } as React.CSSProperties}
         >
           <ReactMarkdown

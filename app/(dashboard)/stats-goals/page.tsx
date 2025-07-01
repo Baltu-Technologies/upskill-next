@@ -5,245 +5,248 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
+import { motion } from 'framer-motion';
 import { 
   Target,
   Calendar,
   BookOpen,
-  Flame,
   Zap,
   Trophy,
   BarChart3,
   Star,
   Plus,
-  Sword,
-  Shield,
-  Crown,
-  Sparkles,
-  Rocket,
-  Medal,
-  Users,
   TrendingUp,
   Activity,
-  Lock,
   CheckCircle,
   Clock,
-  Gift,
-  Gamepad2,
   Award,
-  ThumbsUp,
   Eye,
-  AlertCircle
+  ChevronRight,
+  GraduationCap,
+  Users,
+  Lightbulb,
+  Brain,
+  FileCheck,
+  Timer,
+  Medal,
+  Flame,
+  Crown,
+  Rocket,
+  Shield,
+  Swords,
+  Gem,
+  ArrowUp,
+  ArrowDown
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import Image from 'next/image';
 
-// Gaming-style mock data
-const playerStats = {
-  level: 42,
-  xp: 15847,
-  xpToNext: 2153,
-  xpForNextLevel: 18000,
-  rank: 'Platinum III',
-  battlepassTier: 67,
-  kd: 2.31,
-  wins: 127,
-  totalMatches: 284,
-  winRate: 44.7,
-  achievements: 23,
-  dailyStreak: 15,
-  longestStreak: 28,
-  weeklyXP: 2847,
-  season: 'Season 8',
-  skillRating: 2847,
-  favoriteSkill: 'Data Center Operations'
+// Enhanced mock data with gamification
+const learningStats = {
+  level: 12,
+  currentXP: 2480,
+  nextLevelXP: 3000,
+  totalCourses: 12,
+  completedCourses: 4,
+  inProgressCourses: 3,
+  averageScore: 88,
+  currentStreak: 7,
+  longestStreak: 14,
+  completedHours: 64,
+  totalHours: 156,
+  totalXP: 4500,
+  earnedXP: 2480,
+  rank: 23,
+  totalLearners: 1247,
+  weeklyGoal: 3
 };
 
-const currentChallenges = [
-  {
-    id: 1,
-    title: 'Course Warrior',
-    description: 'Complete 3 courses this week',
-    progress: 2,
-    maxProgress: 3,
-    xpReward: 500,
-    type: 'weekly',
-    rarity: 'rare',
-    icon: BookOpen,
-    color: 'from-blue-500 to-cyan-500'
-  },
-  {
-    id: 2,
-    title: 'Streak Master',
-    description: 'Maintain a 20-day learning streak',
-    progress: 15,
-    maxProgress: 20,
-    xpReward: 1000,
-    type: 'special',
-    rarity: 'legendary',
-    icon: Flame,
-    color: 'from-orange-500 to-red-500'
-  },
-  {
-    id: 3,
-    title: 'Skill Collector',
-    description: 'Master 5 new skills',
-    progress: 3,
-    maxProgress: 5,
-    xpReward: 750,
-    type: 'seasonal',
-    rarity: 'epic',
-    icon: Star,
-    color: 'from-purple-500 to-pink-500'
-  },
-  {
-    id: 4,
-    title: 'Daily Grind',
-    description: 'Study for 2 hours today',
-    progress: 90,
-    maxProgress: 120,
-    xpReward: 200,
-    type: 'daily',
-    rarity: 'common',
-    icon: Clock,
-    color: 'from-green-500 to-emerald-500'
-  }
-];
-
-const achievements = [
-  {
-    id: 1,
-    title: 'First Victory',
-    description: 'Complete your first course',
-    unlocked: true,
-    icon: Trophy,
-    rarity: 'common',
-    date: '2024-01-15'
-  },
-  {
-    id: 2,
-    title: 'Speed Runner',
-    description: 'Complete a course in under 4 hours',
-    unlocked: true,
-    icon: Rocket,
-    rarity: 'rare',
-    date: '2024-02-03'
-  },
-  {
-    id: 3,
-    title: 'Legendary Scholar',
-    description: 'Earn 10,000 XP',
-    unlocked: true,
-    icon: Crown,
-    rarity: 'legendary',
-    date: '2024-03-12'
-  },
-  {
-    id: 4,
-    title: 'Master Technician',
-    description: 'Complete all Data Center courses',
-    unlocked: false,
-    icon: Shield,
-    rarity: 'mythic',
-    date: null
-  }
-];
-
+// Leaderboard data
 const leaderboard = [
-  { rank: 1, name: 'Alex Chen', xp: 25847, avatar: '🥇' },
-  { rank: 2, name: 'Sarah Kim', xp: 22456, avatar: '🥈' },
-  { rank: 3, name: 'Mike Johnson', xp: 19234, avatar: '🥉' },
-  { rank: 4, name: 'You', xp: 15847, avatar: '👤', isPlayer: true },
-  { rank: 5, name: 'Lisa Wang', xp: 14892, avatar: '🔥' }
+  { rank: 1, name: 'Alex Chen', xp: 4890, avatar: '👨‍💻', streak: 21, level: 15 },
+  { rank: 2, name: 'Sarah Johnson', xp: 4720, avatar: '👩‍🔬', streak: 18, level: 15 },
+  { rank: 3, name: 'Marcus Torres', xp: 4350, avatar: '👨‍🏭', streak: 12, level: 14 },
+  { rank: 23, name: 'You (Peter)', xp: 2480, avatar: '👤', streak: 7, level: 12, isUser: true },
+  { rank: 24, name: 'Jennifer Wang', xp: 2440, avatar: '👩‍💼', streak: 5, level: 12 },
+  { rank: 25, name: 'David Rodriguez', xp: 2380, avatar: '👨‍🔧', streak: 9, level: 11 }
+];
+
+// Achievement data
+const achievements = [
+  { id: 1, title: 'First Steps', description: 'Complete your first course', icon: '🎯', unlocked: true, rare: false },
+  { id: 2, title: 'Streak Master', description: 'Maintain a 7-day learning streak', icon: '🔥', unlocked: true, rare: false },
+  { id: 3, title: 'Knowledge Seeker', description: 'Complete 5 courses', icon: '📚', unlocked: false, rare: false },
+  { id: 4, title: 'Perfect Score', description: 'Score 100% on a course assessment', icon: '⭐', unlocked: true, rare: true },
+  { id: 5, title: 'Industry Expert', description: 'Master 3 skill categories', icon: '🏆', unlocked: false, rare: true },
+  { id: 6, title: 'Mentor', description: 'Help 10 fellow learners', icon: '🤝', unlocked: false, rare: true }
+];
+
+// Recent courses with better gamification
+const recentCourses = [
+  {
+    id: 1,
+    title: 'Semiconductor Manufacturing Fundamentals',
+    image: '/media/semiconductor/Technician-with-wafer-in-semiconductor-FAB.jpg',
+    completed: true,
+    score: 92,
+    xpEarned: 450,
+    duration: '8h 30m',
+    completedDate: '2024-01-15',
+    certificate: true
+  },
+  {
+    id: 2,
+    title: 'Data Center Infrastructure',
+    image: '/media/semiconductor/Semiconductor-Manufacturing-Equipment-in-Cleanroom.jpg',
+    completed: true,
+    score: 88,
+    xpEarned: 380,
+    duration: '6h 45m',
+    completedDate: '2024-01-08',
+    certificate: true
+  },
+  {
+    id: 3,
+    title: 'Fiber Optic Installation',
+    image: '/media/semiconductor/Semiconductor-Manufacturing-Equipment-in-Cleanroom.jpg',
+    completed: false,
+    progress: 65,
+    duration: '12h',
+    estimatedCompletion: '2024-02-05'
+  }
 ];
 
 export default function StatsGoalsPage() {
-  const [activeTab, setActiveTab] = useState<'overview' | 'challenges' | 'achievements' | 'leaderboard'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'courses' | 'leaderboard' | 'achievements'>('overview');
   const [animatedXP, setAnimatedXP] = useState(0);
 
   // Animate XP counter on load
   useEffect(() => {
     const interval = setInterval(() => {
       setAnimatedXP(prev => {
-        if (prev < playerStats.xp) {
-          return Math.min(prev + 123, playerStats.xp);
+        if (prev < learningStats.earnedXP) {
+          return Math.min(prev + 47, learningStats.earnedXP);
         }
         return prev;
       });
     }, 10);
-
     return () => clearInterval(interval);
   }, []);
 
-  const getRarityColor = (rarity: string) => {
-    switch (rarity) {
-      case 'common': return 'text-gray-400 border-gray-400';
-      case 'rare': return 'text-blue-400 border-blue-400';
-      case 'epic': return 'text-purple-400 border-purple-400';
-      case 'legendary': return 'text-orange-400 border-orange-400';
-      case 'mythic': return 'text-red-400 border-red-400';
-      default: return 'text-gray-400 border-gray-400';
-    }
-  };
+  const xpProgress = (learningStats.currentXP / learningStats.nextLevelXP) * 100;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 text-white overflow-hidden">
-      {/* Floating background elements */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-1/3 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl animate-pulse delay-1000" />
-        <div className="absolute top-1/2 right-1/3 w-48 h-48 bg-green-500/10 rounded-full blur-3xl animate-pulse delay-500" />
-      </div>
+    <div className="min-h-screen bg-black">
+      {/* Hero Section */}
+      <div className="relative h-[60vh] flex items-center justify-center overflow-hidden">
+        {/* Background Image */}
+        <div className="absolute inset-0 z-0">
+          <Image
+            src="/media/semiconductor/Technician-with-wafer-in-semiconductor-FAB.jpg"
+            alt="Advanced manufacturing environment"
+            fill
+            className="object-cover"
+            priority
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/95 via-black/70 to-black/40" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent" />
+        </div>
 
-      <div className="relative z-10 container mx-auto px-6 py-8">
-        {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center gap-4">
-              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-orange-500 to-red-500 p-1">
-                <div className="w-full h-full rounded-full bg-slate-900 flex items-center justify-center">
-                  <Gamepad2 className="h-8 w-8 text-orange-500" />
+        {/* Hero Content */}
+        <div className="relative z-10 container mx-auto px-4">
+          <div className="max-w-6xl">
+            {/* Level Badge */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+              className="flex items-center gap-4 mb-8"
+            >
+              <div className="relative w-24 h-24 md:w-28 md:h-28 rounded-2xl overflow-hidden shadow-2xl shadow-purple-500/25">
+                <div className="absolute inset-0 bg-gradient-to-r from-purple-500/90 to-blue-600/90" />
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <Crown className="w-8 h-8 md:w-10 md:h-10 text-yellow-300" />
+                </div>
+                <div className="absolute bottom-0 left-0 right-0 bg-black/60 backdrop-blur-sm py-1">
+                  <span className="text-white font-bold text-sm block text-center">Level {learningStats.level}</span>
                 </div>
               </div>
-              <div>
-                <h1 className="text-4xl font-bold bg-gradient-to-r from-orange-400 to-red-400 bg-clip-text text-transparent">
-                  Battle Stats
-                </h1>
-                <p className="text-slate-300">{playerStats.season} • {playerStats.rank}</p>
+
+              {/* XP Progress */}
+              <div className="flex-1 max-w-md">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-white font-medium">Experience Points</span>
+                  <span className="text-purple-400 font-bold">{learningStats.currentXP.toLocaleString()} / {learningStats.nextLevelXP.toLocaleString()} XP</span>
+                </div>
+                <div className="relative h-4 bg-gray-800/50 rounded-full overflow-hidden">
+                  <div 
+                    className="absolute top-0 left-0 h-full bg-gradient-to-r from-purple-500 to-blue-600 transition-all duration-1000 rounded-full"
+                    style={{ width: `${xpProgress}%` }}
+                  />
+                </div>
+                <div className="text-gray-400 text-sm mt-1">
+                  {learningStats.nextLevelXP - learningStats.currentXP} XP to Level {learningStats.level + 1}
+                </div>
               </div>
-            </div>
+            </motion.div>
             
-            {/* Level & XP */}
-            <div className="text-right">
-              <div className="flex items-center gap-2 mb-2">
-                <Crown className="h-5 w-5 text-yellow-400" />
-                <span className="text-2xl font-bold">Level {playerStats.level}</span>
+            {/* Title */}
+            <motion.h1
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight"
+            >
+              <span className="bg-gradient-to-r from-white via-purple-100 to-blue-100 bg-clip-text text-transparent">
+                Learning{" "}
+              </span>
+              <span className="bg-gradient-to-r from-purple-400 via-blue-400 to-purple-300 bg-clip-text text-transparent">
+                Dashboard
+              </span>
+            </motion.h1>
+            
+            {/* Stats */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.4 }}
+              className="flex flex-wrap items-center gap-6 text-gray-300 mb-8"
+            >
+              <div className="flex items-center gap-3 bg-black/30 backdrop-blur-sm px-6 py-3 rounded-full">
+                <Trophy className="w-6 h-6 text-yellow-400" />
+                <span className="text-lg font-medium">{learningStats.completedCourses} Courses Completed</span>
               </div>
-              <div className="text-sm text-slate-300">
-                {animatedXP.toLocaleString()} / {playerStats.xpForNextLevel.toLocaleString()} XP
+              <div className="flex items-center gap-3 bg-black/30 backdrop-blur-sm px-6 py-3 rounded-full">
+                <Flame className="w-6 h-6 text-orange-400" />
+                <span className="text-lg font-medium">{learningStats.currentStreak} Day Streak</span>
               </div>
-            </div>
+              <div className="flex items-center gap-3 bg-black/30 backdrop-blur-sm px-6 py-3 rounded-full">
+                <Target className="w-6 h-6 text-green-400" />
+                <span className="text-lg font-medium">{learningStats.averageScore}% Avg Score</span>
+              </div>
+              <div className="flex items-center gap-3 bg-black/30 backdrop-blur-sm px-6 py-3 rounded-full">
+                <Users className="w-6 h-6 text-blue-400" />
+                <span className="text-lg font-medium">Rank #{learningStats.rank}</span>
+              </div>
+            </motion.div>
           </div>
+        </div>
 
-          {/* XP Progress Bar */}
-          <div className="mb-6">
-            <div className="h-3 bg-slate-800 rounded-full overflow-hidden">
-              <div 
-                className="h-full bg-gradient-to-r from-orange-500 to-red-500 transition-all duration-1000 ease-out"
-                style={{ width: `${(playerStats.xp / playerStats.xpForNextLevel) * 100}%` }}
-              />
-            </div>
-            <div className="flex justify-between text-xs text-slate-400 mt-1">
-              <span>Level {playerStats.level}</span>
-              <span>{playerStats.xpToNext.toLocaleString()} XP to next level</span>
-            </div>
-          </div>
+        {/* Decorative Elements */}
+        <div className="absolute top-20 right-20 w-32 h-32 bg-gradient-to-r from-purple-500/20 to-blue-500/20 rounded-full blur-3xl" />
+        <div className="absolute bottom-20 left-20 w-40 h-40 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-full blur-3xl" />
+      </div>
 
+      {/* Main Content */}
+      <div className="relative bg-gradient-to-br from-gray-950 via-blue-950/20 to-purple-950/20">
+        <div className="container mx-auto px-4 py-8">
           {/* Tab Navigation */}
-          <div className="flex gap-2 mb-6">
+          <div className="flex gap-2 mb-8 overflow-x-auto">
             {[
               { id: 'overview', label: 'Overview', icon: BarChart3 },
-              { id: 'challenges', label: 'Challenges', icon: Target },
-              { id: 'achievements', label: 'Achievements', icon: Trophy },
-              { id: 'leaderboard', label: 'Leaderboard', icon: Users }
+              { id: 'courses', label: 'Course Progress', icon: BookOpen },
+              { id: 'leaderboard', label: 'Leaderboard', icon: Trophy },
+              { id: 'achievements', label: 'Achievements', icon: Award }
             ].map((tab) => {
               const Icon = tab.icon;
               return (
@@ -252,10 +255,10 @@ export default function StatsGoalsPage() {
                   variant={activeTab === tab.id ? 'default' : 'outline'}
                   onClick={() => setActiveTab(tab.id as any)}
                   className={cn(
-                    "gap-2 transition-all duration-200",
+                    "gap-2 transition-all duration-200 whitespace-nowrap",
                     activeTab === tab.id 
-                      ? "bg-gradient-to-r from-orange-500 to-red-500 text-white border-0" 
-                      : "border-slate-600 text-slate-300 hover:bg-slate-800"
+                      ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white border-0 shadow-lg" 
+                      : "border-gray-600 text-gray-300 hover:bg-gray-800 hover:border-blue-500/50"
                   )}
                 >
                   <Icon className="h-4 w-4" />
@@ -264,281 +267,270 @@ export default function StatsGoalsPage() {
               );
             })}
           </div>
-        </div>
 
-        {/* Content */}
-        <div className="space-y-6">
-          {activeTab === 'overview' && (
-            <>
-              {/* Stats Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {/* Win Rate */}
-                <Card className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 border-slate-700/50 backdrop-blur">
-                  <CardContent className="p-6">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm text-slate-400">Win Rate</p>
-                        <p className="text-3xl font-bold text-green-400">{playerStats.winRate}%</p>
-                        <p className="text-xs text-slate-500">{playerStats.wins} wins</p>
+          {/* Tab Content */}
+          <div className="space-y-6">
+            {activeTab === 'overview' && (
+              <>
+                {/* Quick Stats */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                  <Card className="bg-gradient-to-br from-gray-900/80 to-gray-800/60 backdrop-blur-xl border border-white/20 hover:border-emerald-500/50 transition-all duration-300">
+                    <CardContent className="p-6">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm text-gray-400">Completion Rate</p>
+                          <p className="text-3xl font-bold text-emerald-400">
+                            {Math.round((learningStats.completedCourses / learningStats.totalCourses) * 100)}%
+                          </p>
+                          <p className="text-xs text-gray-500">{learningStats.completedCourses} of {learningStats.totalCourses} courses</p>
+                        </div>
+                        <div className="w-12 h-12 rounded-full bg-emerald-500/20 flex items-center justify-center">
+                          <CheckCircle className="h-6 w-6 text-emerald-400" />
+                        </div>
                       </div>
-                      <div className="w-12 h-12 rounded-full bg-green-500/20 flex items-center justify-center">
-                        <Trophy className="h-6 w-6 text-green-400" />
+                    </CardContent>
+                  </Card>
+
+                  <Card className="bg-gradient-to-br from-gray-900/80 to-gray-800/60 backdrop-blur-xl border border-white/20 hover:border-orange-500/50 transition-all duration-300">
+                    <CardContent className="p-6">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm text-gray-400">Current Streak</p>
+                          <p className="text-3xl font-bold text-orange-400">{learningStats.currentStreak}</p>
+                          <p className="text-xs text-gray-500">days • best: {learningStats.longestStreak}</p>
+                        </div>
+                        <div className="w-12 h-12 rounded-full bg-orange-500/20 flex items-center justify-center">
+                          <Flame className="h-6 w-6 text-orange-400" />
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="bg-gradient-to-br from-gray-900/80 to-gray-800/60 backdrop-blur-xl border border-white/20 hover:border-yellow-500/50 transition-all duration-300">
+                    <CardContent className="p-6">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm text-gray-400">Leaderboard Rank</p>
+                          <p className="text-3xl font-bold text-yellow-400">#{learningStats.rank}</p>
+                          <p className="text-xs text-gray-500">of {learningStats.totalLearners.toLocaleString()}</p>
+                        </div>
+                        <div className="w-12 h-12 rounded-full bg-yellow-500/20 flex items-center justify-center">
+                          <Crown className="h-6 w-6 text-yellow-400" />
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="bg-gradient-to-br from-gray-900/80 to-gray-800/60 backdrop-blur-xl border border-white/20 hover:border-purple-500/50 transition-all duration-300">
+                    <CardContent className="p-6">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm text-gray-400">Total XP Earned</p>
+                          <p className="text-3xl font-bold text-purple-400">{animatedXP.toLocaleString()}</p>
+                          <p className="text-xs text-gray-500">Level {learningStats.level}</p>
+                        </div>
+                        <div className="w-12 h-12 rounded-full bg-purple-500/20 flex items-center justify-center">
+                          <Zap className="h-6 w-6 text-purple-400" />
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {/* Weekly Goals */}
+                <Card className="bg-gradient-to-br from-gray-900/80 to-gray-800/60 backdrop-blur-xl border border-white/20">
+                  <CardHeader>
+                    <CardTitle className="text-white flex items-center gap-2">
+                      <Target className="h-5 w-5 text-green-400" />
+                      Weekly Learning Goals
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      <div>
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-gray-300">Complete courses this week</span>
+                          <span className="text-green-400 font-bold">2 / 3</span>
+                        </div>
+                        <Progress value={67} className="h-2" />
+                      </div>
+                      <div>
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-gray-300">Study time this week</span>
+                          <span className="text-blue-400 font-bold">8h / 12h</span>
+                        </div>
+                        <Progress value={67} className="h-2" />
                       </div>
                     </div>
                   </CardContent>
                 </Card>
+              </>
+            )}
 
-                {/* Skill Rating */}
-                <Card className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 border-slate-700/50 backdrop-blur">
-                  <CardContent className="p-6">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm text-slate-400">Skill Rating</p>
-                        <p className="text-3xl font-bold text-purple-400">{playerStats.skillRating}</p>
-                        <p className="text-xs text-slate-500">{playerStats.rank}</p>
-                      </div>
-                      <div className="w-12 h-12 rounded-full bg-purple-500/20 flex items-center justify-center">
-                        <Star className="h-6 w-6 text-purple-400" />
-                      </div>
+            {activeTab === 'courses' && (
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {recentCourses.map((course) => (
+                  <Card key={course.id} className="bg-gradient-to-br from-gray-900/80 to-gray-800/60 backdrop-blur-xl border border-white/20 overflow-hidden hover:border-blue-500/50 transition-all duration-300 group">
+                    <div className="relative h-48">
+                      <Image
+                        src={course.image}
+                        alt={course.title}
+                        fill
+                        className="object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+                      {course.completed && (
+                        <div className="absolute top-4 right-4">
+                          <Badge className="bg-emerald-500/90 text-white">
+                            <CheckCircle className="w-3 h-3 mr-1" />
+                            Complete
+                          </Badge>
+                        </div>
+                      )}
                     </div>
-                  </CardContent>
-                </Card>
-
-                {/* Daily Streak */}
-                <Card className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 border-slate-700/50 backdrop-blur">
-                  <CardContent className="p-6">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm text-slate-400">Daily Streak</p>
-                        <p className="text-3xl font-bold text-orange-400">{playerStats.dailyStreak}</p>
-                        <p className="text-xs text-slate-500">days in a row</p>
-                      </div>
-                      <div className="w-12 h-12 rounded-full bg-orange-500/20 flex items-center justify-center">
-                        <Flame className="h-6 w-6 text-orange-400" />
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Weekly XP */}
-                <Card className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 border-slate-700/50 backdrop-blur">
-                  <CardContent className="p-6">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm text-slate-400">Weekly XP</p>
-                        <p className="text-3xl font-bold text-blue-400">{playerStats.weeklyXP}</p>
-                        <p className="text-xs text-slate-500">this week</p>
-                      </div>
-                      <div className="w-12 h-12 rounded-full bg-blue-500/20 flex items-center justify-center">
-                        <Zap className="h-6 w-6 text-blue-400" />
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+                    <CardContent className="p-6">
+                      <h3 className="text-xl font-bold text-white mb-3">{course.title}</h3>
+                      {course.completed ? (
+                        <div className="space-y-3">
+                          <div className="flex items-center justify-between">
+                            <span className="text-gray-400">Final Score</span>
+                            <span className="text-green-400 font-bold">{course.score}%</span>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-gray-400">XP Earned</span>
+                            <span className="text-purple-400 font-bold">+{course.xpEarned} XP</span>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-gray-400">Duration</span>
+                            <span className="text-blue-400">{course.duration}</span>
+                          </div>
+                          {course.certificate && (
+                            <Badge className="bg-yellow-500/20 text-yellow-400 border border-yellow-500/30">
+                              <Award className="w-3 h-3 mr-1" />
+                              Certificate Earned
+                            </Badge>
+                          )}
+                        </div>
+                      ) : (
+                        <div className="space-y-3">
+                          <div className="flex items-center justify-between">
+                            <span className="text-gray-400">Progress</span>
+                            <span className="text-blue-400 font-bold">{course.progress}%</span>
+                          </div>
+                          <Progress value={course.progress} className="h-2" />
+                          <div className="flex items-center justify-between text-sm">
+                            <span className="text-gray-500">Duration: {course.duration}</span>
+                            <span className="text-gray-500">Est. completion: {course.estimatedCompletion}</span>
+                          </div>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                ))}
               </div>
+            )}
 
-              {/* Battle Pass Progress */}
-              <Card className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 border-slate-700/50 backdrop-blur">
+            {activeTab === 'leaderboard' && (
+              <Card className="bg-gradient-to-br from-gray-900/80 to-gray-800/60 backdrop-blur-xl border border-white/20">
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-white">
-                    <Gift className="h-5 w-5 text-yellow-400" />
-                    Battle Pass - {playerStats.season}
+                  <CardTitle className="text-white flex items-center gap-2">
+                    <Trophy className="h-5 w-5 text-yellow-400" />
+                    Weekly Leaderboard - Advanced Manufacturing
                   </CardTitle>
+                  <p className="text-gray-400">Compete with learners in your industry</p>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-slate-400">Tier Progress</span>
-                    <span className="text-sm text-slate-300">
-                      Tier {playerStats.battlepassTier} / 100
-                    </span>
-                  </div>
-                  <Progress value={playerStats.battlepassTier} className="h-4" />
-                  <div className="flex justify-between text-xs text-slate-500">
-                    <span>Unlock amazing rewards as you progress!</span>
-                    <span>{100 - playerStats.battlepassTier} tiers remaining</span>
+                <CardContent>
+                  <div className="space-y-3">
+                    {leaderboard.map((learner) => (
+                      <div 
+                        key={learner.rank} 
+                        className={cn(
+                          "flex items-center gap-4 p-4 rounded-xl transition-all duration-200",
+                          learner.isUser 
+                            ? "bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-500/30" 
+                            : "bg-gray-800/50 hover:bg-gray-700/50"
+                        )}
+                      >
+                        <div className={cn(
+                          "w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold",
+                          learner.rank <= 3 ? "bg-gradient-to-r from-yellow-500 to-orange-500 text-white" : "bg-gray-600 text-gray-300"
+                        )}>
+                          {learner.rank <= 3 ? (learner.rank === 1 ? '🥇' : learner.rank === 2 ? '🥈' : '🥉') : learner.rank}
+                        </div>
+                        <div className="text-2xl">{learner.avatar}</div>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2">
+                            <span className={cn("font-medium", learner.isUser ? "text-blue-400" : "text-white")}>{learner.name}</span>
+                            <Badge variant="outline" className="text-xs">
+                              Level {learner.level}
+                            </Badge>
+                          </div>
+                          <div className="text-sm text-gray-400">
+                            {learner.xp.toLocaleString()} XP • {learner.streak} day streak
+                          </div>
+                        </div>
+                        {learner.rank <= 3 && (
+                          <Crown className="w-5 h-5 text-yellow-400" />
+                        )}
+                      </div>
+                    ))}
                   </div>
                 </CardContent>
               </Card>
-            </>
-          )}
+            )}
 
-          {activeTab === 'challenges' && (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {currentChallenges.map((challenge) => {
-                const Icon = challenge.icon;
-                const isCompleted = challenge.progress >= challenge.maxProgress;
-                
-                return (
+            {activeTab === 'achievements' && (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {achievements.map((achievement) => (
                   <Card 
-                    key={challenge.id} 
+                    key={achievement.id} 
                     className={cn(
-                      "bg-gradient-to-br from-slate-800/50 to-slate-900/50 border backdrop-blur transition-all duration-200 hover:scale-105",
-                      getRarityColor(challenge.rarity)
-                    )}
-                  >
-                    <CardHeader className="pb-3">
-                      <div className="flex items-start justify-between">
-                        <div className="flex items-center gap-3">
-                          <div className={cn(
-                            "w-10 h-10 rounded-full flex items-center justify-center",
-                            `bg-gradient-to-br ${challenge.color}`
-                          )}>
-                            <Icon className="h-5 w-5 text-white" />
-                          </div>
-                          <div>
-                            <CardTitle className="text-lg text-white">{challenge.title}</CardTitle>
-                            <Badge variant="outline" className={cn("text-xs", getRarityColor(challenge.rarity))}>
-                              {challenge.rarity.toUpperCase()}
-                            </Badge>
-                          </div>
-                        </div>
-                        <div className="text-right">
-                          <div className="text-yellow-400 font-bold">+{challenge.xpReward} XP</div>
-                          <Badge variant="secondary" className="text-xs bg-slate-700 text-slate-300">
-                            {challenge.type}
-                          </Badge>
-                        </div>
-                      </div>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <p className="text-sm text-slate-300">{challenge.description}</p>
-                      <div className="space-y-2">
-                        <div className="flex justify-between text-sm">
-                          <span className="text-slate-400">Progress</span>
-                          <span className="text-slate-300">
-                            {challenge.progress} / {challenge.maxProgress}
-                          </span>
-                        </div>
-                        <Progress 
-                          value={(challenge.progress / challenge.maxProgress) * 100} 
-                          className="h-2"
-                        />
-                        {isCompleted && (
-                          <div className="flex items-center gap-2 text-green-400 text-sm">
-                            <CheckCircle className="h-4 w-4" />
-                            <span>Challenge Complete!</span>
-                          </div>
-                        )}
-                      </div>
-                    </CardContent>
-                  </Card>
-                );
-              })}
-            </div>
-          )}
-
-          {activeTab === 'achievements' && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {achievements.map((achievement) => {
-                const Icon = achievement.icon;
-                
-                return (
-                  <Card 
-                    key={achievement.id}
-                    className={cn(
-                      "bg-gradient-to-br from-slate-800/50 to-slate-900/50 border backdrop-blur transition-all duration-200",
+                      "bg-gradient-to-br backdrop-blur-xl border transition-all duration-300 relative overflow-hidden",
                       achievement.unlocked 
-                        ? "border-yellow-500/50 hover:scale-105" 
-                        : "border-slate-700/50 opacity-60"
+                        ? achievement.rare
+                          ? "from-yellow-900/80 to-orange-800/60 border-yellow-500/50 shadow-lg shadow-yellow-500/20"
+                          : "from-gray-900/80 to-gray-800/60 border-green-500/50"
+                        : "from-gray-900/50 to-gray-800/30 border-gray-700/50"
                     )}
                   >
-                    <CardContent className="p-6">
-                      <div className="flex items-start gap-4">
-                        <div className={cn(
-                          "w-12 h-12 rounded-full flex items-center justify-center",
-                          achievement.unlocked 
-                            ? "bg-gradient-to-br from-yellow-500 to-orange-500" 
-                            : "bg-slate-700"
-                        )}>
-                          {achievement.unlocked ? (
-                            <Icon className="h-6 w-6 text-white" />
-                          ) : (
-                            <Lock className="h-6 w-6 text-slate-400" />
-                          )}
-                        </div>
-                        <div className="flex-1">
-                          <h3 className={cn(
-                            "font-bold text-lg mb-1",
-                            achievement.unlocked ? "text-white" : "text-slate-400"
-                          )}>
-                            {achievement.title}
-                          </h3>
-                          <p className="text-sm text-slate-400 mb-2">
-                            {achievement.description}
-                          </p>
-                          <div className="flex items-center justify-between">
-                            <Badge 
-                              variant="outline" 
-                              className={cn("text-xs", getRarityColor(achievement.rarity))}
-                            >
-                              {achievement.rarity.toUpperCase()}
-                            </Badge>
-                            {achievement.unlocked && achievement.date && (
-                              <span className="text-xs text-slate-500">
-                                {new Date(achievement.date).toLocaleDateString()}
-                              </span>
-                            )}
-                          </div>
-                        </div>
+                    {achievement.rare && achievement.unlocked && (
+                      <div className="absolute top-2 right-2">
+                        <Badge className="bg-gradient-to-r from-yellow-500 to-orange-500 text-white text-xs">
+                          <Gem className="w-3 h-3 mr-1" />
+                          Rare
+                        </Badge>
                       </div>
+                    )}
+                    <CardContent className="p-6 text-center">
+                      <div className={cn(
+                        "text-4xl mb-4 p-4 rounded-full mx-auto w-fit",
+                        achievement.unlocked ? "bg-white/10" : "bg-gray-800/50 grayscale"
+                      )}>
+                        {achievement.icon}
+                      </div>
+                      <h3 className={cn(
+                        "text-lg font-bold mb-2",
+                        achievement.unlocked ? "text-white" : "text-gray-500"
+                      )}>
+                        {achievement.title}
+                      </h3>
+                      <p className={cn(
+                        "text-sm",
+                        achievement.unlocked ? "text-gray-300" : "text-gray-600"
+                      )}>
+                        {achievement.description}
+                      </p>
+                      {!achievement.unlocked && (
+                        <Badge variant="outline" className="mt-3 text-gray-500 border-gray-600">
+                          Locked
+                        </Badge>
+                      )}
                     </CardContent>
                   </Card>
-                );
-              })}
-            </div>
-          )}
-
-          {activeTab === 'leaderboard' && (
-            <Card className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 border-slate-700/50 backdrop-blur">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-white">
-                  <Users className="h-5 w-5 text-yellow-400" />
-                  Weekly Leaderboard
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {leaderboard.map((player) => (
-                    <div 
-                      key={player.rank}
-                      className={cn(
-                        "flex items-center justify-between p-4 rounded-lg transition-all duration-200",
-                        player.isPlayer 
-                          ? "bg-gradient-to-r from-orange-500/20 to-red-500/20 border border-orange-500/30" 
-                          : "bg-slate-800/30 hover:bg-slate-700/30"
-                      )}
-                    >
-                      <div className="flex items-center gap-4">
-                        <div className={cn(
-                          "w-8 h-8 rounded-full flex items-center justify-center font-bold",
-                          player.rank <= 3 
-                            ? "bg-gradient-to-br from-yellow-500 to-orange-500 text-white" 
-                            : "bg-slate-700 text-slate-300"
-                        )}>
-                          {player.rank}
-                        </div>
-                        <div className="text-2xl">{player.avatar}</div>
-                        <div>
-                          <div className={cn(
-                            "font-semibold",
-                            player.isPlayer ? "text-orange-400" : "text-white"
-                          )}>
-                            {player.name}
-                          </div>
-                          <div className="text-sm text-slate-400">
-                            {player.xp.toLocaleString()} XP
-                          </div>
-                        </div>
-                      </div>
-                      {player.rank <= 3 && (
-                        <Trophy className="h-5 w-5 text-yellow-400" />
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          )}
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>

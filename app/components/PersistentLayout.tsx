@@ -1,9 +1,10 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
+import { useMessages } from '../contexts/MessagesContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import Image from 'next/image';
@@ -16,12 +17,14 @@ import {
   MessageSquare,
   Bot,
   X,
-  Search
+  Search,
+  BookOpen
 } from 'lucide-react';
 import CollapsibleSidebar from './CollapsibleSidebar';
 import MobileBottomNav from './MobileBottomNav';
 import MessagesModal from './MessagesModal';
 import { cn } from '@/lib/utils';
+import { StudyModal } from '@/components/microlesson/StudyModal';
 
 interface PersistentLayoutProps {
   children: React.ReactNode;
@@ -29,17 +32,18 @@ interface PersistentLayoutProps {
 
 export default function PersistentLayout({ children }: PersistentLayoutProps) {
   const router = useRouter();
+  const pathname = usePathname();
   const { user, signOut } = useAuth();
   const { theme, setTheme } = useTheme();
+  const { showMessagesModal, openMessagesModal, closeMessagesModal } = useMessages();
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(true); // Start as mobile to prevent sidebar flash
   const [showStatsPanel, setShowStatsPanel] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [showSearchBar, setShowSearchBar] = useState(false);
-  const [showMessagesModal, setShowMessagesModal] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [showStudyModal, setShowStudyModal] = useState(false);
 
-  
   // Refs for click outside detection
   const notificationsRef = useRef<HTMLDivElement>(null);
   const messagesRef = useRef<HTMLDivElement>(null);
@@ -64,7 +68,6 @@ export default function PersistentLayout({ children }: PersistentLayoutProps) {
       if (notificationsRef.current && !notificationsRef.current.contains(event.target as Node)) {
         setShowNotifications(false);
       }
-
     }
 
     document.addEventListener('mousedown', handleClickOutside);
@@ -168,13 +171,42 @@ export default function PersistentLayout({ children }: PersistentLayoutProps) {
                   </div>
                 </div>
 
+                {/* Enhanced Study Button */}
+                <div className="relative">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="relative group h-10 px-4 hover:bg-gradient-to-r hover:from-green-500/10 hover:to-emerald-500/10 dark:hover:from-green-400/10 dark:hover:to-emerald-400/10 rounded-xl transition-all duration-300 hover:scale-105 border border-transparent hover:border-green-200/30 dark:hover:border-green-400/20 bg-slate-200/40 dark:bg-[hsl(222,84%,12%)]"
+                    onClick={() => setShowStudyModal(true)}
+                  >
+                    {/* Study Icon with Enhanced Styling */}
+                    <div className="relative flex items-center gap-2">
+                      <BookOpen className="h-4 w-4 text-slate-600 dark:text-slate-400 group-hover:text-green-600 dark:group-hover:text-green-400 transition-colors duration-300" />
+                      
+                      {/* Study Items Count */}
+                      <div className="absolute -top-1 -right-1 flex items-center justify-center">
+                        <span className="relative flex h-4 w-4">
+                          <span className="relative inline-flex rounded-full h-4 w-4 bg-gradient-to-r from-green-500 to-emerald-500 items-center justify-center shadow-lg">
+                            <span className="text-[9px] font-bold text-white">5</span>
+                          </span>
+                        </span>
+                      </div>
+                      
+                      {/* Label */}
+                      <span className="text-sm font-medium text-slate-700 dark:text-slate-300 group-hover:text-green-600 dark:group-hover:text-green-400 transition-colors duration-300">
+                        Study
+                      </span>
+                    </div>
+                  </Button>
+                </div>
+
                 {/* Enhanced Messages Button */}
                 <div className="relative" ref={messagesRef}>
                   <Button
                     variant="ghost"
                     size="sm"
                     className="relative group h-10 px-4 hover:bg-gradient-to-r hover:from-blue-500/10 hover:to-purple-500/10 dark:hover:from-blue-400/10 dark:hover:to-purple-400/10 rounded-xl transition-all duration-300 hover:scale-105 border border-transparent hover:border-blue-200/30 dark:hover:border-blue-400/20 bg-slate-200/40 dark:bg-[hsl(222,84%,12%)]"
-                    onClick={() => setShowMessagesModal(true)}
+                    onClick={() => openMessagesModal()}
                   >
                     {/* Message Icon with Enhanced Styling */}
                     <div className="relative flex items-center gap-2">
@@ -202,22 +234,32 @@ export default function PersistentLayout({ children }: PersistentLayoutProps) {
           </div>
         )}
 
-        {/* Page Content */}
-        <main className={cn(
-          "flex-1 overflow-auto",
-          isMobile ? "pt-[68px] pb-20 px-6" : "pt-0"
+        {/* Content Area */}
+        <div className={cn(
+          "flex-1 overflow-auto transition-all duration-300 ease-in-out",
+          isMobile ? "pt-20" : "pt-0"
         )}>
           {children}
-        </main>
+        </div>
 
-        {/* Mobile Bottom Navigation - Only show on mobile */}
-        {isMobile && <MobileBottomNav onToggleMessages={() => setShowMessagesModal(true)} />}
+        {/* Mobile Bottom Navigation */}
+        {isMobile && (
+          <div className="fixed bottom-0 left-0 right-0 z-40">
+            <MobileBottomNav />
+          </div>
+        )}
       </div>
 
       {/* Messages Modal */}
       <MessagesModal 
         isOpen={showMessagesModal} 
-        onClose={() => setShowMessagesModal(false)} 
+        onClose={closeMessagesModal} 
+      />
+
+      {/* Study Modal */}
+      <StudyModal 
+        isOpen={showStudyModal} 
+        onClose={() => setShowStudyModal(false)} 
       />
     </div>
   );

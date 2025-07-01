@@ -4,8 +4,10 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { LessonConfig } from '@/types/microlesson/slide';
 import { SlideRenderer } from './SlideRenderer';
+import { StudyModal } from './StudyModal';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, ChevronRight, Home, RotateCcw, Play, MessageSquare, Search, Flame, Zap } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Home, RotateCcw, Play, MessageSquare, Search, Flame, Zap, BookOpen } from 'lucide-react';
+import { useMessages } from '@/app/contexts/MessagesContext';
 
 interface SlidePlayerProps {
   config: LessonConfig;
@@ -19,12 +21,15 @@ export const SlidePlayer: React.FC<SlidePlayerProps> = ({
   onExit 
 }) => {
   const router = useRouter();
+  const { openMessagesModal } = useMessages();
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(true);
   const [completedSlides, setCompletedSlides] = useState<Set<number>>(new Set());
   const [slideProgress, setSlideProgress] = useState<{ [key: number]: number }>({});
   const [showMessagesModal, setShowMessagesModal] = useState(false);
   const [showSearchModal, setShowSearchModal] = useState(false);
+  const [showCompleteModal, setShowCompleteModal] = useState(false);
+  const [showStudyModal, setShowStudyModal] = useState(false);
 
   const currentSlide = config.slides[currentSlideIndex];
   const progress = ((currentSlideIndex + 1) / config.slides.length) * 100;
@@ -88,6 +93,35 @@ export const SlidePlayer: React.FC<SlidePlayerProps> = ({
     }));
   };
 
+  // Context menu handlers
+  const handleDefineWord = (word: string) => {
+    // This will be handled by the DefinitionModal in SlideRenderer
+    console.log('Define word:', word);
+  };
+
+  const handleSaveToStudyList = (word: string) => {
+    // This will be handled by the context menu in SlideRenderer
+    console.log('Save to study list:', word);
+  };
+
+  const handleAddToNotes = (text: string, slideId?: string) => {
+    // This will be handled by the NotesModal in SlideRenderer
+    console.log('Add to notes:', text, slideId);
+  };
+
+  const handleAskAI = (text: string) => {
+    const slideTitle = 'title' in currentSlide ? currentSlide.title : `Slide ${currentSlide.id}`;
+    const contextData = {
+      selectedText: text,
+      slideTitle: slideTitle,
+      slideId: currentSlide.id,
+      lessonTitle: config.title,
+      course: config.course || undefined
+    };
+
+    openMessagesModal(contextData);
+  };
+
   const canGoNext = currentSlideIndex < config.slides.length - 1;
   const canGoPrevious = currentSlideIndex > 0;
 
@@ -95,7 +129,8 @@ export const SlidePlayer: React.FC<SlidePlayerProps> = ({
     <div className="fixed inset-0 z-50 bg-slate-900 flex flex-col overflow-hidden">
       {/* Header */}
       <div className="bg-slate-800/90 backdrop-blur-sm border-b border-slate-700 p-4 flex items-center justify-between z-50">
-        <div className="flex items-center space-x-4">
+        {/* Left Section - Exit and Progress */}
+        <div className="flex items-center space-x-4 flex-1">
           <button
             onClick={onExit}
             className="p-2 hover:bg-slate-700 rounded-lg transition-colors"
@@ -104,15 +139,8 @@ export const SlidePlayer: React.FC<SlidePlayerProps> = ({
             <Home className="w-5 h-5 text-slate-400" />
           </button>
           
-          <div>
-            <h1 className="text-white font-semibold">{config.title}</h1>
-            {config.course && (
-              <p className="text-slate-400 text-sm">{config.course}</p>
-            )}
-          </div>
-
-          {/* Progress Info - Now on the left */}
-          <div className="text-left ml-6">
+          {/* Progress Info */}
+          <div className="text-left">
             <div className="text-white text-sm font-medium">
               {currentSlideIndex + 1} / {config.slides.length}
             </div>
@@ -122,7 +150,29 @@ export const SlidePlayer: React.FC<SlidePlayerProps> = ({
           </div>
         </div>
 
-        <div className="flex items-center space-x-4">
+        {/* Center Section - Breadcrumb */}
+        <div className="flex-1 flex justify-center">
+          <div className="bg-slate-700/50 backdrop-blur-sm rounded-xl px-4 py-2 border border-slate-600/50">
+            <div className="flex items-center text-sm">
+              {config.course && (
+                <>
+                  <span className="text-blue-400 font-medium">{config.course}</span>
+                  <ChevronRight className="w-3 h-3 text-slate-500 mx-2" />
+                </>
+              )}
+              {config.lesson && (
+                <>
+                  <span className="text-emerald-400 font-medium">{config.lesson}</span>
+                  <ChevronRight className="w-3 h-3 text-slate-500 mx-2" />
+                </>
+              )}
+              <span className="text-white font-semibold">{config.title}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Right Section - Tools and Actions */}
+        <div className="flex items-center space-x-4 flex-1 justify-end">
           <button
             onClick={restartLesson}
             className="p-2 hover:bg-slate-700 rounded-lg transition-colors"
@@ -131,7 +181,7 @@ export const SlidePlayer: React.FC<SlidePlayerProps> = ({
             <RotateCcw className="w-5 h-5 text-slate-400" />
           </button>
 
-          {/* Floating Window Components - Now on the very right */}
+          {/* Floating Window Components */}
           <div className="flex items-center gap-3">
             {/* Points Display */}
             <div className="flex items-center gap-2">
@@ -152,6 +202,23 @@ export const SlidePlayer: React.FC<SlidePlayerProps> = ({
               title="Search"
             >
               <Search className="h-4 w-4 text-slate-400 hover:text-emerald-400 transition-colors" />
+            </button>
+
+            {/* Study Hub */}
+            <button
+              onClick={() => setShowStudyModal(true)}
+              className="relative group p-2 hover:bg-slate-700 rounded-lg transition-all duration-300 hover:scale-105"
+              title="Study Hub"
+            >
+              <BookOpen className="h-4 w-4 text-slate-400 group-hover:text-green-400 transition-colors duration-300" />
+              {/* Study Items Count */}
+              <div className="absolute -top-1 -right-1 flex items-center justify-center">
+                <span className="relative flex h-3 w-3">
+                  <span className="relative inline-flex rounded-full h-3 w-3 bg-gradient-to-r from-green-500 to-emerald-500 items-center justify-center shadow-lg">
+                    <span className="text-[8px] font-bold text-white">5</span>
+                  </span>
+                </span>
+              </div>
             </button>
 
             {/* Messages */}
@@ -202,6 +269,10 @@ export const SlidePlayer: React.FC<SlidePlayerProps> = ({
               onNext={nextSlide}
               onPrevious={previousSlide}
               onQuickCheckAnswered={handleQuickCheckAnswered}
+              onDefineWord={handleDefineWord}
+              onSaveToStudyList={handleSaveToStudyList}
+              onAddToNotes={handleAddToNotes}
+              onAskAI={handleAskAI}
             />
           </motion.div>
         </AnimatePresence>
@@ -247,8 +318,6 @@ export const SlidePlayer: React.FC<SlidePlayerProps> = ({
           </button>
         </div>
       </div>
-
-
 
       {/* Messages Modal */}
       {showMessagesModal && (
@@ -465,6 +534,12 @@ export const SlidePlayer: React.FC<SlidePlayerProps> = ({
           </motion.div>
         </div>
       )}
+
+      {/* Study Modal */}
+      <StudyModal 
+        isOpen={showStudyModal} 
+        onClose={() => setShowStudyModal(false)} 
+      />
     </div>
   );
 }; 

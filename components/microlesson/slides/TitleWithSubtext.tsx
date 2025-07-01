@@ -9,9 +9,11 @@ interface TitleWithSubtextProps {
   slide: TitleWithSubtextType;
   onNext?: () => void;
   onPrevious?: () => void;
+  onContextMenu?: (event: React.MouseEvent) => void;
+  style?: React.CSSProperties;
 }
 
-export const TitleWithSubtext: React.FC<TitleWithSubtextProps> = ({ slide, onNext }) => {
+export const TitleWithSubtext: React.FC<TitleWithSubtextProps> = ({ slide, onNext, onContextMenu, style }) => {
   return (
     <SlideContainer
       backgroundColor="#0F172A"
@@ -33,8 +35,11 @@ export const TitleWithSubtext: React.FC<TitleWithSubtextProps> = ({ slide, onNex
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
           className="text-5xl md:text-6xl font-bold text-white mb-8"
+          onContextMenu={onContextMenu}
           style={{ 
-            color: slide.accentColor ? `${slide.accentColor}` : undefined 
+            color: slide.accentColor ? `${slide.accentColor}` : undefined,
+            userSelect: 'text' as const,
+            ...style
           }}
         >
           {slide.title}
@@ -45,6 +50,11 @@ export const TitleWithSubtext: React.FC<TitleWithSubtextProps> = ({ slide, onNex
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.3, ease: "easeOut" }}
           className="text-xl md:text-2xl text-slate-300 leading-relaxed mb-12 max-w-4xl mx-auto"
+          onContextMenu={onContextMenu}
+          style={{ 
+            userSelect: 'text' as const,
+            ...style
+          }}
         >
           {slide.subtext}
         </motion.p>

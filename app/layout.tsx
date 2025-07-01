@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import './globals.css';
 import { AuthProvider } from './contexts/AuthContext';
 import { ThemeProvider } from './contexts/ThemeContext';
+import { MessagesProvider } from './contexts/MessagesContext';
 import { Toaster } from 'sonner';
 // import { StagewiseToolbar } from '@stagewise/toolbar-next';
 // import ClientOnly from './components/ClientOnly';
@@ -37,17 +38,19 @@ export default function RootLayout({
       <body className={inter.className}>
         <ThemeProvider>
           <AuthProvider>
-            {children}
-            <Toaster 
-              position="top-right"
-              toastOptions={{
-                style: {
-                  background: 'hsl(var(--background))',
-                  color: 'hsl(var(--foreground))',
-                  border: '1px solid hsl(var(--border))',
-                },
-              }}
-            />
+            <MessagesProvider>
+              {children}
+              <Toaster 
+                position="top-right"
+                toastOptions={{
+                  style: {
+                    background: 'hsl(var(--background))',
+                    color: 'hsl(var(--foreground))',
+                    border: '1px solid hsl(var(--border))',
+                  },
+                }}
+              />
+            </MessagesProvider>
           </AuthProvider>
         </ThemeProvider>
         {/* {process.env.NODE_ENV === 'development' && (
