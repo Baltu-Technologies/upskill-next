@@ -30,7 +30,8 @@ import {
   Gamepad2,
   Play,
   Building2,
-  UserCheck
+  UserCheck,
+  Edit3
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTheme } from '../contexts/ThemeContext';
@@ -500,6 +501,36 @@ export default function CollapsibleSidebar({ isCollapsed, onToggle }: SidebarPro
           href: '/guide-access/groups'
         }
       ]
+    },
+    
+    // Course Creator - Internal team course management
+    {
+      title: 'Course Creator',
+      icon: Edit3,
+      color: 'text-violet-600',
+      href: '/course-creator',
+      submenu: [
+        {
+          title: 'Dashboard',
+          href: '/course-creator'
+        },
+        {
+          title: 'Create Course',
+          href: '/course-creator/create'
+        },
+        {
+          title: 'Manage Courses',
+          href: '/course-creator/manage'
+        },
+        {
+          title: 'Content Library',
+          href: '/course-creator/library'
+        },
+        {
+          title: 'Analytics',
+          href: '/course-creator/analytics'
+        }
+      ]
     }
   ];
 
@@ -578,6 +609,11 @@ export default function CollapsibleSidebar({ isCollapsed, onToggle }: SidebarPro
     // Guide Access pages
     if (pathname.startsWith('/guide-access')) {
       newExpandedMenus.add('Guide Access');
+    }
+    
+    // Course Creator pages
+    if (pathname.startsWith('/course-creator')) {
+      newExpandedMenus.add('Course Creator');
     }
     
     setExpandedMenus(newExpandedMenus);
