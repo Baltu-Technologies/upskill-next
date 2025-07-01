@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import CollapsibleSidebar from './CollapsibleSidebar';
 import MobileBottomNav from './MobileBottomNav';
+import MessagesModal from './MessagesModal';
 import { cn } from '@/lib/utils';
 
 interface PersistentLayoutProps {
@@ -35,6 +36,7 @@ export default function PersistentLayout({ children }: PersistentLayoutProps) {
   const [showStatsPanel, setShowStatsPanel] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [showSearchBar, setShowSearchBar] = useState(false);
+  const [showMessagesModal, setShowMessagesModal] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
   
@@ -172,7 +174,7 @@ export default function PersistentLayout({ children }: PersistentLayoutProps) {
                     variant="ghost"
                     size="sm"
                     className="relative group h-10 px-4 hover:bg-gradient-to-r hover:from-blue-500/10 hover:to-purple-500/10 dark:hover:from-blue-400/10 dark:hover:to-purple-400/10 rounded-xl transition-all duration-300 hover:scale-105 border border-transparent hover:border-blue-200/30 dark:hover:border-blue-400/20 bg-slate-200/40 dark:bg-[hsl(222,84%,12%)]"
-                    onClick={() => router.push('/messages')}
+                    onClick={() => setShowMessagesModal(true)}
                   >
                     {/* Message Icon with Enhanced Styling */}
                     <div className="relative flex items-center gap-2">
@@ -209,8 +211,14 @@ export default function PersistentLayout({ children }: PersistentLayoutProps) {
         </main>
 
         {/* Mobile Bottom Navigation - Only show on mobile */}
-        {isMobile && <MobileBottomNav />}
+        {isMobile && <MobileBottomNav onToggleMessages={() => setShowMessagesModal(true)} />}
       </div>
+
+      {/* Messages Modal */}
+      <MessagesModal 
+        isOpen={showMessagesModal} 
+        onClose={() => setShowMessagesModal(false)} 
+      />
     </div>
   );
 } 

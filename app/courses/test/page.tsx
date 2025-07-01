@@ -1,12 +1,12 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Clock, Award, BookOpen, Target, CheckCircle2, Play, GraduationCap, ArrowRight, Zap, Shield, Building2, MapPin, Briefcase, Users, Trophy, TrendingUp } from 'lucide-react';
+import { Clock, Award, BookOpen, Target, CheckCircle2, Play, GraduationCap, ArrowRight, Zap, Shield, Building2, MapPin, Briefcase, Users, Trophy, TrendingUp, Star, ArrowDown, Plus, RotateCcw, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
+
 import { sampleCourse } from '@/data/microlesson/sampleConfig';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
@@ -15,16 +15,69 @@ export default function CourseTestPage() {
   const router = useRouter();
   const course = sampleCourse;
 
-  // Calculate total lessons and microlessons
+  // Calculate total lessons, microlessons, and XP
   const totalLessons = course.lessons.length;
   const totalMicrolessons = course.lessons.reduce((total, lesson) => total + lesson.microlessons.length, 0);
+  const totalXP = totalMicrolessons * 50; // 50 XP per microlesson
 
-  const handleStartCourse = () => {
-    router.push('/courses/test/lessons');
+  // Mock course state - in real app this would come from user data/API
+  type CourseState = 'not-added' | 'not-started' | 'in-progress' | 'completed';
+  const [courseState] = useState<CourseState>('not-started'); // Change this to test different states
+  
+  // Calculate overall progress (mock data)
+  const overallProgress = courseState === 'completed' ? 100 : courseState === 'in-progress' ? 33 : 0;
+
+  const getCourseButtonConfig = () => {
+    switch (courseState) {
+      case 'not-added':
+        return {
+          text: 'Add Course',
+          icon: Plus,
+          className: 'bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700',
+          action: () => {
+            // In real app: add course to user's enrolled courses
+            console.log('Adding course to user library');
+            router.push('/courses/test/lessons');
+          }
+        };
+      case 'not-started':
+        return {
+          text: 'Start Course',
+          icon: Play,
+          className: 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700',
+          action: () => router.push('/courses/test/lessons')
+        };
+      case 'in-progress':
+        return {
+          text: 'Continue Course',
+          icon: Play,
+          className: 'bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700',
+          action: () => router.push('/courses/test/lessons')
+        };
+      case 'completed':
+        return {
+          text: 'Review Course',
+          icon: RotateCcw,
+          className: 'bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700',
+          action: () => router.push('/courses/test/lessons')
+        };
+      default:
+        return {
+          text: 'Start Course',
+          icon: Play,
+          className: 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700',
+          action: () => router.push('/courses/test/lessons')
+        };
+    }
   };
 
+  const buttonConfig = getCourseButtonConfig();
+
   const handleViewLessons = () => {
-    router.push('/courses/test/lessons');
+    const curriculumSection = document.getElementById('course-curriculum');
+    if (curriculumSection) {
+      curriculumSection.scrollIntoView({ behavior: 'smooth' });
+    }
   };
 
   return (
@@ -112,6 +165,10 @@ export default function CourseTestPage() {
                 <Target className="w-6 h-6 text-green-400" />
                 <span className="text-lg font-medium">{totalMicrolessons} Microlessons</span>
               </div>
+              <div className="flex items-center gap-3 bg-black/30 backdrop-blur-sm px-6 py-3 rounded-full">
+                <Star className="w-6 h-6 text-yellow-400" />
+                <span className="text-lg font-medium">{totalXP} XP</span>
+              </div>
             </motion.div>
 
             {/* CTA Buttons */}
@@ -122,11 +179,11 @@ export default function CourseTestPage() {
               className="flex flex-col sm:flex-row gap-6"
             >
               <Button
-                onClick={handleStartCourse}
-                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold px-12 py-6 text-lg rounded-2xl transition-all duration-300 shadow-2xl hover:shadow-blue-500/25 hover:scale-105 group"
+                onClick={buttonConfig.action}
+                className={`${buttonConfig.className} text-white font-bold px-12 py-6 text-lg rounded-2xl transition-all duration-300 shadow-2xl hover:shadow-blue-500/25 hover:scale-105 group`}
               >
-                <Play className="w-6 h-6 mr-3 group-hover:scale-110 transition-transform" />
-                Start Course
+                <buttonConfig.icon className="w-6 h-6 mr-3 group-hover:scale-110 transition-transform" />
+                {buttonConfig.text}
                 <ArrowRight className="w-6 h-6 ml-3 group-hover:translate-x-1 transition-transform" />
               </Button>
               <Button
@@ -138,6 +195,33 @@ export default function CourseTestPage() {
                 View Curriculum
               </Button>
             </motion.div>
+
+            {/* Scroll Down Indicator */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 1.2 }}
+              className="flex flex-col items-center mt-16"
+            >
+              <span className="text-gray-400 text-sm mb-3 font-medium">Scroll to explore</span>
+              <motion.div
+                animate={{ y: [0, 8, 0] }}
+                transition={{ 
+                  duration: 2,
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }}
+                className="flex items-center justify-center w-10 h-10 rounded-full border border-white/20 bg-white/5 backdrop-blur-sm hover:bg-white/10 transition-all duration-300 cursor-pointer"
+                onClick={() => {
+                  const content = document.getElementById('main-content');
+                  if (content) {
+                    content.scrollIntoView({ behavior: 'smooth' });
+                  }
+                }}
+              >
+                <ArrowDown className="w-5 h-5 text-white/70" />
+              </motion.div>
+            </motion.div>
           </div>
         </div>
 
@@ -146,7 +230,7 @@ export default function CourseTestPage() {
         <div className="absolute bottom-20 left-20 w-40 h-40 bg-gradient-to-r from-purple-500/20 to-blue-500/20 rounded-full blur-3xl" />
       </div>
 
-      <div className="container mx-auto px-4 py-16">
+      <div id="main-content" className="container mx-auto px-4 py-16">
         {/* Main Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
           {/* Left Column - What You'll Learn */}
@@ -160,17 +244,17 @@ export default function CourseTestPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-2">
+                <div className="space-y-1">
                   {course.learningOutcomes.map((objective: string, index: number) => (
                     <motion.div
                       key={index}
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: index * 0.1 }}
-                      className="flex items-start gap-3 p-3 rounded-lg bg-slate-900/50 hover:bg-slate-900/70 transition-all duration-200"
+                      className="flex items-start gap-2 p-2 rounded-lg bg-slate-900/50 hover:bg-slate-900/70 transition-all duration-200"
                     >
-                      <CheckCircle2 className="w-5 h-5 text-green-400 mt-0.5 flex-shrink-0" />
-                      <span className="text-gray-300 leading-relaxed">{objective}</span>
+                      <CheckCircle2 className="w-4 h-4 text-green-400 mt-0.5 flex-shrink-0" />
+                      <span className="text-gray-300 text-sm leading-snug">{objective}</span>
                     </motion.div>
                   ))}
                 </div>
@@ -178,7 +262,7 @@ export default function CourseTestPage() {
             </Card>
 
             {/* Course Curriculum */}
-            <Card className="group overflow-hidden border-slate-700 bg-slate-800/50 hover:bg-slate-800/70 transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/10">
+            <Card id="course-curriculum" className="group overflow-hidden border-slate-700 bg-slate-800/50 hover:bg-slate-800/70 transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/10">
               <CardHeader>
                 <CardTitle className="text-2xl font-bold text-white flex items-center gap-3">
                   <BookOpen className="w-6 h-6 text-purple-400" />
@@ -213,14 +297,7 @@ export default function CourseTestPage() {
                         <Play className="w-5 h-5 text-blue-400 mt-2 opacity-0 group-hover/lesson:opacity-100 transition-opacity" />
                       </div>
                       
-                      {/* Progress Bar */}
-                      <div className="mb-4">
-                        <div className="flex items-center justify-between text-sm text-slate-400 mb-2">
-                          <span>Progress</span>
-                          <span>{index * 15}% Complete</span>
-                        </div>
-                        <Progress value={index * 15} className="h-2 bg-slate-700" />
-                      </div>
+
                       
                       {/* Microlessons */}
                       <div className="pl-4 border-l-2 border-slate-700 space-y-2">
@@ -267,9 +344,16 @@ export default function CourseTestPage() {
                     <span className="text-slate-400 font-medium">Lessons</span>
                     <span className="text-white font-medium">{totalLessons}</span>
                   </div>
-                  <div className="flex justify-between items-center py-3">
+                  <div className="flex justify-between items-center py-3 border-b border-slate-700">
                     <span className="text-slate-400 font-medium">Microlessons</span>
                     <span className="text-white font-medium">{totalMicrolessons}</span>
+                  </div>
+                  <div className="flex justify-between items-center py-3">
+                    <span className="text-slate-400 font-medium">XP Earned</span>
+                    <span className="text-white font-medium flex items-center gap-1">
+                      <Star className="w-4 h-4 text-yellow-400" />
+                      {totalXP}
+                    </span>
                   </div>
                 </div>
               </CardContent>
@@ -294,12 +378,56 @@ export default function CourseTestPage() {
               </CardContent>
             </Card>
 
-            {/* Badges Earned */}
+            {/* Certifications */}
+            <Card className="group overflow-hidden border-slate-700 bg-slate-800/50 hover:bg-slate-800/70 transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/10">
+              <CardHeader>
+                <CardTitle className="text-xl font-bold text-white flex items-center gap-3">
+                  <GraduationCap className="w-5 h-5 text-green-400" />
+                  Aligns with Certifications
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {[
+                    { 
+                      name: 'IPC-A-610 Acceptability of Electronic Assemblies', 
+                      org: 'IPC International',
+                      level: 'Operator'
+                    },
+                    { 
+                      name: 'Semiconductor Manufacturing Fundamentals', 
+                      org: 'SEMI International',
+                      level: 'Level 1'
+                    },
+                    { 
+                      name: 'Clean Room Operations Certificate', 
+                      org: 'IEST (Institute of Environmental Sciences)',
+                      level: 'Basic'
+                    }
+                  ].map((cert, index) => (
+                    <div key={index} className="flex items-start gap-3 p-3 rounded-lg bg-slate-900/50 hover:bg-slate-900/70 transition-all duration-200">
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-r from-green-500 to-emerald-600 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <Shield className="w-4 h-4 text-white" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h4 className="text-white font-medium text-sm leading-tight mb-1">{cert.name}</h4>
+                        <p className="text-slate-400 text-xs">{cert.org}</p>
+                        <Badge variant="outline" className="border-green-400/50 text-green-400 bg-green-400/5 text-xs mt-1">
+                          {cert.level}
+                        </Badge>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Badges You'll Earn */}
             <Card className="group overflow-hidden border-slate-700 bg-slate-800/50 hover:bg-slate-800/70 transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/10">
               <CardHeader>
                 <CardTitle className="text-xl font-bold text-white flex items-center gap-3">
                   <Award className="w-5 h-5 text-purple-400" />
-                  Badges Earned
+                  Badges You'll Earn
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -325,11 +453,11 @@ export default function CourseTestPage() {
             <Card className="group overflow-hidden border-slate-700 bg-gradient-to-r from-blue-900/30 via-purple-900/20 to-blue-900/30 hover:from-blue-900/50 hover:to-purple-900/50 transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/20">
               <CardContent className="p-6">
                 <Button
-                  onClick={handleStartCourse}
-                  className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-4 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 group"
+                  onClick={buttonConfig.action}
+                  className={`w-full ${buttonConfig.className} text-white font-semibold py-4 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 group`}
                 >
-                  <Play className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" />
-                  Start Course
+                  <buttonConfig.icon className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" />
+                  {buttonConfig.text}
                   <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </CardContent>
@@ -337,11 +465,14 @@ export default function CourseTestPage() {
           </div>
         </div>
 
-        {/* Industry Partners Section */}
+        {/* Hiring Partners Section */}
         <div className="mb-12">
           <h2 className="text-3xl font-bold text-white mb-8 text-center">
-            Industry Partners
+            Hiring Partners
           </h2>
+          <p className="text-gray-300 text-center mb-8 max-w-3xl mx-auto">
+            These employers actively hire professionals who complete our semiconductor training programs.
+          </p>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[
               {
@@ -484,11 +615,11 @@ export default function CourseTestPage() {
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button
-                  onClick={handleStartCourse}
-                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold px-8 py-3 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105"
+                  onClick={buttonConfig.action}
+                  className={`${buttonConfig.className} text-white font-semibold px-8 py-3 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105`}
                 >
-                  <Play className="w-5 h-5 mr-2" />
-                  Start Learning Now
+                  <buttonConfig.icon className="w-5 h-5 mr-2" />
+                  {buttonConfig.text} Now
                 </Button>
                 <Button
                   onClick={handleViewLessons}

@@ -35,6 +35,7 @@ import Image from 'next/image';
 
 interface MobileBottomNavProps {
   className?: string;
+  onToggleMessages?: () => void;
 }
 
 interface NavItem {
@@ -52,7 +53,7 @@ interface ProfileMenuItem {
   badge?: string;
 }
 
-export default function MobileBottomNav({ className }: MobileBottomNavProps) {
+export default function MobileBottomNav({ className, onToggleMessages }: MobileBottomNavProps) {
   const router = useRouter();
   const pathname = usePathname();
   const { theme, setTheme } = useTheme();
@@ -334,7 +335,13 @@ export default function MobileBottomNav({ className }: MobileBottomNavProps) {
                 key={item.title}
                 variant="ghost"
                 size="icon"
-                onClick={() => handleNavClick(item.href)}
+                onClick={() => {
+                  if (item.title === 'Messages' && onToggleMessages) {
+                    onToggleMessages();
+                  } else {
+                    handleNavClick(item.href);
+                  }
+                }}
                 className={cn(
                   "relative flex flex-col items-center justify-center h-12 w-12 p-1",
                   "transition-all duration-200 ease-out",

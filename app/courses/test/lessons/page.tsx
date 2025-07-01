@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
-import { Clock, BookOpen, Target, CheckCircle2, Play, ChevronDown, Zap, Trophy, FileCheck, Brain, Award, Star, X, RotateCcw, Eye } from 'lucide-react';
+import { Clock, BookOpen, Target, CheckCircle2, Play, ChevronDown, Zap, Trophy, FileCheck, Brain, Award, Star, X, RotateCcw, Eye, ArrowRight, ArrowDown, Timer, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
@@ -13,6 +13,22 @@ import { sampleCourse } from '@/data/microlesson/sampleConfig';
 export default function CourseLessonsPage() {
   const router = useRouter();
   const course = sampleCourse;
+  
+  // Calculate totals for header
+  const totalLessons = course.lessons.length;
+  const totalMicrolessons = course.lessons.reduce((total, lesson) => total + lesson.microlessons.length, 0);
+  const totalXP = totalMicrolessons * 50; // 50 XP per microlesson
+
+  const handleStartCourse = () => {
+    const lessonsSection = document.getElementById('lessons-list');
+    if (lessonsSection) {
+      lessonsSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  const handleViewCourseOverview = () => {
+    router.push('/courses/test');
+  };
   
   // Modal state for quiz results
   const [quizModal, setQuizModal] = useState<{
@@ -113,16 +129,71 @@ export default function CourseLessonsPage() {
 
   const isLessonQuizAvailable = (lessonId: string) => {
     const microlessons = getMicrolessonProgress(lessonId);
-    return microlessons.every(ml => ml.status === 'completed' && ml.quizCompleted);
+    // Only allow quiz if there are microlessons AND all are completed with quiz done
+    return microlessons.length > 0 && microlessons.every(ml => ml.status === 'completed' && ml.quizCompleted);
   };
 
   // Calculate overall progress (mock data)
-  const overallProgress = 35;
+  const overallProgress: number = 35;
+
+  // Course state logic - determines button appearance and behavior
+  type CourseState = 'not-started' | 'in-progress' | 'completed';
+  
+  // Mock course state based on overall progress - in real app this would come from user data/API
+  const getCourseState = (): CourseState => {
+    if (overallProgress <= 0) return 'not-started';
+    if (overallProgress >= 100) return 'completed';
+    return 'in-progress';
+  };
+  
+  const courseState = getCourseState();
+
+  const getCourseButtonConfig = () => {
+    const scrollAction = () => {
+      const lessonsSection = document.getElementById('lessons-list');
+      if (lessonsSection) {
+        lessonsSection.scrollIntoView({ behavior: 'smooth' });
+      }
+    };
+
+    switch (courseState) {
+      case 'not-started':
+        return {
+          text: 'Start Course',
+          icon: Play,
+          className: 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700',
+          action: scrollAction
+        };
+      case 'in-progress':
+        return {
+          text: 'Continue Course',
+          icon: Play,
+          className: 'bg-blue-600 hover:bg-blue-700',
+          action: scrollAction
+        };
+      case 'completed':
+        return {
+          text: 'Review Course',
+          icon: CheckCircle2,
+          className: 'bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700',
+          action: scrollAction
+        };
+      default:
+        return {
+          text: 'Start Course',
+          icon: Play,
+          className: 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700',
+          action: scrollAction
+        };
+    }
+  };
+
+  const buttonConfig = getCourseButtonConfig();
 
   return (
     <div className="min-h-screen bg-black">
-      {/* Large Hero Section - Restored */}
-      <div className="relative min-h-screen flex items-center justify-center overflow-hidden">
+      {/* Compact Hero Section */}
+      <div className="relative h-[60vh] flex items-center justify-center overflow-hidden">
         {/* Background Image */}
         <div className="absolute inset-0 z-0">
           <Image
@@ -137,91 +208,137 @@ export default function CourseLessonsPage() {
         </div>
 
         {/* Hero Content */}
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-          <div className="max-w-5xl">
+        <div className="relative z-10 container mx-auto px-4">
+          <div className="max-w-6xl">
             {/* Course Badge */}
             <motion.div
-              initial={{ opacity: 0, y: 30 }}
+              initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
-              className="flex items-center gap-3 sm:gap-6 mb-6 sm:mb-8"
+              className="flex items-center gap-3 mb-8"
             >
-              <div className="w-12 h-12 sm:w-16 sm:h-16 lg:w-20 lg:h-20 bg-white/10 backdrop-blur-md rounded-xl sm:rounded-2xl p-2 sm:p-3 lg:p-4 flex items-center justify-center border border-white/20">
-                <div className="text-sm sm:text-lg lg:text-xl font-bold text-white">SC</div>
-              </div>
-              <div className="flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 bg-blue-500/20 backdrop-blur-md text-blue-400 rounded-full text-xs sm:text-sm font-medium border border-blue-500/30">
-                <Target className="h-3 w-3 sm:h-4 sm:w-4" />
-                Course
+              <div className="relative w-20 h-20 md:w-24 md:h-24 rounded-2xl overflow-hidden shadow-2xl shadow-blue-500/25">
+                <Image
+                  src="https://images.unsplash.com/photo-1518186285589-2f7649de83e0?w=100&h=100&fit=crop&crop=center"
+                  alt="Course"
+                  fill
+                  className="object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-500/80 to-purple-600/80" />
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="text-white font-bold text-2xl md:text-3xl">SC</span>
+                </div>
               </div>
             </motion.div>
-
-            {/* Main Content */}
-            <motion.div
+            
+            {/* Title */}
+            <motion.h1
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
-              className="space-y-3 sm:space-y-4 md:space-y-6"
+              className="text-3xl md:text-5xl lg:text-6xl font-bold mb-4 leading-tight"
             >
-              <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-light text-white leading-tight">
-                Basics of
-                <br />
-                <span className="font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-                  Semiconductor
-                </span>
-              </h1>
-              
-              <div className="space-y-4">
-                <p className="text-base sm:text-lg md:text-xl font-light text-gray-200 max-w-3xl">
-                  Master the fundamentals of semiconductor manufacturing and clean room operations
-                </p>
-                <p className="text-sm sm:text-base md:text-lg text-gray-300 max-w-2xl">
-                  Essential lessons and microlessons in semiconductor manufacturing technology
-                </p>
-              </div>
+              <span className="bg-gradient-to-r from-white via-blue-100 to-purple-100 bg-clip-text text-transparent">
+                Basics of{" "}
+              </span>
+              <span className="bg-gradient-to-r from-blue-400 via-purple-400 to-blue-300 bg-clip-text text-transparent">
+                Semiconductor
+              </span>
+            </motion.h1>
+            
+            {/* Description */}
+            <motion.p
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.4 }}
+              className="text-lg md:text-xl text-gray-300 leading-relaxed max-w-4xl mb-6"
+            >
+              {course.description}
+            </motion.p>
 
-              {/* Course Meta Info */}
-              <div className="flex flex-col sm:flex-row gap-4 sm:gap-8 pt-4">
-                <div className="flex items-center gap-3">
-                  <Clock className="h-6 w-6 text-green-400" />
-                  <span className="text-lg font-semibold text-white">6 weeks</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <BookOpen className="h-6 w-6 text-blue-400" />
-                  <span className="text-lg text-gray-300">{course.lessons.length} Lessons</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Award className="h-6 w-6 text-purple-400" />
-                  <span className="text-lg text-gray-300">Course Certificate</span>
-                </div>
+            {/* Course Meta */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.6 }}
+              className="flex flex-wrap items-center gap-6 text-gray-300 mb-8"
+            >
+              <div className="flex items-center gap-3 bg-black/30 backdrop-blur-sm px-6 py-3 rounded-full">
+                <Clock className="w-6 h-6 text-blue-400" />
+                <span className="text-lg font-medium">{course.duration}</span>
               </div>
-
-              {/* CTA Buttons */}
-              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 md:gap-6 pt-6 sm:pt-8">
-                <Button 
-                  size="lg"
-                  className="px-4 sm:px-6 md:px-8 py-2.5 sm:py-3 md:py-4 bg-white text-black font-semibold rounded-lg hover:bg-gray-100 transition-all duration-300 transform hover:scale-105 text-center text-sm sm:text-base"
-                >
-                  <Zap className="w-5 h-5 mr-3" />
-                  Continue Learning
-                </Button>
-                <Button 
-                  variant="outline"
-                  className="flex items-center justify-center gap-2 sm:gap-3 px-4 sm:px-6 md:px-8 py-2.5 sm:py-3 md:py-4 border border-white/30 text-white rounded-lg hover:bg-white/10 transition-all duration-300 backdrop-blur-md text-sm sm:text-base"
-                >
-                  <Eye className="h-4 w-4 md:h-5 md:w-5" />
-                  Course Overview
-                </Button>
+              <div className="flex items-center gap-3 bg-black/30 backdrop-blur-sm px-6 py-3 rounded-full">
+                <BookOpen className="w-6 h-6 text-purple-400" />
+                <span className="text-lg font-medium">{totalLessons} Lessons</span>
+              </div>
+              <div className="flex items-center gap-3 bg-black/30 backdrop-blur-sm px-6 py-3 rounded-full">
+                <Target className="w-6 h-6 text-green-400" />
+                <span className="text-lg font-medium">{totalMicrolessons} Microlessons</span>
+              </div>
+              <div className="flex items-center gap-3 bg-black/30 backdrop-blur-sm px-6 py-3 rounded-full">
+                <Star className="w-6 h-6 text-yellow-400" />
+                <span className="text-lg font-medium">{totalXP} XP</span>
               </div>
             </motion.div>
+
+            {/* CTA Button */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.8 }}
+              className="flex justify-start"
+            >
+              <Button
+                onClick={buttonConfig.action}
+                className={`${buttonConfig.className} text-white font-bold px-12 py-6 text-lg rounded-2xl transition-all duration-300 shadow-2xl hover:scale-105 group`}
+              >
+                <buttonConfig.icon className="w-6 h-6 mr-3 group-hover:scale-110 transition-transform" />
+                {buttonConfig.text}
+                <ArrowDown className="w-6 h-6 ml-3 group-hover:translate-y-1 transition-transform" />
+              </Button>
+            </motion.div>
+          </div>
+        </div>
+
+        {/* Decorative Elements */}
+        <div className="absolute top-20 right-20 w-32 h-32 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-full blur-3xl" />
+        <div className="absolute bottom-20 left-20 w-40 h-40 bg-gradient-to-r from-purple-500/20 to-blue-500/20 rounded-full blur-3xl" />
+      </div>
+
+      {/* Course Progress Section */}
+      <div className="relative bg-black/50 border-b border-white/10 mx-4 md:mx-8 my-4 rounded-2xl">
+        <div className="container mx-auto px-4 py-6">
+          <div className="max-w-4xl">
+            <div className="text-left mb-4">
+              <h3 className="text-xl font-bold text-white mb-1">Course Progress</h3>
+              <p className="text-gray-400 text-sm">Complete all lessons to earn your certificate</p>
+            </div>
+            
+            <div className="bg-gray-900/50 backdrop-blur-sm rounded-2xl p-4 border border-white/10">
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-white font-medium">Overall Progress</span>
+                <span className="text-blue-400 font-bold">{overallProgress}% Complete</span>
+              </div>
+              <div className="relative h-4 bg-gray-800/50 rounded-full overflow-hidden">
+                <div 
+                  className="absolute top-0 left-0 h-full bg-gradient-to-r from-blue-500 to-purple-600 transition-all duration-1000 rounded-full"
+                  style={{ width: `${overallProgress}%` }}
+                />
+              </div>
+              <div className="flex items-center justify-between mt-4 text-sm text-gray-400">
+                <span>1 of {totalLessons} lessons completed</span>
+                <span>{Math.round((overallProgress / 100) * totalXP)} / {totalXP} XP earned</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
       {/* Main Content Section - Condensed Lessons */}
-      <div className="relative bg-gradient-to-br from-gray-950 via-blue-950/20 to-purple-950/20">
-        <div className="container mx-auto px-4 py-8">
+      <div id="lessons-list" className="relative bg-gradient-to-br from-gray-950 via-blue-950/20 to-purple-950/20">
+        <div className="container mx-auto px-4 py-6">
           {/* Lessons List */}
-          <div className="space-y-4">
+          <div className="space-y-3">
             {course.lessons.map((lesson, index) => {
               // Use the new progress tracking system
               const lessonProgress = getLessonProgress(lesson.id);
@@ -245,12 +362,12 @@ export default function CourseLessonsPage() {
                           <div className="relative flex-shrink-0">
                             <div className={
                               lessonProgress === 'completed' 
-                                ? 'w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg transition-all duration-500 bg-gradient-to-br from-emerald-500 to-green-600 shadow-green-500/20'
+                                ? 'w-20 h-16 rounded-2xl flex items-center justify-center shadow-lg transition-all duration-500 bg-gradient-to-br from-emerald-500 to-green-600 shadow-green-500/20'
                                 : lessonProgress === 'in-progress'
-                                ? 'w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg transition-all duration-500 bg-gradient-to-br from-blue-500 to-purple-600 shadow-blue-500/20'
-                                : 'w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg transition-all duration-500 bg-gradient-to-br from-gray-600 to-gray-700 shadow-gray-600/10'
+                                ? 'w-20 h-16 rounded-2xl flex items-center justify-center shadow-lg transition-all duration-500 bg-gradient-to-br from-blue-500 to-purple-600 shadow-blue-500/20'
+                                : 'w-20 h-16 rounded-2xl flex items-center justify-center shadow-lg transition-all duration-500 bg-gradient-to-br from-gray-600 to-gray-700 shadow-gray-600/10'
                             }>
-                              <span className="text-xl font-bold text-white">{index + 1}</span>
+                              <span className="text-sm font-bold text-white">Lesson {index + 1}</span>
                             </div>
                             
                             {/* Status Indicator */}
@@ -264,7 +381,7 @@ export default function CourseLessonsPage() {
                               {lessonProgress === 'completed' ? (
                                 <CheckCircle2 className="w-2.5 h-2.5 text-white" />
                               ) : lessonProgress === 'in-progress' ? (
-                                <Play className="w-2.5 h-2.5 text-white" />
+                                <Timer className="w-2.5 h-2.5 text-white" />
                               ) : (
                                 <div className="w-1.5 h-1.5 bg-white rounded-full" />
                               )}
@@ -366,13 +483,20 @@ export default function CourseLessonsPage() {
                                 variant="outline"
                                 size="sm"
                                 onClick={() => handleReviewAssessment('lesson', lesson.id)}
-                                className="px-3 py-2 border-purple-500/50 text-purple-400 hover:bg-purple-400/10 hover:border-purple-400 transition-all duration-300 rounded-full text-xs"
+                                disabled={lessonProgress !== 'completed'}
+                                className={
+                                  lessonProgress === 'completed'
+                                    ? 'px-3 py-2 border-purple-500/50 text-purple-400 hover:bg-purple-400/10 hover:border-purple-400 transition-all duration-300 rounded-full text-xs'
+                                    : 'px-3 py-2 border-gray-600/50 text-gray-500 cursor-not-allowed transition-all duration-300 rounded-full text-xs'
+                                }
                               >
                                 <FileCheck className="w-3 h-3 mr-1" />
                                 Review
-                                <Badge variant="secondary" className="ml-1 bg-yellow-500/20 text-yellow-400 text-xs">
-                                  +10 XP
-                                </Badge>
+                                {lessonProgress === 'completed' && (
+                                  <Badge variant="secondary" className="ml-1 bg-yellow-500/20 text-yellow-400 text-xs">
+                                    +10 XP
+                                  </Badge>
+                                )}
                               </Button>
 
                               {/* Quiz Button */}
@@ -421,13 +545,13 @@ export default function CourseLessonsPage() {
                                                 microlesson.status === 'completed' 
                                                   ? 'w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 bg-emerald-500'
                                                   : microlesson.status === 'in-progress'
-                                                  ? 'w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 bg-gradient-to-r from-yellow-500 to-orange-600'
+                                                  ? 'w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 bg-gradient-to-r from-blue-500 to-purple-600'
                                                   : 'w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 bg-gray-600'
                                               }>
                                                 {microlesson.status === 'completed' ? (
                                                   <CheckCircle2 className="w-4 h-4 text-white" />
                                                 ) : microlesson.status === 'in-progress' ? (
-                                                  <Play className="w-4 h-4 text-white" />
+                                                  <Timer className="w-4 h-4 text-white" />
                                                 ) : (
                                                   <BookOpen className="w-4 h-4 text-white" />
                                                 )}
@@ -479,15 +603,22 @@ export default function CourseLessonsPage() {
 
                                               {/* Review Button */}
                                               <Button
-                                                variant="outline"
+                                                variant="outline" 
                                                 size="sm"
                                                 onClick={() => handleReviewAssessment('microlesson', microlesson.id)}
-                                                className="px-2 py-1.5 border-purple-500/50 text-purple-400 hover:bg-purple-400/10 hover:border-purple-400 transition-all duration-300 rounded-lg text-xs"
+                                                disabled={microlesson.status !== 'completed'}
+                                                className={
+                                                  microlesson.status === 'completed'
+                                                    ? 'px-2 py-1.5 border-purple-500/50 text-purple-400 hover:bg-purple-400/10 hover:border-purple-400 transition-all duration-300 rounded-lg text-xs'
+                                                    : 'px-2 py-1.5 border-gray-600/50 text-gray-500 cursor-not-allowed transition-all duration-300 rounded-lg text-xs'
+                                                }
                                               >
                                                 Review
-                                                <Badge variant="secondary" className="ml-1 bg-yellow-500/20 text-yellow-400 text-xs">
-                                                  +10
-                                                </Badge>
+                                                {microlesson.status === 'completed' && (
+                                                  <Badge variant="secondary" className="ml-1 bg-yellow-500/20 text-yellow-400 text-xs">
+                                                    +10
+                                                  </Badge>
+                                                )}
                                               </Button>
 
                                               {/* Quiz Button */}
