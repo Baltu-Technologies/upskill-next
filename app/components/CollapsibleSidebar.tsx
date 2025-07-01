@@ -28,7 +28,9 @@ import {
   Clock,
   Star,
   Gamepad2,
-  Play
+  Play,
+  Building2,
+  UserCheck
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTheme } from '../contexts/ThemeContext';
@@ -446,6 +448,58 @@ export default function CollapsibleSidebar({ isCollapsed, onToggle }: SidebarPro
           href: '/courses/test/progress'
         }
       ]
+    },
+    
+    // Employer Access - For employers to create profiles and manage pipeline
+    {
+      title: 'Employer Access',
+      icon: Building2,
+      color: 'text-indigo-600',
+      href: '/employer-access',
+      submenu: [
+        {
+          title: 'Dashboard',
+          href: '/employer-access'
+        },
+        {
+          title: 'Create Profile',
+          href: '/employer-access/profile'
+        },
+        {
+          title: 'Manage Pipeline',
+          href: '/employer-access/pipeline'
+        },
+        {
+          title: 'Analytics',
+          href: '/employer-access/analytics'
+        }
+      ]
+    },
+    
+    // Guide Access - For teachers, instructors, case managers
+    {
+      title: 'Guide Access',
+      icon: UserCheck,
+      color: 'text-emerald-600',
+      href: '/guide-access',
+      submenu: [
+        {
+          title: 'Dashboard',
+          href: '/guide-access'
+        },
+        {
+          title: 'Invite Learners',
+          href: '/guide-access/invite'
+        },
+        {
+          title: 'Monitor Progress',
+          href: '/guide-access/progress'
+        },
+        {
+          title: 'Manage Groups',
+          href: '/guide-access/groups'
+        }
+      ]
     }
   ];
 
@@ -514,6 +568,16 @@ export default function CollapsibleSidebar({ isCollapsed, onToggle }: SidebarPro
     // Course Test pages
     if (pathname.startsWith('/courses/test')) {
       newExpandedMenus.add('Course Test');
+    }
+    
+    // Employer Access pages
+    if (pathname.startsWith('/employer-access')) {
+      newExpandedMenus.add('Employer Access');
+    }
+    
+    // Guide Access pages
+    if (pathname.startsWith('/guide-access')) {
+      newExpandedMenus.add('Guide Access');
     }
     
     setExpandedMenus(newExpandedMenus);
