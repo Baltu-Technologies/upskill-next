@@ -6,6 +6,12 @@
 .pnp.js
 /.yarn/install-state.gz
 
+# ┌─ Amplify backend dependencies (AWS best practice) ─────────────────────────
+amplify/**/node_modules/
+amplify/package-lock.json
+amplify/yarn.lock
+amplify/pnpm-lock.yaml
+
 # ┌─ Build outputs ─────────────────────────────────────────────────────────────
 /.next/
 /out/

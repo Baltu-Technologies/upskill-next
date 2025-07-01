@@ -1,0 +1,17 @@
+{
+  "name": "amplify-backend",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "tsc && node --loader tsx/esm --experimental-specifier-resolution=node dist/backend.js",
+    "sandbox": "npx ampx sandbox"
+  },
+  "devDependencies": {
+    "@aws-amplify/backend": "^1.5.1",
+    "@aws-amplify/backend-cli": "^1.2.4",
+    "aws-cdk-lib": "^2.38.0",
+    "constructs": "^10.3.0",
+    "typescript": "^5.0.0",
+    "tsx": "^4.0.0"
+  }
+} 
