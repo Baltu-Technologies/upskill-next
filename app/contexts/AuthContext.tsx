@@ -1,7 +1,7 @@
 'use client';
 
 import { createContext, useContext, useEffect, useState, useCallback } from 'react';
-import { authClient } from '@/auth-client';
+// import { authClient } from '@/auth-client'; // Temporarily commented out
 
 interface AuthContextType {
   user: any;
@@ -26,11 +26,29 @@ const AuthContext = createContext<AuthContextType>({
 });
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<any>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  // TEMPORARILY DISABLED AUTHENTICATION
+  // Mock user data for development
+  const mockUser = {
+    id: 'mock-user-id',
+    email: 'dev@example.com',
+    name: 'Development User',
+    role: 'user',
+    firstName: 'Dev',
+    lastName: 'User'
+  };
+
+  const [user, setUser] = useState<any>(mockUser); // Set mock user by default
+  const [isLoading, setIsLoading] = useState(false); // Set to false since we have a mock user
   const [error, setError] = useState<string | null>(null);
 
   const checkUser = useCallback(async () => {
+    // TEMPORARILY DISABLED - Return mock user immediately
+    console.log('🔓 Authentication temporarily disabled - using mock user');
+    setUser(mockUser);
+    setIsLoading(false);
+    setError(null);
+    
+    /* Original auth code commented out:
     try {
       setIsLoading(true);
       setError(null);
@@ -50,6 +68,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } finally {
       setIsLoading(false);
     }
+    */
   }, []);
 
   useEffect(() => {
@@ -57,22 +76,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [checkUser]);
 
   const handleSignOut = useCallback(async () => {
-    try {
-      setError(null);
-      await authClient.signOut();
-      setUser(null);
-    } catch (error: any) {
-      console.error('Error signing out:', error);
-      setError(error.message || 'Failed to sign out');
-    }
+    // TEMPORARILY DISABLED - Just log the action
+    console.log('🔓 Sign out requested but authentication is disabled');
+    // setUser(null); // Commented out to keep mock user
   }, []);
 
   const showAuthModal = useCallback(() => {
-    console.log("showAuthModal called - Better Auth modal integration needed");
+    console.log("🔓 Auth modal requested but authentication is disabled");
   }, []);
 
   const hideAuthModal = useCallback(() => {
-    console.log("hideAuthModal called - Better Auth modal integration needed");
+    console.log("🔓 Hide auth modal requested but authentication is disabled");
   }, []);
 
   return (
@@ -80,7 +94,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       user, 
       isLoading, 
       error,
-      isAuthenticated: !isLoading && !!user,
+      isAuthenticated: true, // Always return true since we have a mock user
       signOut: handleSignOut,
       refreshUser: checkUser,
       showAuthModal,
