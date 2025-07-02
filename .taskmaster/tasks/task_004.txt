@@ -1,0 +1,11 @@
+# Task ID: 4
+# Title: Configure RDS Proxy for Authentication Database
+# Status: pending
+# Dependencies: 3
+# Priority: high
+# Description: Set up RDS Proxy for connection pooling and security for the auth Aurora cluster
+# Details:
+Use CDK DatabaseProxy construct to create RDS Proxy for Aurora Serverless v2. Configure connection pooling with max connections, security groups, and IAM authentication. Set connectionBorrowTimeout to 5 seconds. Configure proxy in private subnets with proper target group settings.
+
+# Test Strategy:
+Test proxy endpoint connectivity, connection pooling behavior, and IAM authentication. Verify timeout settings and connection management under load.

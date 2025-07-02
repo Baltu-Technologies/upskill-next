@@ -1,0 +1,11 @@
+# Task ID: 2
+# Title: Configure VPC and Networking Infrastructure
+# Status: pending
+# Dependencies: 1
+# Priority: high
+# Description: Define and deploy VPC with public/private subnets and NAT Gateway for secure cloud networking
+# Details:
+Use CDK VPC construct to create a VPC with public and private subnets across multiple AZs. Configure NAT Gateway for private subnet internet access. Set up route tables, internet gateway, and security groups. Ensure public subnets allow Next.js dev connections from internet while private subnets secure Lambda and database access. Use aws-ec2 v2.x constructs.
+
+# Test Strategy:
+Deploy VPC stack and verify subnet configurations, NAT Gateway functionality, and route tables. Test connectivity from both public and private subnets. Validate security group rules.

@@ -1,0 +1,171 @@
+# Backend Infrastructure Setup - Product Requirements Document
+
+## Project Overview
+
+Transform the Upskill platform's backend infrastructure to use cloud-native AWS services with Amplify Gen 2, moving from local development dependencies to a robust, scalable cloud architecture.
+
+## Current State
+
+- Using Aurora PostgreSQL instance only for BetterAuth user authentication
+- Limited to basic authentication functionality
+- Missing course management database infrastructure
+- Missing high-velocity data storage for real-time features
+
+## Target Architecture
+
+### Database Infrastructure
+
+**Auth Database**: Aurora PostgreSQL Serverless v2 (1-4 ACU) behind RDS Proxy
+
+- Purpose: Handle user authentication and sessions via BetterAuth
+- Scaling: Auto-scales to zero when inactive, handles connection bursts
+- Access: Via RDS Proxy for connection pooling and security
+
+**Course Database**: Aurora PostgreSQL provisioned (db.t4g.small) with read replica + RDS Proxy
+
+- Purpose: Store course content, lessons, microlessons, progress tracking
+- Configuration: Dedicated writer/reader instances for performance tuning
+- Access: Via RDS Proxy with separate endpoints for read/write operations
+
+**High-Velocity Tables**: DynamoDB On-Demand mode
+
+- Purpose: Real-time features like notifications, activity streams, analytics
+- Scaling: Pay-per-request with automatic scaling
+- Access: Direct AWS SDK v3 client connections
+
+### Security & Secrets Management
+
+**AWS Secrets Manager**: Centralized credential storage
+
+- Store database connection strings and API keys
+- Automatic rotation capabilities
+- Runtime injection into Amplify environment
+- No credentials in code or .env files
+
+### Networking
+
+**VPC Configuration**: Public + private subnets
+
+- Public subnets: Allow Next.js dev connections from internet
+- Private subnets: Secure Lambda functions and database access
+- NAT Gateway: Enable private subnet internet access for updates
+
+## Technical Implementation
+
+### CDK Infrastructure (amplify/backend.ts)
+
+- DatabaseCluster constructs for Aurora instances
+- DatabaseProxy constructs for RDS Proxy configuration
+- Table constructs for DynamoDB tables
+- VPC and networking setup
+- Secrets Manager integration
+
+### Application Integration
+
+**BetterAuth Configuration**:
+- Use pg.Pool connecting to RDS Proxy
+- adapter: 'postgresql'
+- connectionString: process.env.AUTH_DB_URL
+- max: 10 connections
+- idleTimeoutMillis: 5_000
+
+**Kysely Database Client**:
+- PostgresDialect with RDS Proxy connection
+- connectionString: process.env.COURSE_DB_URL
+- Connection pooling for course data operations
+
+**DynamoDB Client**:
+- AWS SDK v3 DynamoDBDocumentClient
+- region: process.env.AWS_REGION
+- Direct table access for high-velocity operations
+
+### DevOps Pipeline (amplify.yml)
+
+- Backend deployment via amplify push
+- Automated database migrations
+- Connection testing in postBuild phase
+- Efficient caching strategy for node_modules
+
+### Security Features
+
+- IAM DB Authentication for service connections
+- RDS Proxy connection tuning (5s timeout)
+- DynamoDB Point-in-Time Recovery
+- Encrypted secrets with versioning
+
+### Developer Experience
+
+- Direct RDS Proxy connections during next dev
+- Database migrations via npm run setup-db
+- Hot-reload compatibility with persistent connections
+- Cloud-first development (no local databases)
+
+## Implementation Phases
+
+### Phase 1: Infrastructure Foundation
+
+- Set up CDK constructs for Aurora clusters
+- Configure RDS Proxies for both databases
+- Create DynamoDB tables for high-velocity data
+- Establish VPC and networking
+
+### Phase 2: Secrets & Security
+
+- Configure AWS Secrets Manager
+- Set up IAM roles and policies
+- Implement secure connection patterns
+- Configure Amplify environment variables
+
+### Phase 3: Application Integration
+
+- Update BetterAuth to use new Aurora setup
+- Implement Kysely for course database operations
+- Set up DynamoDB client for real-time features
+- Test all database connections
+
+### Phase 4: DevOps & Deployment
+
+- Configure amplify.yml for backend deployment
+- Set up automated testing and validation
+- Implement database migration scripts
+- Optimize build and deployment pipeline
+
+### Phase 5: Monitoring & Optimization
+
+- Set up CloudWatch monitoring
+- Configure performance metrics
+- Implement backup and recovery procedures
+- Optimize connection pooling and performance
+
+## Success Criteria
+
+1. Infrastructure: Aurora clusters, RDS Proxies, and DynamoDB tables deployed
+2. Security: All credentials managed via Secrets Manager
+3. Integration: BetterAuth and Kysely working with new infrastructure
+4. Performance: Sub-100ms database response times
+5. Reliability: 99.9% uptime with automatic scaling
+6. Developer Experience: Seamless next dev with cloud databases
+7. Deployment: Automated CI/CD with amplify push
+
+## Constraints
+
+- No frontend changes: Backend-only implementation
+- Maintain compatibility: Existing BetterAuth functionality must continue working
+- Cloud-first: No local database dependencies
+- Security-first: All connections via RDS Proxy and IAM authentication where possible
+
+## Technology Stack
+
+- Infrastructure: AWS CDK with Amplify Gen 2
+- Databases: Aurora PostgreSQL Serverless v2 + Provisioned, DynamoDB
+- Security: AWS Secrets Manager, IAM, RDS Proxy
+- Application: Next.js, BetterAuth, Kysely, AWS SDK v3
+- DevOps: Amplify Console, CloudWatch
+
+## Timeline
+
+Target completion: 2-3 weeks
+
+- Week 1: Infrastructure setup and CDK implementation
+- Week 2: Application integration and testing
+- Week 3: DevOps pipeline and optimization

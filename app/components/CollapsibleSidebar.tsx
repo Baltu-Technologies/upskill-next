@@ -532,6 +532,7 @@ export default function CollapsibleSidebar({ isCollapsed, onToggle }: SidebarPro
 
   // Function to check if a main nav item is active
   const isMainNavItemActive = (item: NavItem): boolean => {
+    if (!pathname) return false;
     if (item.href === '/') {
       // Home route should be active for both "/" and "/dashboard" since authenticated users get redirected
       return pathname === '/' || pathname === '/dashboard';
@@ -572,6 +573,8 @@ export default function CollapsibleSidebar({ isCollapsed, onToggle }: SidebarPro
 
   // Auto-expand relevant menus based on current page
   useEffect(() => {
+    if (!pathname) return;
+    
     const newExpandedMenus = new Set<string>();
     
     // Profile-related pages - now includes career exploration

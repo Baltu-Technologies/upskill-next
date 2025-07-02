@@ -1,0 +1,11 @@
+# Task ID: 13
+# Title: Configure Amplify Environment Variables and Secrets
+# Status: pending
+# Dependencies: 8, 9
+# Priority: high
+# Description: Set up Amplify environment variable injection from Secrets Manager
+# Details:
+Configure Amplify Console environment variables for database URLs (AUTH_DB_URL, COURSE_DB_URL), AWS_REGION, and other runtime configuration. Link secrets from Secrets Manager to Amplify environment. Ensure runtime-only injection to prevent exposure in client bundles.
+
+# Test Strategy:
+Verify environment variable injection in both development and production. Test secret access and application startup. Validate that sensitive data is not exposed in client-side code.

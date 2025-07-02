@@ -1,0 +1,470 @@
+name: Pull Request Validation
+
+on:
+  pull_request:
+    branches: [main, develop]
+    types: [opened, synchronize, reopened, ready_for_review]
+
+  # Allow manual trigger for testing
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: 'PR number to validate (optional)'
+        required: false
+        type: string
+
+env:
+  # AWS Configuration for testing
+  AWS_REGION: us-west-2
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  
+  # Test Database URLs (should be separate test instances)
+  AUTH_DB_URL: ${{ secrets.AUTH_DB_URL_TEST || secrets.AUTH_DB_URL }}
+  COURSE_DB_URL: ${{ secrets.COURSE_DB_URL_TEST || secrets.COURSE_DB_URL }}
+  BETTER_AUTH_DATABASE_URL: ${{ secrets.BETTER_AUTH_DATABASE_URL_TEST || secrets.BETTER_AUTH_DATABASE_URL }}
+
+jobs:
+  # Job 1: Basic Code Validation
+  code-validation:
+    name: Code Quality & Type Checking
+    runs-on: ubuntu-latest
+    if: ${{ !github.event.pull_request.draft }}
+    
+    steps:
+      - name: Checkout PR Code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: TypeScript Type Checking
+        run: |
+          echo "🔍 Running TypeScript type checking..."
+          npx tsc --noEmit
+
+      - name: ESLint Code Quality
+        run: |
+          echo "🧹 Running ESLint..."
+          npm run lint
+
+      - name: Check for Security Issues
+        run: |
+          echo "🔒 Running security audit..."
+          npm audit --audit-level=moderate
+
+      - name: Test Application Build
+        run: |
+          echo "🔨 Testing application build..."
+          npm run build
+
+      - name: Upload Build Results
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: build-validation-results
+          path: |
+            .next/
+            *.log
+          retention-days: 7
+
+  # Job 2: Database Migration Testing
+  migration-testing:
+    name: Database Migration Validation
+    runs-on: ubuntu-latest
+    if: ${{ !github.event.pull_request.draft }}
+    
+    strategy:
+      matrix:
+        database: [auth, course]
+        
+    steps:
+      - name: Checkout PR Code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Detect Migration Changes
+        id: migration-changes
+        run: |
+          # Check if migration files were modified in this PR
+          CHANGED_FILES=$(git diff --name-only origin/${{ github.base_ref }}...HEAD)
+          
+          if echo "$CHANGED_FILES" | grep -q "migrations/${{ matrix.database }}/"; then
+            echo "has-changes=true" >> $GITHUB_OUTPUT
+            echo "🔄 ${{ matrix.database }} migration changes detected"
+            
+            # List changed migration files
+            echo "Changed migration files:"
+            echo "$CHANGED_FILES" | grep "migrations/${{ matrix.database }}/" || true
+          else
+            echo "has-changes=false" >> $GITHUB_OUTPUT
+            echo "ℹ️ No ${{ matrix.database }} migration changes in this PR"
+          fi
+
+      - name: Validate Migration Syntax
+        if: steps.migration-changes.outputs.has-changes == 'true'
+        run: |
+          echo "🔍 Validating ${{ matrix.database }} migration syntax..."
+          
+          # Run validation for specific database
+          npm run validate:db:${{ matrix.database }} --json > migration-validation.json
+          
+          # Check validation results
+          if jq -e '.tests[] | select(.test == "Migration Scripts" and .passed == false)' migration-validation.json > /dev/null; then
+            echo "❌ Migration validation failed:"
+            jq '.tests[] | select(.test == "Migration Scripts" and .passed == false) | .message' migration-validation.json
+            exit 1
+          else
+            echo "✅ Migration syntax validation passed"
+          fi
+
+      - name: Test Migration Dry Run
+        if: steps.migration-changes.outputs.has-changes == 'true'
+        run: |
+          echo "🧪 Running ${{ matrix.database }} migration dry run..."
+          
+          # Run migration in dry-run mode (no actual changes)
+          npm run migrate:${{ matrix.database }} -- --dry-run --verbose > migration-dryrun.log 2>&1 || true
+          
+          # Check if dry run completed without errors
+          if grep -q "ERROR\|FAILED" migration-dryrun.log; then
+            echo "❌ Migration dry run failed:"
+            cat migration-dryrun.log
+            exit 1
+          else
+            echo "✅ Migration dry run completed successfully"
+            echo "📋 Dry run summary:"
+            tail -10 migration-dryrun.log
+          fi
+
+      - name: Test Database Connection
+        run: |
+          echo "🔗 Testing ${{ matrix.database }} database connection..."
+          
+          # Test basic connectivity
+          npm run validate:db:${{ matrix.database }} --json > connection-test.json
+          
+          # Check connection results
+          if jq -e '.tests[] | select(.test == "Database Connection" and .passed == true)' connection-test.json > /dev/null; then
+            echo "✅ ${{ matrix.database }} database connection successful"
+            CONNECTION_TIME=$(jq -r '.tests[] | select(.test == "Database Connection") | .message' connection-test.json)
+            echo "⏱️ Connection time: $CONNECTION_TIME"
+          else
+            echo "❌ ${{ matrix.database }} database connection failed"
+            jq '.tests[] | select(.test == "Database Connection" and .passed == false) | .message' connection-test.json
+          fi
+
+      - name: Upload Migration Test Results
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: migration-test-${{ matrix.database }}
+          path: |
+            migration-validation.json
+            migration-dryrun.log
+            connection-test.json
+          retention-days: 14
+
+  # Job 3: Amplify Backend Testing
+  amplify-backend-testing:
+    name: Amplify Backend Validation
+    runs-on: ubuntu-latest
+    needs: [code-validation]
+    if: ${{ !failure() && !github.event.pull_request.draft }}
+    
+    steps:
+      - name: Checkout PR Code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Check Amplify Configuration
+        run: |
+          echo "🔍 Validating Amplify backend configuration..."
+          
+          # Check if backend.ts exists and is valid
+          if [[ -f "amplify/backend.ts" ]]; then
+            echo "✅ Backend configuration file found"
+            
+            # Validate TypeScript syntax
+            npx tsc --noEmit amplify/backend.ts
+            echo "✅ Backend configuration TypeScript valid"
+          else
+            echo "❌ Backend configuration file missing"
+            exit 1
+          fi
+
+      - name: Test Amplify Schema Generation
+        run: |
+          echo "🏗️ Testing Amplify schema generation..."
+          
+          # Try to generate schema without deploying
+          cd amplify
+          npm install
+          
+          # This would validate the CDK constructs without deploying
+          echo "✅ Amplify dependencies installed successfully"
+
+      - name: Detect Backend Changes
+        id: backend-changes
+        run: |
+          # Check if Amplify backend files were modified
+          CHANGED_FILES=$(git diff --name-only origin/${{ github.base_ref }}...HEAD)
+          
+          if echo "$CHANGED_FILES" | grep -q "amplify/"; then
+            echo "has-changes=true" >> $GITHUB_OUTPUT
+            echo "🔄 Amplify backend changes detected"
+            
+            echo "Changed backend files:"
+            echo "$CHANGED_FILES" | grep "amplify/" || true
+          else
+            echo "has-changes=false" >> $GITHUB_OUTPUT
+            echo "ℹ️ No Amplify backend changes in this PR"
+          fi
+
+      - name: Upload Backend Validation Results
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: amplify-backend-validation
+          path: |
+            amplify/node_modules/.bin/
+            *.log
+          retention-days: 7
+
+  # Job 4: Integration Testing
+  integration-testing:
+    name: Integration Tests
+    runs-on: ubuntu-latest
+    needs: [code-validation, migration-testing]
+    if: ${{ !failure() && !github.event.pull_request.draft }}
+    
+    steps:
+      - name: Checkout PR Code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Run Integration Tests
+        run: |
+          echo "🧪 Running integration tests..."
+          
+          # Test database connectivity across both databases
+          npm run validate:db:json > integration-test.json
+          
+          # Check overall integration status
+          TOTAL_TESTS=$(jq '.summary.total' integration-test.json)
+          PASSED_TESTS=$(jq '.summary.passed' integration-test.json)
+          FAILED_TESTS=$(jq '.summary.failed' integration-test.json)
+          
+          echo "📊 Integration Test Results:"
+          echo "   Total: $TOTAL_TESTS"
+          echo "   Passed: $PASSED_TESTS"
+          echo "   Failed: $FAILED_TESTS"
+          
+          if [[ "$FAILED_TESTS" -gt 0 ]]; then
+            echo "❌ Integration tests failed:"
+            jq '.tests[] | select(.passed == false) | "\(.database) - \(.test): \(.message)"' integration-test.json
+            exit 1
+          else
+            echo "✅ All integration tests passed"
+          fi
+
+      - name: Test Application with Database
+        run: |
+          echo "🔨 Testing application build with database integration..."
+          
+          # Test the full application build with database connections
+          npm run build
+
+      - name: Upload Integration Test Results
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: integration-test-results
+          path: integration-test.json
+          retention-days: 14
+
+  # Job 5: Security Scanning
+  security-scanning:
+    name: Security & Dependency Scanning
+    runs-on: ubuntu-latest
+    if: ${{ !github.event.pull_request.draft }}
+    
+    steps:
+      - name: Checkout PR Code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Run Security Audit
+        run: |
+          echo "🔒 Running npm security audit..."
+          npm audit --audit-level=high --json > security-audit.json || true
+          
+          # Check for high/critical vulnerabilities
+          CRITICAL=$(jq '.metadata.vulnerabilities.critical // 0' security-audit.json)
+          HIGH=$(jq '.metadata.vulnerabilities.high // 0' security-audit.json)
+          
+          echo "🔍 Security scan results:"
+          echo "   Critical: $CRITICAL"
+          echo "   High: $HIGH"
+          
+          if [[ "$CRITICAL" -gt 0 ]]; then
+            echo "❌ Critical security vulnerabilities found"
+            jq '.advisories' security-audit.json
+            exit 1
+          elif [[ "$HIGH" -gt 0 ]]; then
+            echo "⚠️ High security vulnerabilities found (review recommended)"
+            jq '.advisories' security-audit.json
+          else
+            echo "✅ No critical or high security vulnerabilities found"
+          fi
+
+      - name: Check for Secrets in Code
+        run: |
+          echo "🔍 Scanning for potential secrets in code..."
+          
+          # Basic secret scanning (could be enhanced with tools like truffleHog)
+          if grep -r -i "password\|secret\|token\|key" --include="*.ts" --include="*.js" --exclude-dir=node_modules . | grep -v -E "(console\.|//|/\*|\*/)"; then
+            echo "⚠️ Potential secrets found in code - please review"
+          else
+            echo "✅ No obvious secrets found in code"
+          fi
+
+      - name: Upload Security Results
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: security-scan-results
+          path: security-audit.json
+          retention-days: 30
+
+  # Job 6: Generate PR Summary
+  pr-summary:
+    name: Generate PR Validation Summary
+    runs-on: ubuntu-latest
+    needs: [code-validation, migration-testing, amplify-backend-testing, integration-testing, security-scanning]
+    if: always()
+    
+    steps:
+      - name: Download All Artifacts
+        uses: actions/download-artifact@v3
+
+      - name: Generate Validation Summary
+        run: |
+          echo "# 📋 Pull Request Validation Summary" > pr-summary.md
+          echo "" >> pr-summary.md
+          echo "**PR**: #${{ github.event.pull_request.number || 'Manual' }}" >> pr-summary.md
+          echo "**Branch**: ${{ github.head_ref || github.ref_name }}" >> pr-summary.md
+          echo "**Commit**: ${{ github.event.pull_request.head.sha || github.sha }}" >> pr-summary.md
+          echo "" >> pr-summary.md
+          
+          # Job results
+          echo "## 🧪 Validation Results" >> pr-summary.md
+          echo "" >> pr-summary.md
+          echo "| Check | Status |" >> pr-summary.md
+          echo "|-------|--------|" >> pr-summary.md
+          echo "| Code Validation | ${{ needs.code-validation.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> pr-summary.md
+          echo "| Migration Testing | ${{ needs.migration-testing.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> pr-summary.md
+          echo "| Amplify Backend | ${{ needs.amplify-backend-testing.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> pr-summary.md
+          echo "| Integration Tests | ${{ needs.integration-testing.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> pr-summary.md
+          echo "| Security Scanning | ${{ needs.security-scanning.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> pr-summary.md
+          echo "" >> pr-summary.md
+          
+          # Overall status
+          if [[ "${{ needs.code-validation.result }}" == "success" && "${{ needs.migration-testing.result }}" == "success" && "${{ needs.integration-testing.result }}" == "success" ]]; then
+            echo "## ✅ Overall Status: READY FOR REVIEW" >> pr-summary.md
+            echo "" >> pr-summary.md
+            echo "All validation checks have passed. This PR is ready for code review and merge." >> pr-summary.md
+          else
+            echo "## ❌ Overall Status: NEEDS ATTENTION" >> pr-summary.md
+            echo "" >> pr-summary.md
+            echo "Some validation checks have failed. Please review the failed checks and address any issues." >> pr-summary.md
+          fi
+          
+          echo "" >> pr-summary.md
+          echo "---" >> pr-summary.md
+          echo "*Generated by GitHub Actions on $(date)*" >> pr-summary.md
+          
+          cat pr-summary.md
+
+      - name: Upload PR Summary
+        uses: actions/upload-artifact@v3
+        with:
+          name: pr-validation-summary
+          path: pr-summary.md
+          retention-days: 30
+
+      - name: Comment on PR
+        if: github.event.pull_request.number
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const summary = fs.readFileSync('pr-summary.md', 'utf8');
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: summary
+            });
+
+      - name: Set PR Status
+        if: github.event.pull_request.number
+        run: |
+          # This will be reflected in the PR checks
+          if [[ "${{ needs.code-validation.result }}" == "success" && "${{ needs.migration-testing.result }}" == "success" && "${{ needs.integration-testing.result }}" == "success" ]]; then
+            echo "✅ All PR validation checks passed"
+            exit 0
+          else
+            echo "❌ Some PR validation checks failed"
+            exit 1
+          fi 

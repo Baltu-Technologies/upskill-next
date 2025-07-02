@@ -1,0 +1,11 @@
+# Task ID: 15
+# Title: Configure DevOps Pipeline (amplify.yml)
+# Status: pending
+# Dependencies: 13, 14
+# Priority: high
+# Description: Set up comprehensive CI/CD pipeline for backend deployment and testing
+# Details:
+Create/update amplify.yml for backend deployment via 'amplify push --yes'. Configure preBuild (npm ci), backendBuild (amplify push), build (npm run build), and postBuild (connection testing) phases. Implement efficient caching strategy for node_modules. Set up proper build artifact handling.
+
+# Test Strategy:
+Test complete pipeline execution, backend deployment, database migrations, and connection testing. Verify build performance and caching effectiveness. Test deployment across different environments.

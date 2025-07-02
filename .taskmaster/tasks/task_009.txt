@@ -1,0 +1,11 @@
+# Task ID: 9
+# Title: Set Up IAM Roles and Policies
+# Status: pending
+# Dependencies: 8
+# Priority: high
+# Description: Define comprehensive IAM roles and policies for secure service-to-service access
+# Details:
+Use CDK IAM constructs to create roles and policies for Lambda functions, Amplify deployment, and database access. Enable IAM DB authentication for RDS Proxy connections. Implement least privilege access patterns. Configure roles for Secrets Manager access and cross-service communication.
+
+# Test Strategy:
+Verify role and policy creation, IAM DB authentication functionality, and least privilege access validation. Test service-to-service authentication flows.

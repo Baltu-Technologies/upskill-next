@@ -1,0 +1,11 @@
+# Task ID: 10
+# Title: Update BetterAuth Configuration for New Aurora Setup
+# Status: pending
+# Dependencies: 4, 8
+# Priority: high
+# Description: Modify BetterAuth to use Aurora Serverless v2 through RDS Proxy connection
+# Details:
+Update BetterAuth configuration to use pg.Pool (pg v8.x) connecting to RDS Proxy endpoint. Configure adapter: 'postgresql', connectionString: process.env.AUTH_DB_URL, max: 10 connections, idleTimeoutMillis: 5000. Ensure no hardcoded credentials and proper environment variable usage.
+
+# Test Strategy:
+Test complete authentication flow including login, signup, and session management. Verify connection pooling behavior and environment variable injection. Ensure no credentials leak into code.

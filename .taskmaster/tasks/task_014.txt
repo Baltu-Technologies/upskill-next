@@ -1,0 +1,11 @@
+# Task ID: 14
+# Title: Create Database Migration and Testing Scripts
+# Status: pending
+# Dependencies: 10, 11, 12
+# Priority: high
+# Description: Implement database migration scripts and connection testing utilities
+# Details:
+Create npm scripts for database setup and migrations (npm run setup-db). Implement connection testing script for postBuild phase (scripts/test-db-connection.js). Set up migration framework for both auth and course databases. Ensure scripts work with RDS Proxy endpoints.
+
+# Test Strategy:
+Test migration scripts against both databases. Verify connection testing in CI/CD pipeline. Validate rollback capabilities and migration versioning.

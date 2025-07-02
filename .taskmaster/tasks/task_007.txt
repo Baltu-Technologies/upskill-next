@@ -1,0 +1,11 @@
+# Task ID: 7
+# Title: Create DynamoDB Tables for High-Velocity Data
+# Status: pending
+# Dependencies: 2
+# Priority: high
+# Description: Set up DynamoDB tables in On-Demand mode for real-time features like notifications and analytics
+# Details:
+Use CDK Table construct to create DynamoDB tables for notifications, activity streams, and analytics in On-Demand billing mode. Enable Point-in-Time Recovery (PITR) for data protection. Configure proper table schemas, indexes, and access patterns. Use aws-dynamodb v2.x constructs.
+
+# Test Strategy:
+Verify table creation, On-Demand mode configuration, and Point-in-Time Recovery setup. Test table access via AWS SDK v3 and validate performance characteristics.

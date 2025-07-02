@@ -1,0 +1,26 @@
+{
+  "sensitivePatterns": [
+    {},
+    {},
+    {},
+    {},
+    {}
+  ],
+  "allowedExtensions": [
+    ".js",
+    ".ts",
+    ".json",
+    ".md",
+    ".txt",
+    ".csv",
+    ".html",
+    ".css",
+    ".sql",
+    ".yml",
+    ".yaml",
+    ".log",
+    ".report",
+    ".xml"
+  ],
+  "maxFileSize": 10485760
+}

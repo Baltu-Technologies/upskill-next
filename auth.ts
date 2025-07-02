@@ -18,13 +18,32 @@ const getBaseURL = () => {
 
 export const auth = betterAuth({
     database: new Pool({
-        connectionString: process.env.BETTER_AUTH_DATABASE_URL,
-        ssl: process.env.BETTER_AUTH_DATABASE_URL?.includes('rds.amazonaws.com') 
-            ? { rejectUnauthorized: false } 
+        // ✅ TASK 10.1: Updated to use RDS Proxy endpoint
+        connectionString: process.env.AUTH_DB_URL || process.env.BETTER_AUTH_DATABASE_URL,
+        
+        // ✅ TASK 10.3: Enhanced SSL configuration for RDS Proxy
+        ssl: process.env.AUTH_DB_URL?.includes('proxy-') || process.env.BETTER_AUTH_DATABASE_URL?.includes('rds.amazonaws.com') 
+            ? { 
+                rejectUnauthorized: false,
+                ca: undefined, // RDS Proxy handles certificate management
+                checkServerIdentity: () => undefined, // Disable hostname verification for proxy
+            } 
             : false,
-        max: 10,
-        idleTimeoutMillis: 30000,
-        connectionTimeoutMillis: 2000,
+        
+        // ✅ TASK 10.1: Optimized connection pool settings for RDS Proxy
+        max: parseInt(process.env.AUTH_DB_MAX_CONNECTIONS || '10'),
+        idleTimeoutMillis: parseInt(process.env.AUTH_DB_IDLE_TIMEOUT || '5000'),
+        connectionTimeoutMillis: parseInt(process.env.AUTH_DB_CONNECTION_TIMEOUT || '2000'),
+        
+        // ✅ Additional RDS Proxy optimizations
+        keepAlive: true,
+        keepAliveInitialDelayMillis: 10000,
+        query_timeout: 30000, // 30 second query timeout
+        statement_timeout: 30000, // 30 second statement timeout
+        
+        // ✅ TASK 10.3: Enhanced error handling for RDS Proxy
+        application_name: 'upskill-betterauth',
+        fallback_application_name: 'upskill-app',
     }),
     secret: process.env.BETTER_AUTH_SECRET || process.env.AUTH_SECRET, // Fallback for compatibility
     baseURL: getBaseURL(),

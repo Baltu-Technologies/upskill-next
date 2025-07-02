@@ -89,7 +89,7 @@ function ProfilePageContent() {
 
   // Get tab from URL params
   useEffect(() => {
-    const tab = searchParams.get('tab');
+    const tab = searchParams?.get('tab');
     if (tab && tabs.find(t => t.id === tab)) {
       setActiveTab(tab);
     }

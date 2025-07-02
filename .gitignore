@@ -76,3 +76,17 @@ next-env.d.ts
 *.dmg
 *.iso
 *.exe
+
+# Logs
+logs
+# Dependency directories
+node_modules/
+# Environment variables
+# Editor directories and files
+.idea
+.vscode
+# OS specific
+
+# Task files
+# tasks.json
+# tasks/ 

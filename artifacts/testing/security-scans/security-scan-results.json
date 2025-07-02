@@ -1,0 +1,187 @@
+{
+  "scannedFiles": 6,
+  "sensitiveDataFound": true,
+  "violations": [
+    {
+      "file": ".security-config.json",
+      "pattern": "[object Object]",
+      "matches": 1,
+      "severity": "high"
+    },
+    {
+      "file": ".security-config.json",
+      "pattern": "[object Object]",
+      "matches": 1,
+      "severity": "high"
+    },
+    {
+      "file": ".security-config.json",
+      "pattern": "[object Object]",
+      "matches": 1,
+      "severity": "high"
+    },
+    {
+      "file": ".security-config.json",
+      "pattern": "[object Object]",
+      "matches": 1,
+      "severity": "high"
+    },
+    {
+      "file": ".security-config.json",
+      "pattern": "[object Object]",
+      "matches": 1,
+      "severity": "high"
+    },
+    {
+      "file": "backend/migration-reports/task-complexity-report.json",
+      "pattern": "[object Object]",
+      "matches": 1,
+      "severity": "high"
+    },
+    {
+      "file": "backend/migration-reports/task-complexity-report.json",
+      "pattern": "[object Object]",
+      "matches": 1,
+      "severity": "high"
+    },
+    {
+      "file": "backend/migration-reports/task-complexity-report.json",
+      "pattern": "[object Object]",
+      "matches": 1,
+      "severity": "high"
+    },
+    {
+      "file": "backend/migration-reports/task-complexity-report.json",
+      "pattern": "[object Object]",
+      "matches": 1,
+      "severity": "high"
+    },
+    {
+      "file": "backend/migration-reports/task-complexity-report.json",
+      "pattern": "[object Object]",
+      "matches": 1,
+      "severity": "high"
+    },
+    {
+      "file": "backend/migrations/scripts/migrate.js",
+      "pattern": "[object Object]",
+      "matches": 1,
+      "severity": "high"
+    },
+    {
+      "file": "backend/migrations/scripts/migrate.js",
+      "pattern": "[object Object]",
+      "matches": 1,
+      "severity": "high"
+    },
+    {
+      "file": "backend/migrations/scripts/migrate.js",
+      "pattern": "[object Object]",
+      "matches": 1,
+      "severity": "high"
+    },
+    {
+      "file": "backend/migrations/scripts/migrate.js",
+      "pattern": "[object Object]",
+      "matches": 1,
+      "severity": "high"
+    },
+    {
+      "file": "backend/migrations/scripts/migrate.js",
+      "pattern": "[object Object]",
+      "matches": 1,
+      "severity": "high"
+    },
+    {
+      "file": "backend/migrations/scripts/rollback.js",
+      "pattern": "[object Object]",
+      "matches": 1,
+      "severity": "high"
+    },
+    {
+      "file": "backend/migrations/scripts/rollback.js",
+      "pattern": "[object Object]",
+      "matches": 1,
+      "severity": "high"
+    },
+    {
+      "file": "backend/migrations/scripts/rollback.js",
+      "pattern": "[object Object]",
+      "matches": 1,
+      "severity": "high"
+    },
+    {
+      "file": "backend/migrations/scripts/rollback.js",
+      "pattern": "[object Object]",
+      "matches": 1,
+      "severity": "high"
+    },
+    {
+      "file": "backend/migrations/scripts/rollback.js",
+      "pattern": "[object Object]",
+      "matches": 1,
+      "severity": "high"
+    },
+    {
+      "file": "backend/migrations/scripts/test-db.js",
+      "pattern": "[object Object]",
+      "matches": 1,
+      "severity": "high"
+    },
+    {
+      "file": "backend/migrations/scripts/test-db.js",
+      "pattern": "[object Object]",
+      "matches": 1,
+      "severity": "high"
+    },
+    {
+      "file": "backend/migrations/scripts/test-db.js",
+      "pattern": "[object Object]",
+      "matches": 1,
+      "severity": "high"
+    },
+    {
+      "file": "backend/migrations/scripts/test-db.js",
+      "pattern": "[object Object]",
+      "matches": 1,
+      "severity": "high"
+    },
+    {
+      "file": "backend/migrations/scripts/test-db.js",
+      "pattern": "[object Object]",
+      "matches": 1,
+      "severity": "high"
+    },
+    {
+      "file": "metadata.json",
+      "pattern": "[object Object]",
+      "matches": 1,
+      "severity": "high"
+    },
+    {
+      "file": "metadata.json",
+      "pattern": "[object Object]",
+      "matches": 1,
+      "severity": "high"
+    },
+    {
+      "file": "metadata.json",
+      "pattern": "[object Object]",
+      "matches": 1,
+      "severity": "high"
+    },
+    {
+      "file": "metadata.json",
+      "pattern": "[object Object]",
+      "matches": 1,
+      "severity": "high"
+    },
+    {
+      "file": "metadata.json",
+      "pattern": "[object Object]",
+      "matches": 1,
+      "severity": "high"
+    }
+  ],
+  "timestamp": "2025-07-02T16:09:06.375Z"
+}

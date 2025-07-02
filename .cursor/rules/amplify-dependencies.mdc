@@ -1,5 +1,174 @@
 ---
-description:
-globs:
-alwaysApply: false
+description: 
+globs: 
+alwaysApply: true
 ---
+# AWS Amplify Gen 2 Dependency Management (Official AWS Structure)
+
+## **Correct Project Structure**
+
+```
+repo-root/
+│  package.json        ← Next.js app dependencies
+│  package-lock.json   ← Lock file for Next.js
+│  node_modules/       ← Single node_modules (local dev & CI)
+│
+├─ amplify/            ← Code-first backend
+│   ├─ backend.ts
+│   └─ package.json    ← CDK / @aws-amplify/backend dev-deps ONLY
+│
+└─ (other code...)
+```
+
+## **Key Rules**
+
+### **✅ DO: Correct Structure**
+- **Root `package.json`**: Contains Next.js app dependencies
+- **Root `node_modules/`**: Single node_modules for the entire project
+- **`amplify/package.json`**: Contains only CDK and @aws-amplify/backend dev dependencies
+- **NO `amplify/node_modules/`**: Should never be committed to Git
+
+### **❌ DON'T: Common Mistakes**
+- Multiple `node_modules` directories
+- Amplify backend deps in root `devDependencies`
+- Committing `amplify/node_modules/` to Git
+- Duplicate package-lock files
+
+## **Dependency Placement**
+
+### **Root `package.json` Contains:**
+```json
+{
+  "dependencies": {
+    "next": "...",
+    "react": "...",
+    "aws-amplify": "...",
+    // All frontend/app dependencies
+  },
+  "devDependencies": {
+    "typescript": "...",
+    "@types/react": "...",
+    // Frontend build tools only
+  }
+}
+```
+
+### **`amplify/package.json` Contains:**
+```json
+{
+  "devDependencies": {
+    "@aws-amplify/backend": "^1.x.x",
+    "@aws-amplify/backend-cli": "^1.x.x", 
+    "aws-cdk-lib": "^2.x.x",
+    "constructs": "^10.x.x",
+    "typescript": "^5.x.x"
+    // CDK and backend build tools only
+  }
+}
+```
+
+## **Git Configuration**
+
+### **Required .gitignore entries:**
+```gitignore
+# Dependencies
+node_modules/
+amplify/**/node_modules/
+
+# Lock files (keep root, ignore amplify)
+amplify/package-lock.json
+amplify/yarn.lock
+amplify/pnpm-lock.yaml
+```
+
+## **Build Configuration**
+
+### **amplify.yml Build Settings:**
+```yaml
+version: 1
+backend:
+  phases:
+    preBuild:
+      commands:
+        - cd amplify && npm ci
+    build:
+      commands:
+        - npx amplify pipeline-deploy --branch $AWS_BRANCH --app-id $AWS_APP_ID
+frontend:
+  phases:
+    preBuild:
+      commands:
+        - npm ci
+    build:
+      commands:
+        - npm run build
+  artifacts:
+    baseDirectory: .next
+    files:
+      - '**/*'
+  cache:
+    paths:
+      - node_modules/**/*
+```
+
+## **Common Build Errors & Solutions**
+
+| Error Symptoms | Root Cause | Solution |
+|---|---|---|
+| `Missing: jackspeak@x.x.x from lock file` | Corrupted package-lock.json | `npm cache clean --force && npm ci` |
+| Multiple node_modules detected | Wrong structure | Keep only root node_modules |
+| Amplify framework detection fails | Duplicate package.json confusion | Ensure root package.json is primary |
+| Backend deploy fails | Missing amplify dependencies | Check amplify/package.json has CDK deps |
+
+## **Troubleshooting Steps**
+
+### **1. Clean Dependencies:**
+```bash
+# Root level
+rm -rf node_modules package-lock.json
+npm cache clean --force
+npm install
+
+# Amplify level  
+cd amplify
+rm -rf node_modules package-lock.json
+# Don't install here - Amplify handles this
+cd ..
+```
+
+### **2. Verify Structure:**
+```bash
+# Should show only one node_modules
+find . -name "node_modules" -type d
+
+# Should show both package.json files
+find . -name "package.json" -maxdepth 2
+```
+
+### **3. Test Build:**
+```bash
+npm run build  # Should work without dependency errors
+```
+
+## **Why This Structure Works**
+
+- **Framework Detection**: Amplify detects Next.js from root package.json
+- **Build Efficiency**: Single node_modules reduces CI time and cache complexity
+- **Dependency Isolation**: Backend CDK deps separate from frontend deps  
+- **AWS Optimization**: Amplify's build cache expects this structure
+- **Monorepo Support**: Scales well with workspaces when needed
+
+## **Migration from Incorrect Structure**
+
+### **If you have dual node_modules:**
+1. Delete `amplify/node_modules/` 
+2. Move CDK deps from root to `amplify/package.json`
+3. Clean install at root level only
+4. Update .gitignore to prevent amplify/node_modules commits
+
+### **If missing amplify/package.json:**
+1. Create `amplify/package.json` with CDK dependencies
+2. Move backend deps from root devDependencies 
+3. Clean install to verify structure
+
+**Source**: [AWS Amplify Gen 2 Documentation](mdc:https:/docs.amplify.aws)

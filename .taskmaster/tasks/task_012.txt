@@ -1,0 +1,11 @@
+# Task ID: 12
+# Title: Set Up DynamoDB Client for Real-Time Features
+# Status: pending
+# Dependencies: 7, 8
+# Priority: high
+# Description: Configure AWS SDK v3 DynamoDB client for high-velocity data operations
+# Details:
+Set up AWS SDK v3 DynamoDBDocumentClient (v3.x) with region: process.env.AWS_REGION. Implement direct table access patterns for notifications, activity streams, and analytics. Configure proper error handling, retry logic, and performance optimization.
+
+# Test Strategy:
+Test DynamoDB CRUD operations, SDK initialization, and environment variable injection. Verify performance characteristics and error handling. Ensure no credentials in code.

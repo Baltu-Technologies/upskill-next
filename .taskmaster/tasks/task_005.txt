@@ -1,0 +1,11 @@
+# Task ID: 5
+# Title: Deploy Aurora PostgreSQL Provisioned for Course Data
+# Status: pending
+# Dependencies: 2
+# Priority: high
+# Description: Set up Aurora PostgreSQL provisioned cluster with read replica for course management
+# Details:
+Use CDK DatabaseCluster construct to deploy Aurora PostgreSQL (db.t4g.small) with a read replica in private subnets. Configure dedicated writer/reader instances for performance tuning. Set up proper security groups and parameter groups. Configure backup, monitoring, and performance insights.
+
+# Test Strategy:
+Verify cluster and read replica creation, writer/reader endpoint functionality, and connectivity. Test failover scenarios and performance under load.

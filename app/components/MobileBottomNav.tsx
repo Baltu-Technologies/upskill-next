@@ -71,7 +71,7 @@ export default function MobileBottomNav({ className, onToggleMessages }: MobileB
       title: 'Courses',
       icon: BookOpen,
       href: '/courses',
-      isActive: pathname.startsWith('/courses')
+      isActive: pathname?.startsWith('/courses') || false
     }
   ];
 
@@ -82,14 +82,14 @@ export default function MobileBottomNav({ className, onToggleMessages }: MobileB
       icon: Briefcase,
       href: '/employers/search',
       badge: '5',
-      isActive: pathname.startsWith('/employers')
+      isActive: pathname?.startsWith('/employers') || false
     },
     {
       title: 'Messages',
       icon: MessageSquare,
       href: '/study-hub/ask-ai',
       badge: '2',
-      isActive: pathname.startsWith('/study-hub/ask-ai') || pathname.startsWith('/messages')
+      isActive: (pathname?.startsWith('/study-hub/ask-ai') || pathname?.startsWith('/messages')) || false
     }
   ];
 
@@ -132,10 +132,10 @@ export default function MobileBottomNav({ className, onToggleMessages }: MobileB
     }
   };
 
-  const isProfileActive = pathname.startsWith('/profile') || 
-                         pathname.startsWith('/study-hub/study-list') || 
-                         pathname.startsWith('/stats-goals') ||
-                         pathname.startsWith('/career-exploration');
+  const isProfileActive = (pathname?.startsWith('/profile') || 
+                         pathname?.startsWith('/study-hub/study-list') || 
+                         pathname?.startsWith('/stats-goals') ||
+                         pathname?.startsWith('/career-exploration')) || false;
 
   return (
     <div     className={cn(

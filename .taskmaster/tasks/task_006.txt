@@ -1,0 +1,11 @@
+# Task ID: 6
+# Title: Configure RDS Proxy for Course Database
+# Status: pending
+# Dependencies: 5
+# Priority: high
+# Description: Set up RDS Proxy with separate read/write endpoints for the course Aurora cluster
+# Details:
+Use CDK DatabaseProxy construct to create RDS Proxy for Aurora provisioned cluster. Configure separate endpoints for read/write operations to leverage read replicas. Set connectionBorrowTimeout to 5 seconds and configure proper IAM authentication and security groups.
+
+# Test Strategy:
+Test proxy endpoint connectivity, read/write separation functionality, and IAM authentication. Verify proper routing to read replicas and timeout settings.

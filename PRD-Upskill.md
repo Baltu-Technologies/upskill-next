@@ -308,15 +308,18 @@ Employer Connection → Job Application → Placement
 ### 2. Employer Journey
 ```
 Company Registration → Profile Creation → Job Posting → 
-Candidate Discovery → Skills Verification → 
+Skills/Aptitude/Attitude Acceptance Level → Open Pipeline → 
+Candidate Review → Skills/Aptitude/Attitude Verification → 
 Communication → Interview Process → Hiring
+
 ```
 
 ### 3. Content Creator Journey
 ```
-Creator Onboarding → Course Planning → Content Development → 
+Course Planning → Content Development → 
 Multimedia Upload → Assessment Design → Publishing → 
 Performance Monitoring → Content Updates
+
 ```
 
 ### 4. Data Flow Architecture
@@ -325,6 +328,7 @@ User Interaction → Frontend (Next.js) → API Layer →
 Business Logic → Database (PostgreSQL) → 
 External Integrations (Employers, Assessment Tools) → 
 Analytics & Reporting
+
 ```
 
 ---
@@ -400,26 +404,25 @@ Analytics & Reporting
 
 ## Development Roadmap
 
-### Phase 1: Core Platform (Months 1-6)
+### Phase 1: Core Platform 
 - [x] Authentication system implementation
 - [x] Course management system
 - [x] Basic learner dashboard
 - [x] Employer profile creation
 - [ ] Assessment and certification engine
 
-### Phase 2: Advanced Features (Months 7-12)
+### Phase 2: Advanced Features 
 - [ ] Career pathway algorithm
 - [ ] Advanced matching system
 - [ ] Mobile application
 - [ ] API for third-party integrations
 - [ ] Advanced analytics dashboard
 
-### Phase 3: Scale & Optimization (Months 13-18)
+### Phase 3: Scale & Optimization 
 - [ ] Enterprise employer tools
 - [ ] Advanced learning analytics
 - [ ] AI-powered content recommendations
 - [ ] Virtual reality training modules
-- [ ] Blockchain-based certification
 
 ---
 

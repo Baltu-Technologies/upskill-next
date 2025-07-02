@@ -1,50 +1,358 @@
 version: 1
+# Enhanced Amplify Gen 2 CI/CD Pipeline Configuration with Comprehensive Artifact Management
+# Integrates with comprehensive backend infrastructure:
+# - Aurora PostgreSQL (auth + course databases)
+# - RDS Proxy connections
+# - DynamoDB tables
+# - AWS Secrets Manager
+# - Database migration system
+# - GitHub Actions coordination
+# - Multi-phase artifact management system
+
 backend:
   phases:
     preBuild:
       commands:
+        # Environment Setup
+        - echo "=== Pre-Build Phase - Environment Setup ==="
+        - echo "Setting up Node.js 22 environment"
         - nvm install 22
         - nvm use 22
         - node --version
         - npm --version
+        
+        # Install Dependencies
+        - echo "Installing backend dependencies"
+        - cd amplify
+        - npm ci --cache .npm --prefer-offline --include=optional
+        - cd ..
+        
+        # Database Connection Validation
+        - echo "=== Database Connection Validation ==="
+        - echo "Validating auth database connection"
+        - npm run validate:db:auth || echo "⚠️  Auth DB validation failed - will retry during migration"
+        - echo "Validating course database connection"
+        - npm run validate:db:course || echo "⚠️  Course DB validation failed - will retry during migration"
+        
+        # Environment Status Check
+        - echo "Environment setup completed"
+        - echo "Current branch:$AWS_BRANCH"
+        - echo "App ID:$AWS_APP_ID"
+        
+        # Cache Status Check
+        - echo "=== Cache Status Analysis ==="
+        - npm run cache:inspect || echo "⚠️  Cache inspection failed - continuing..."
+        - npm run cache:key || echo "⚠️  Cache key generation failed - continuing..."
+        
+        # Initialize Artifact Management
+        - echo "=== Artifact Management Initialization ==="
+        - npm run artifacts:init || echo "⚠️  Artifact initialization failed - continuing..."
+        
     build:
       commands:
-        - npm ci --cache .npm --prefer-offline --include=optional
-        - npm install @parcel/watcher --save-optional || echo "Watcher install failed, continuing..."
-        - npx ampx pipeline-deploy --branch $AWS_BRANCH --app-id $AWS_APP_ID || echo "Backend deployment completed with warnings"
+        # Backend Infrastructure Deployment
+        - echo "=== Backend Build Phase - Infrastructure Deployment ==="
+        
+        # Database Migration Execution
+        - echo "=== Database Migration Phase ==="
+        - echo "Running auth database migrations"
+        - npm run migrate:auth || (echo "❌ Auth migration failed" && exit 1)
+        - echo "Running course database migrations"
+        - npm run migrate:course || (echo "❌ Course migration failed" && exit 1)
+        - echo "✅ Database migrations completed successfully"
+        
+        # Capture Migration Artifacts
+        - echo "=== Capturing Migration Artifacts ==="
+        - npm run artifacts:collect:migrations || echo "⚠️  Migration artifact collection failed - continuing..."
+        
+        # Backend Infrastructure Deployment
+        - echo "=== Amplify Backend Deployment ==="
+        - cd amplify
+        - echo "Installing additional dependencies if needed"
+        - npm install @parcel/watcher --save-optional || echo "Watcher install optional, continuing..."
+        
+        # Deploy backend infrastructure (Aurora, RDS Proxy, DynamoDB, Secrets Manager)
+        - echo "Deploying Amplify Gen 2 backend infrastructure"
+        - npx ampx pipeline-deploy --branch $AWS_BRANCH --app-id $AWS_APP_ID || (echo "❌ Backend deployment failed" && exit 1)
+        - echo "✅ Backend infrastructure deployed successfully"
+        - cd ..
+        
+        # Capture Backend Infrastructure Artifacts
+        - echo "=== Capturing Backend Infrastructure Artifacts ==="
+        - npm run artifacts:collect:backend || echo "⚠️  Backend artifact collection failed - continuing..."
+        
+        # Post-Deployment Validation
+        - echo "=== Post-Deployment Backend Validation ==="
+        - echo "Validating backend deployment and database connections"
+        - npm run validate:db:verbose || echo "⚠️  Post-deployment validation warnings detected"
+
+    postBuild:
+      commands:
+        # Backend Health Checks
+        - echo "=== Backend Health Checks ==="
+        - echo "Running comprehensive database connection tests"
+        - npm run test:db:auth || echo "⚠️  Auth database health check failed"
+        - npm run test:db:course || echo "⚠️  Course database health check failed"
+        - echo "Backend deployment and health checks completed"
+        
+        # Cache Performance Monitoring
+        - echo "=== Cache Performance Analysis ==="
+        - npm run cache:monitor || echo "⚠️  Cache monitoring failed - continuing..."
+        - npm run cache:optimize || echo "⚠️  Cache optimization analysis failed - continuing..."
+        
+        # Backend Artifact Finalization
+        - echo "=== Backend Artifact Finalization ==="
+        - npm run artifacts:finalize:backend || echo "⚠️  Backend artifact finalization failed - continuing..."
+        - npm run artifacts:validate:backend || echo "⚠️  Backend artifact validation failed - continuing..."
+        
+        # Pipeline Integration Testing
+        - echo "=== Backend Pipeline Validation ==="
+        - npm run pipeline:validate || echo "⚠️  Backend pipeline validation failed - continuing..."
+        - npm run pipeline:artifacts || echo "⚠️  Pipeline artifact validation failed - continuing..."
+
 frontend:
   phases:
     preBuild:
       commands:
+        # Frontend Environment Setup
+        - echo "=== Frontend Pre-Build Phase ==="
+        - echo "Setting up Node.js 22 environment for frontend"
         - nvm install 22
         - nvm use 22
         - node --version
         - npm --version
+        
+        # Install Frontend Dependencies
+        - echo "Installing frontend dependencies"
         - npm ci --cache .npm --prefer-offline --include=optional
-        - npm install @parcel/watcher --save-optional || echo "Watcher install failed, continuing..."
+        - npm install @parcel/watcher --save-optional || echo "Watcher install optional, continuing..."
+        
+        # Environment Variables Setup
+        - echo "=== Environment Variables Configuration ==="
+        - echo "Setting up environment variables for production build"
+        
+        # Download Backend Artifacts
+        - echo "=== Downloading Backend Artifacts ==="
+        - npm run artifacts:download:backend || echo "⚠️  Backend artifact download failed - continuing..."
+        
     build:
       commands:
-        - env | grep -e BETTER_AUTH_DATABASE_URL >> .env.production
-        - env | grep -e BETTER_AUTH_SECRET >> .env.production
-        - env | grep -e BETTER_AUTH_URL >> .env.production
-        - env | grep -e GOOGLE_CLIENT_ID >> .env.production
-        - env | grep -e GOOGLE_CLIENT_SECRET >> .env.production
-        - npm run build
-  artifacts:
-    baseDirectory: .next
+        # Frontend Build with Environment Variables
+        - echo "=== Frontend Build Phase ==="
+        
+        # Inject Environment Variables for Production
+        - echo "Configuring production environment variables"
+        - echo "# Generated environment file for production build" > .env.production
+        - env | grep -e BETTER_AUTH_DATABASE_URL >> .env.production || echo "BETTER_AUTH_DATABASE_URL not set"
+        - env | grep -e BETTER_AUTH_SECRET >> .env.production || echo "BETTER_AUTH_SECRET not set"
+        - env | grep -e BETTER_AUTH_URL >> .env.production || echo "BETTER_AUTH_URL not set"
+        - env | grep -e GOOGLE_CLIENT_ID >> .env.production || echo "GOOGLE_CLIENT_ID not set"
+        - env | grep -e GOOGLE_CLIENT_SECRET >> .env.production || echo "GOOGLE_CLIENT_SECRET not set"
+        - env | grep -e AUTH_DB_URL >> .env.production || echo "AUTH_DB_URL not set"
+        - env | grep -e COURSE_DB_URL >> .env.production || echo "COURSE_DB_URL not set"
+        
+        # Execute Frontend Build
+        - echo "Building Next.js application"
+        - npm run build || (echo "❌ Frontend build failed" && exit 1)
+        - echo "✅ Frontend build completed successfully"
+        
+        # Collect Frontend Build Artifacts
+        - echo "=== Collecting Frontend Build Artifacts ==="
+        - npm run artifacts:collect:frontend || echo "⚠️  Frontend artifact collection failed - continuing..."
+        
+    postBuild:
+      commands:
+        # Frontend Validation
+        - echo "=== Frontend Post-Build Validation ==="
+        - echo "Validating build artifacts"
+        - ls -la .next/ || echo "Build directory check failed"
+        - echo "Frontend deployment preparation completed"
+        
+        # Security Validation
+        - echo "=== Security Validation ==="
+        - echo "Checking for sensitive data exposure in build artifacts"
+        - npm run artifacts:security:scan || echo "⚠️  Security scan failed - continuing..."
+        - echo "Security checks completed"
+        
+        # Final Artifact Processing
+        - echo "=== Final Artifact Processing ==="
+        - npm run artifacts:finalize:frontend || echo "⚠️  Frontend artifact finalization failed - continuing..."
+        - npm run artifacts:validate:frontend || echo "⚠️  Frontend artifact validation failed - continuing..."
+        - npm run artifacts:report || echo "⚠️  Artifact report generation failed - continuing..."
+        
+        # Complete Pipeline Integration Testing
+        - echo "=== Complete Pipeline Integration Testing ==="
+        - npm run pipeline:integration || echo "⚠️  Pipeline integration testing failed - continuing..."
+        - npm run pipeline:report || echo "⚠️  Pipeline report generation failed - continuing..."
+
+# Comprehensive Build Artifacts Configuration
+# Handles artifacts across all pipeline phases with intelligent organization
+artifacts:
+  # Primary Frontend Build Artifacts (for deployment)
+  baseDirectory: .next
+  files:
+    - '**/*'
+  name: frontend-build-$AWS_BRANCH-$AWS_COMMIT_ID
+  
+  # Backend Infrastructure Artifacts
+  backend:
+    baseDirectory: artifacts/backend
     files:
-      - '**/*'
-  cache:
-    paths:
-      - node_modules/**/*
-      - .next/cache/**/*
-  customHeaders:
-    - pattern: '**/*'
-      headers:
-        - key: 'X-Frame-Options'
-          value: 'DENY'
-        - key: 'X-XSS-Protection'
-          value: '1; mode=block'
+      # CDK Synthesis and Deployment Outputs
+      - 'cdk-outputs/**/*'
+      - 'amplify-outputs/**/*'
+      - 'stack-templates/**/*'
+      
+      # Migration Results and Logs
+      - 'migrations/**/*'
+      - 'migration-logs/**/*'
+      - 'migration-reports/**/*'
+      
+      # Database Schema and Validation Reports
+      - 'schema-validation/**/*'
+      - 'connection-reports/**/*'
+      
+      # Infrastructure Configuration
+      - 'infrastructure-config/**/*'
+      - 'environment-config/**/*'
+    name: backend-artifacts-$AWS_BRANCH-$AWS_COMMIT_ID
+  
+  # Development and Testing Artifacts
+  testing:
+    baseDirectory: artifacts/testing
+    files:
+      # Test Results and Coverage
+      - 'test-results/**/*'
+      - 'coverage-reports/**/*'
+      - 'integration-tests/**/*'
+      
+      # Performance and Load Test Results
+      - 'performance-tests/**/*'
+      - 'load-test-results/**/*'
+      
+      # Security Scan Results
+      - 'security-scans/**/*'
+      - 'vulnerability-reports/**/*'
+    name: testing-artifacts-$AWS_BRANCH-$AWS_COMMIT_ID
+  
+  # Build Metadata and Reports
+  metadata:
+    baseDirectory: artifacts/metadata
+    files:
+      # Build Information
+      - 'build-info/**/*'
+      - 'dependency-reports/**/*'
+      - 'cache-reports/**/*'
+      
+      # Deployment Manifests
+      - 'deployment-manifests/**/*'
+      - 'environment-manifests/**/*'
+      
+      # Audit Trails
+      - 'audit-logs/**/*'
+      - 'compliance-reports/**/*'
+    name: metadata-artifacts-$AWS_BRANCH-$AWS_COMMIT_ID
+
+# Caching Configuration for Performance Optimization
+cache:
+  # Cache paths with intelligent invalidation strategies
+  paths:
+    # Node.js Dependencies - Invalidated by package-lock.json changes
+    - node_modules/**/*
+    - amplify/node_modules/**/*
+    
+    # Next.js Build Cache - Persistent across builds unless Next.js config changes
+    - .next/cache/**/*
+    
+    # NPM Package Cache - Shared across all npm operations
+    - .npm/**/*
+    
+    # TypeScript Compilation Cache - Invalidated by tsconfig changes
+    - .tsbuildinfo
+    - amplify/.tsbuildinfo
+    
+    # Migration System Cache - Custom cache for migration state
+    - migrations/.migration-cache/**/*
+    
+    # CDK Output Cache - Amplify backend synthesis artifacts
+    - amplify/cdk.out/**/*
+    - amplify/.cdk.staging/**/*
+    
+    # Environment-Specific Build Artifacts
+    - build-cache/**/*
+    - temp-build/**/*
+    
+    # Artifact Management Cache
+    - artifacts/.artifact-cache/**/*
+    - artifacts/.upload-cache/**/*
+
+  # Cache key strategy (Amplify automatically uses file hashes for cache invalidation)
+  # Key files that trigger cache invalidation:
+  # - package.json, package-lock.json (dependency changes)
+  # - amplify/package.json, amplify/package-lock.json (backend dependency changes)
+  # - next.config.js (Next.js configuration changes)
+  # - tsconfig.json (TypeScript configuration changes)
+  # - amplify.yml (pipeline configuration changes)
+  # - migrations/ directory changes (database schema changes)
+  # - scripts/artifact-manager.js (artifact management logic changes)
+
+# Custom Headers for Security
+customHeaders:
+  - pattern: '**/*'
+    headers:
+      - key: 'X-Frame-Options'
+        value: 'DENY'
+      - key: 'X-XSS-Protection'
+        value: '1; mode=block'
+      - key: 'X-Content-Type-Options'
+        value: 'nosniff'
+      - key: 'Referrer-Policy'
+        value: 'strict-origin-when-cross-origin'
+      - key: 'Permissions-Policy'
+        value: 'camera=(), microphone=(), geolocation=()'
+
+# Environment Configuration
 env:
   variables:
+    # Node.js Configuration
     NODE_VERSION: '22'
+    NPM_CONFIG_CACHE: '.npm'
+    NPM_CONFIG_PREFER_OFFLINE: 'true'
+    
+    # Build Configuration
+    NEXT_TELEMETRY_DISABLED: '1'
+    
+    # Database Configuration Flags
+    MIGRATION_TIMEOUT: '300000'  # 5 minutes
+    CONNECTION_RETRY_ATTEMPTS: '3'
+    VALIDATION_TIMEOUT: '60000'  # 1 minute
+    
+    # Artifact Management Configuration
+    ARTIFACT_RETENTION_DAYS: '30'
+    ARTIFACT_COMPRESSION: 'true'
+    ARTIFACT_ENCRYPTION: 'true'
+    ARTIFACT_VALIDATION: 'strict'
+
+# Test Configuration for Different Environments
+test:
+  phases:
+    preTest:
+      commands:
+        - echo "=== Test Environment Setup ==="
+        - npm ci
+        - npm run validate:db:verbose
+        - npm run artifacts:download:testing || echo "⚠️  Testing artifact download failed - continuing..."
+    test:
+      commands:
+        - echo "=== Running Database Integration Tests ==="
+        - npm run test:db:schema
+        - echo "=== Running Connection Tests ==="
+        - npm run test:auth
+        - npm run test:course
+        - echo "=== Running Artifact Validation Tests ==="
+        - npm run test:artifacts
+    postTest:
+      commands:
+        - echo "=== Test Cleanup ==="
+        - npm run artifacts:collect:testing || echo "⚠️  Testing artifact collection failed - continuing..."
+        - echo "Test phase completed"

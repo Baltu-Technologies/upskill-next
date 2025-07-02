@@ -1,0 +1,11 @@
+# Task ID: 8
+# Title: Configure AWS Secrets Manager
+# Status: pending
+# Dependencies: 4, 6
+# Priority: high
+# Description: Set up centralized credential storage using AWS Secrets Manager for all database connections
+# Details:
+Use CDK Secret construct to create Secrets Manager resources for database connection strings and API keys. Configure automatic rotation capabilities where applicable. Set up proper IAM policies for secret access. Store AUTH_DB_URL, COURSE_DB_URL, and other sensitive configuration. Use aws-secretsmanager v2.x constructs.
+
+# Test Strategy:
+Verify secret creation, proper encryption, and access policies. Test secret rotation functionality and runtime injection into Amplify environment variables.
