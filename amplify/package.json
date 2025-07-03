@@ -9,7 +9,9 @@
   "devDependencies": {
     "@aws-amplify/backend": "^1.5.1",
     "@aws-amplify/backend-cli": "^1.2.4",
+    "@types/json-schema": "^7.0.15",
     "@types/node": "^24.0.10",
+    "@types/uuid": "^10.0.0",
     "aws-cdk-lib": "^2.38.0",
     "constructs": "^10.3.0",
     "tsx": "^4.0.0",
