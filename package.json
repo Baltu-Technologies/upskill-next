@@ -65,7 +65,12 @@
     "pipeline:performance": "node scripts/pipeline-tester.js performance",
     "pipeline:simulate": "node scripts/pipeline-tester.js simulate",
     "pipeline:integration": "node scripts/pipeline-tester.js integration",
-    "pipeline:report": "node scripts/pipeline-tester.js report"
+    "pipeline:report": "node scripts/pipeline-tester.js report",
+    "monitoring:validate": "node scripts/validate-monitoring.js --environment dev",
+    "monitoring:validate:staging": "node scripts/validate-monitoring.js --environment staging",
+    "monitoring:validate:prod": "node scripts/validate-monitoring.js --environment prod",
+    "monitoring:report": "node scripts/validate-monitoring.js --environment dev",
+    "monitoring:test": "node scripts/validate-monitoring.js --environment dev"
   },
   "dependencies": {
     "@aws-amplify/ui-react": "^6.11.2",
