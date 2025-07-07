@@ -1,0 +1,245 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+      - 'feature/**'
+  pull_request:
+    branches:
+      - main
+      - develop
+
+env:
+  NODE_VERSION: '18'
+  AMPLIFY_MONOREPO_APP_ROOT: '.'
+
+jobs:
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run linting
+        run: npm run lint
+
+      - name: Run type checking
+        run: npm run type-check
+
+      - name: Run unit tests
+        run: npm run test:unit
+
+      - name: Run integration tests
+        run: npm run test:integration
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL_TEST }}
+          AUTH0_SECRET: ${{ secrets.AUTH0_SECRET_TEST }}
+          AUTH0_BASE_URL: ${{ secrets.AUTH0_BASE_URL_TEST }}
+          AUTH0_ISSUER_BASE_URL: ${{ secrets.AUTH0_ISSUER_BASE_URL_TEST }}
+          AUTH0_CLIENT_ID: ${{ secrets.AUTH0_CLIENT_ID_TEST }}
+          AUTH0_CLIENT_SECRET: ${{ secrets.AUTH0_CLIENT_SECRET_TEST }}
+
+      - name: Run E2E tests
+        run: npm run test:e2e
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL_TEST }}
+          AUTH0_SECRET: ${{ secrets.AUTH0_SECRET_TEST }}
+          AUTH0_BASE_URL: ${{ secrets.AUTH0_BASE_URL_TEST }}
+          AUTH0_ISSUER_BASE_URL: ${{ secrets.AUTH0_ISSUER_BASE_URL_TEST }}
+          AUTH0_CLIENT_ID: ${{ secrets.AUTH0_CLIENT_ID_TEST }}
+          AUTH0_CLIENT_SECRET: ${{ secrets.AUTH0_CLIENT_SECRET_TEST }}
+
+  migration-validation:
+    name: Validate Database Migrations
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Validate migration scripts
+        run: npm run migrate:employer:dry
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL_TEST }}
+
+  deploy-preview:
+    name: Deploy Preview Environment
+    runs-on: ubuntu-latest
+    needs: [test, migration-validation]
+    if: github.event_name == 'pull_request' || startsWith(github.ref, 'refs/heads/feature/')
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Install Amplify CLI
+        run: npm install -g @aws-amplify/cli
+
+      - name: Build application
+        run: npm run build
+        env:
+          AUTH0_SECRET: ${{ secrets.AUTH0_SECRET_DEV }}
+          AUTH0_BASE_URL: ${{ secrets.AUTH0_BASE_URL_DEV }}
+          AUTH0_ISSUER_BASE_URL: ${{ secrets.AUTH0_ISSUER_BASE_URL_DEV }}
+          AUTH0_CLIENT_ID: ${{ secrets.AUTH0_CLIENT_ID_DEV }}
+          AUTH0_CLIENT_SECRET: ${{ secrets.AUTH0_CLIENT_SECRET_DEV }}
+
+      - name: Deploy to Amplify (Preview)
+        run: |
+          amplify pull --appId ${{ secrets.AMPLIFY_APP_ID }} --envName preview --yes
+          amplify publish --yes
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    needs: [test, migration-validation]
+    if: github.ref == 'refs/heads/develop'
+    environment: staging
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Install Amplify CLI
+        run: npm install -g @aws-amplify/cli
+
+      - name: Run database migrations (Staging)
+        run: npm run migrate:employer
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL_STAGING }}
+
+      - name: Build application
+        run: npm run build
+        env:
+          AUTH0_SECRET: ${{ secrets.AUTH0_SECRET_STAGING }}
+          AUTH0_BASE_URL: ${{ secrets.AUTH0_BASE_URL_STAGING }}
+          AUTH0_ISSUER_BASE_URL: ${{ secrets.AUTH0_ISSUER_BASE_URL_STAGING }}
+          AUTH0_CLIENT_ID: ${{ secrets.AUTH0_CLIENT_ID_STAGING }}
+          AUTH0_CLIENT_SECRET: ${{ secrets.AUTH0_CLIENT_SECRET_STAGING }}
+
+      - name: Deploy to Amplify (Staging)
+        run: |
+          amplify pull --appId ${{ secrets.AMPLIFY_APP_ID }} --envName staging --yes
+          amplify publish --yes
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+  deploy-production:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    needs: [test, migration-validation]
+    if: github.ref == 'refs/heads/main'
+    environment: production
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID_PROD }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_PROD }}
+          aws-region: us-east-1
+
+      - name: Install Amplify CLI
+        run: npm install -g @aws-amplify/cli
+
+      - name: Run database migrations (Production)
+        run: npm run migrate:employer
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL_PROD }}
+
+      - name: Build application
+        run: npm run build
+        env:
+          AUTH0_SECRET: ${{ secrets.AUTH0_SECRET_PROD }}
+          AUTH0_BASE_URL: ${{ secrets.AUTH0_BASE_URL_PROD }}
+          AUTH0_ISSUER_BASE_URL: ${{ secrets.AUTH0_ISSUER_BASE_URL_PROD }}
+          AUTH0_CLIENT_ID: ${{ secrets.AUTH0_CLIENT_ID_PROD }}
+          AUTH0_CLIENT_SECRET: ${{ secrets.AUTH0_CLIENT_SECRET_PROD }}
+
+      - name: Deploy to Amplify (Production)
+        run: |
+          amplify pull --appId ${{ secrets.AMPLIFY_APP_ID_PROD }} --envName production --yes
+          amplify publish --yes
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID_PROD }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY_PROD }}
+
+  notify-slack:
+    name: Notify Slack
+    runs-on: ubuntu-latest
+    needs: [deploy-staging, deploy-production]
+    if: always()
+    steps:
+      - name: Notify deployment status
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          channel: '#deployments'
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }} 

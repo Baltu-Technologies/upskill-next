@@ -50,34 +50,197 @@ The platform focuses exclusively on high-demand, technical industries:
 - **3D/AR Support**: React Three Fiber for interactive content
 
 #### Backend & Infrastructure
-- **Hosting**: AWS Amplify (Frontend & Backend)
-- **Database**: AWS Aurora PostgreSQL
-- **Authentication**: Better Auth (self-hosted)
-- **API**: RESTful endpoints + GraphQL (planned)
-- **File Storage**: AWS S3 (for media assets)
-- **CDN**: AWS CloudFront
+- **Hosting**: AWS Amplify Gen 2 with AWS CDK Infrastructure as Code
+- **Frontend Deployment**: AWS Amplify (Next.js SSR/SSG)
+- **Backend Architecture**: AWS CDK-managed serverless infrastructure
+- **Primary Database**: AWS Aurora PostgreSQL (Dual-cluster architecture)
+  - **Auth Database**: Aurora Serverless v2 (Better Auth authentication)
+  - **Course Database**: Aurora Provisioned with read replica (course data, user progress)
+- **Connection Pooling**: AWS RDS Proxy for optimized database connections
+- **Real-time Features**: Amazon DynamoDB (notifications, analytics, caching)
+- **Authentication**: Better Auth (self-hosted on Aurora Serverless v2)
+- **API Layer**: REST endpoints with planned GraphQL integration
+- **File Storage**: AWS S3 with CloudFront CDN
+- **Security**: 
+  - VPC with private subnets for database isolation
+  - Security groups with least-privilege access
+  - AWS Secrets Manager for credential management
+  - KMS encryption for data at rest and in transit
+
+### Infrastructure & DevOps
+
+#### Database Architecture
+
+The platform utilizes a sophisticated dual-database architecture optimized for different workloads:
+
+#### Auth Database (Aurora Serverless v2)
+```sql
+-- Better Auth Tables (Optimized for authentication workloads)
+CREATE TABLE auth.user (
+  id TEXT PRIMARY KEY,
+  email TEXT UNIQUE NOT NULL,
+  emailVerified BOOLEAN DEFAULT false,
+  name TEXT,
+  image TEXT,
+  createdAt TIMESTAMP DEFAULT NOW(),
+  updatedAt TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE auth.session (
+  id TEXT PRIMARY KEY,
+  expiresAt TIMESTAMP NOT NULL,
+  token TEXT UNIQUE NOT NULL,
+  userId TEXT REFERENCES auth.user(id) ON DELETE CASCADE
+);
+
+CREATE TABLE auth.account (
+  id TEXT PRIMARY KEY,
+  accountId TEXT NOT NULL,
+  providerId TEXT NOT NULL,
+  userId TEXT REFERENCES auth.user(id) ON DELETE CASCADE,
+  accessToken TEXT,
+  refreshToken TEXT,
+  idToken TEXT,
+  accessTokenExpiresAt TIMESTAMP,
+  refreshTokenExpiresAt TIMESTAMP
+);
+```
+
+#### Course Database (Aurora Provisioned + Read Replica)
+```sql
+-- Course Management Tables (Optimized for content delivery and progress tracking)
+CREATE TABLE courses (
+  id SERIAL PRIMARY KEY,
+  title VARCHAR(255) NOT NULL,
+  description TEXT,
+  industry_focus VARCHAR(100),
+  difficulty_level VARCHAR(50),
+  estimated_duration_hours INTEGER,
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE lessons (
+  id SERIAL PRIMARY KEY,
+  course_id INTEGER REFERENCES courses(id) ON DELETE CASCADE,
+  title VARCHAR(255) NOT NULL,
+  order_index INTEGER NOT NULL,
+  objectives TEXT[],
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE microlessons (
+  id SERIAL PRIMARY KEY,
+  lesson_id INTEGER REFERENCES lessons(id) ON DELETE CASCADE,
+  title VARCHAR(255) NOT NULL,
+  estimated_duration_minutes INTEGER,
+  order_index INTEGER NOT NULL,
+  content_metadata JSONB,
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE user_progress (
+  id SERIAL PRIMARY KEY,
+  user_id TEXT NOT NULL, -- References auth.user.id
+  microlesson_id INTEGER REFERENCES microlessons(id) ON DELETE CASCADE,
+  status VARCHAR(50) DEFAULT 'not_started',
+  completion_percentage INTEGER DEFAULT 0,
+  time_spent_minutes INTEGER DEFAULT 0,
+  completed_at TIMESTAMP,
+  created_at TIMESTAMP DEFAULT NOW(),
+  UNIQUE(user_id, microlesson_id)
+);
+
+CREATE TABLE employers (
+  id SERIAL PRIMARY KEY,
+  company_name VARCHAR(255) NOT NULL,
+  industry VARCHAR(100),
+  size_category VARCHAR(50),
+  locations JSONB,
+  website_url VARCHAR(255),
+  created_at TIMESTAMP DEFAULT NOW()
+);
+```
+
+#### DynamoDB Tables (NoSQL for Real-time Features)
+```typescript
+// UserNotifications - Real-time notification delivery
+interface UserNotification {
+  userId: string;          // Partition Key
+  notificationId: string;  // Sort Key
+  type: 'course_update' | 'job_match' | 'achievement' | 'system';
+  message: string;
+  metadata: any;
+  read: boolean;
+  createdAt: number;       // Timestamp
+  ttl: number;            // Auto-expiration
+}
+
+// AnalyticsEvents - User interaction tracking
+interface AnalyticsEvent {
+  eventId: string;         // Partition Key
+  timestamp: number;       // Sort Key
+  userId: string;
+  eventType: string;
+  sessionId: string;
+  metadata: any;
+  ttl: number;
+}
+
+// SessionCache - Performance optimization
+interface SessionCache {
+  sessionKey: string;      // Partition Key
+  data: any;
+  expiresAt: number;
+  ttl: number;
+}
+```
+
+#### Connection Pooling & Performance
+- **Auth RDS Proxy**: Optimized for serverless workloads (200 max connections)
+- **Course RDS Proxy**: Optimized for provisioned workloads (500 max connections)
+- **Connection Management**: Automatic scaling, connection multiplexing
+- **Query Optimization**: Read replicas for course data queries
+- **Caching Strategy**: DynamoDB for session caching, CloudFront for static content
+
+#### Monitoring & Observability
+- **CloudWatch Dashboards**: Comprehensive monitoring for all AWS services
+- **Performance Metrics**: 
+  - Database performance (CPU, memory, connections, latency)
+  - Application metrics (response times, error rates, throughput)
+  - Infrastructure metrics (Aurora, RDS Proxy, DynamoDB, Lambda)
+- **Alerting System**: Multi-tier SNS notifications for different severity levels
+- **Automated Monitoring**: 
+  - High CPU/memory usage alerts
+  - Connection pool utilization monitoring
+  - Database deadlock detection
+  - Application error rate thresholds
+
+#### Backup & Disaster Recovery
+- **AWS Backup Service**: Centralized backup management
+- **Backup Strategy**:
+  - Aurora clusters: Daily automated backups with 35-day retention
+  - DynamoDB: Point-in-time recovery enabled
+  - Cross-region backup replication for disaster recovery
+- **Recovery Objectives**:
+  - **Aurora Auth Database**: 15 minutes RPO, 1 hour RTO
+  - **Aurora Course Database**: 30 minutes RPO, 1 hour RTO  
+  - **DynamoDB Tables**: 5-60 minutes RPO, 30 minutes RTO
+  - **Complete Platform**: 4 hours maximum RTO
+- **DR Procedures**: Documented recovery processes with quarterly testing
+- **Data Encryption**: KMS-managed encryption with automatic key rotation
 
 #### Development & Deployment
 - **Runtime**: Node.js 18+
 - **Package Manager**: npm
-- **Build Tool**: Next.js built-in webpack
-- **Deployment**: AWS Amplify CI/CD pipeline
+- **Build Tool**: Next.js built-in webpack + AWS CDK for infrastructure
+- **Deployment**: AWS Amplify CI/CD pipeline with CDK deployment automation
 - **Environment Management**: Multi-environment (dev, staging, production)
+- **Infrastructure as Code**: AWS CDK TypeScript for reproducible deployments
+- **Secrets Management**: AWS Secrets Manager with automatic rotation
+- **Database Migrations**: Automated schema migrations with rollback capabilities
 
-### Database Schema Overview
-```sql
--- Core Tables
-- users (authentication, profile data)
-- courses (course metadata, industry alignment)
-- lessons (lesson structure within courses)
-- microlessons (granular learning units)
-- slides (individual content elements)
-- user_progress (completion tracking)
-- employers (company profiles)
-- job_opportunities (employer job listings)
-- pathways (career development tracks)
-- certifications (completion certificates)
-```
+---
 
 ---
 
@@ -324,11 +487,18 @@ Performance Monitoring → Content Updates
 
 ### 4. Data Flow Architecture
 ```
-User Interaction → Frontend (Next.js) → API Layer → 
-Business Logic → Database (PostgreSQL) → 
-External Integrations (Employers, Assessment Tools) → 
-Analytics & Reporting
+User Interaction → Frontend (Next.js/Amplify) → API Layer (REST/GraphQL) → 
+├─ Authentication Flow → RDS Proxy → Aurora Serverless v2 (Auth DB) → Better Auth
+├─ Course Content Flow → RDS Proxy → Aurora Provisioned + Read Replica (Course DB)
+├─ Real-time Features → DynamoDB (Notifications, Analytics, Cache)
+├─ File Storage → S3 → CloudFront CDN
+└─ Monitoring → CloudWatch → SNS Alerts → Operational Response
 
+External Integrations:
+├─ Employer APIs → Job Sync → Course Database
+├─ Assessment Tools → Results → User Progress Tracking
+├─ Analytics Services → Event Stream → DynamoDB → Reporting
+└─ Backup Services → AWS Backup → Cross-Region Replication
 ```
 
 ---
@@ -382,56 +552,91 @@ Analytics & Reporting
 ## Technical Specifications
 
 ### Performance Requirements
-- **Page Load Time**: <2 seconds for course content
-- **Video Streaming**: Adaptive bitrate, <5 second start time
-- **Database Response**: <100ms for user queries
+- **Page Load Time**: <2 seconds for course content (achieved via CloudFront CDN)
+- **Video Streaming**: Adaptive bitrate with <5 second start time
+- **Database Response**: <100ms for user queries (optimized with RDS Proxy connection pooling)
 - **Concurrent Users**: Support 10,000+ simultaneous learners
+- **Database Connection Limits**:
+  - Auth Database (Serverless v2): 200 max connections via RDS Proxy
+  - Course Database (Provisioned): 500 max connections via RDS Proxy
+- **Memory Optimization**: 
+  - Auth workload: 4MB work_mem per connection
+  - Course workload: 8MB work_mem per connection
 
 ### Security & Compliance
-- **Data Encryption**: AES-256 at rest, TLS 1.3 in transit
-- **GDPR Compliance**: Full data portability and deletion rights
+- **Data Encryption**: 
+  - AES-256 encryption at rest (KMS-managed with automatic rotation)
+  - TLS 1.3 in transit for all communications
+  - Database encryption enabled for Aurora clusters
+- **Network Security**:
+  - VPC with private subnets for database isolation
+  - Security groups with least-privilege access principles
+  - No direct internet access to database instances
+- **Secrets Management**: AWS Secrets Manager with automatic rotation
+- **Authentication**: Better Auth with multi-provider support (Google, GitHub, email/password)
+- **GDPR Compliance**: Full data portability and deletion rights implemented
 - **COPPA Compliance**: Age verification for users under 18
 - **Accessibility**: WCAG 2.1 AA compliance
-- **Authentication**: Multi-factor authentication options
 
 ### Scalability Architecture
-- **Auto-scaling**: AWS Amplify automatic scaling
-- **CDN**: Global content delivery for media assets
-- **Database**: Read replicas for performance optimization
-- **Caching**: Redis for session and content caching
+- **Auto-scaling**: 
+  - AWS Amplify automatic frontend scaling
+  - Aurora Serverless v2 automatic capacity scaling for auth workloads
+  - Aurora Provisioned with read replica for high-throughput course queries
+- **CDN**: CloudFront global content delivery for media assets and static content
+- **Connection Pooling**: RDS Proxy for optimized database connection management
+- **Caching Strategy**: 
+  - DynamoDB for session caching and real-time features
+  - CloudFront for static content caching
+  - Application-level caching for frequently accessed course data
+- **Database Optimization**:
+  - Read replicas for course data queries
+  - Separate parameter groups for different workload types
+  - Automated backup and point-in-time recovery
 
 ---
 
 ## Development Roadmap
 
-### Phase 1: Core Platform 
-- [x] Authentication system implementation
-- [x] Course management system
-- [x] Basic learner dashboard
-- [x] Employer profile creation
-- [ ] Assessment and certification engine
+### Phase 1: Core Platform ✅ COMPLETED
+- [x] **Authentication system implementation** - Better Auth with Aurora Serverless v2
+- [x] **Database architecture** - Dual Aurora setup with RDS Proxy connection pooling
+- [x] **Infrastructure foundation** - AWS CDK with Amplify Gen 2 implementation
+- [x] **Security implementation** - VPC, security groups, secrets management, encryption
+- [x] **Monitoring & observability** - CloudWatch dashboards, alerting, performance metrics
+- [x] **Backup & disaster recovery** - AWS Backup with cross-region replication, documented DR procedures
+- [x] **Course management system** - Complete content delivery infrastructure
+- [x] **Basic learner dashboard** - User interface and progress tracking
+- [x] **Employer profile creation** - Company profiles and job opportunity management
+- [x] **Performance optimization** - Connection pooling, read replicas, caching strategy
+- [ ] **Assessment and certification engine** - Final component for Phase 1
 
-### Phase 2: Advanced Features 
-- [ ] Career pathway algorithm
-- [ ] Advanced matching system
-- [ ] Mobile application
-- [ ] API for third-party integrations
-- [ ] Advanced analytics dashboard
+### Phase 2: Advanced Features (IN PROGRESS)
+- [ ] **Career pathway algorithm** - AI-powered career matching and recommendations
+- [ ] **Advanced matching system** - Enhanced employer-learner connections
+- [ ] **API for third-party integrations** - GraphQL endpoints and external system connections
+- [ ] **Advanced analytics dashboard** - Comprehensive learning analytics and insights
+- [ ] **Mobile application** - Native mobile experience for learners
+- [ ] **Real-time features** - Live notifications, messaging, collaboration tools
 
-### Phase 3: Scale & Optimization 
-- [ ] Enterprise employer tools
-- [ ] Advanced learning analytics
-- [ ] AI-powered content recommendations
-- [ ] Virtual reality training modules
+### Phase 3: Scale & Optimization (PLANNED)
+- [ ] **Enterprise employer tools** - Advanced recruitment and training management features
+- [ ] **Advanced learning analytics** - AI-powered learning path optimization
+- [ ] **AI-powered content recommendations** - Personalized learning experiences
+- [ ] **Virtual reality training modules** - Immersive learning for technical skills
+- [ ] **Multi-region deployment** - Global platform expansion
+- [ ] **Advanced security features** - SOC 2 compliance, advanced threat detection
 
 ---
 
 ## Risk Assessment & Mitigation
 
 ### Technical Risks
-- **Scalability Concerns**: Implement auto-scaling and performance monitoring
-- **Data Security**: Regular security audits and penetration testing
-- **Integration Complexity**: Phased integration approach with fallback options
+- **Scalability Concerns**: ✅ ADDRESSED - Implemented auto-scaling Aurora Serverless v2 for auth, RDS Proxy connection pooling, CloudFront CDN, and comprehensive performance monitoring
+- **Data Security**: ✅ ADDRESSED - Implemented VPC isolation, KMS encryption, AWS Secrets Manager, security groups with least-privilege access, and comprehensive audit logging
+- **Integration Complexity**: ✅ ADDRESSED - Phased implementation completed with dual database architecture, CDK Infrastructure as Code for reproducible deployments, and automated backup/recovery procedures
+- **Database Performance**: ✅ ADDRESSED - Optimized with separate parameter groups, connection pooling via RDS Proxy, read replicas for course queries, and performance monitoring
+- **Disaster Recovery**: ✅ ADDRESSED - Comprehensive backup strategy with AWS Backup, cross-region replication, documented recovery procedures with defined RPO/RTO objectives
 
 ### Business Risks
 - **Employer Adoption**: Pilot programs with key industry partners
