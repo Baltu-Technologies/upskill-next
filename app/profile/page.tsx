@@ -71,12 +71,12 @@ import CoreProfileSection from '@/src/components/profile/CoreProfileSection';
 import ProfilePortfolioProjects from '../components/ProfilePortfolioProjects';
 
 const tabs = [
-  { id: 'basic', label: 'Basic Information', icon: User },
-  { id: 'professional', label: 'Professional Profile', icon: Briefcase },
-  { id: 'education', label: 'Education & Credentials', icon: GraduationCap },
-  { id: 'portfolio', label: 'Portfolio & Projects', icon: FolderOpen },
-  { id: 'skills', label: 'Skills & Proficiency', icon: Brain },
-  { id: 'pathways', label: 'Career Interests & Pathways', icon: Navigation },
+  { id: 'basic', label: 'Basic Information', icon: User, badge: undefined },
+  { id: 'professional', label: 'Professional Profile', icon: Briefcase, badge: undefined },
+  { id: 'education', label: 'Education & Credentials', icon: GraduationCap, badge: undefined },
+  { id: 'portfolio', label: 'Portfolio & Projects', icon: FolderOpen, badge: undefined },
+  { id: 'skills', label: 'Skills & Proficiency', icon: Brain, badge: undefined },
+  { id: 'pathways', label: 'Career Interests & Pathways', icon: Navigation, badge: undefined },
 ];
 
 function ProfilePageContent() {
@@ -157,7 +157,7 @@ function ProfilePageContent() {
             <div className="relative flex-shrink-0">
               <div className="w-32 h-32 rounded-full overflow-hidden bg-gray-100 dark:bg-gray-800 shadow-lg">
                 <img 
-                  src={`https://images.unsplash.com/photo-1494790108755-2616b612b786?w=128&h=128&fit=crop&crop=face`}
+                  src="/media/Peter_Costa_Bio_2024.jpg"
                   alt={`${profileData.candidate.firstName} ${profileData.candidate.lastName}`}
                   className="w-full h-full object-cover"
                 />
