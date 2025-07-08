@@ -3,6 +3,8 @@
 import { useState, useEffect, Suspense, useCallback } from 'react';
 import React from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
+import Image from 'next/image';
+import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input';
@@ -51,7 +53,8 @@ import {
   Info,
   Briefcase,
   Zap,
-  BookOpen
+  BookOpen,
+  Trophy
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { 
@@ -148,72 +151,120 @@ function ProfilePageContent() {
   };
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-black">
       <div className="container mx-auto px-6 py-8">
-        {/* User Header Banner */}
-        <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl p-8 mb-8">
-          <div className="flex items-start gap-8 max-w-4xl">
-            {/* Profile Image */}
-            <div className="relative flex-shrink-0">
-              <div className="w-32 h-32 rounded-full overflow-hidden bg-gray-100 dark:bg-gray-800 shadow-lg">
-                <img 
-                  src="/media/Peter_Costa_Bio_2024.jpg"
-                  alt={`${profileData.candidate.firstName} ${profileData.candidate.lastName}`}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-            </div>
-            
-            {/* User Info */}
-            <div className="flex-1 pt-4">
-              <div className="flex items-center gap-4 mb-6">
-                <h1 className="text-4xl font-semibold text-gray-900 dark:text-white">
-                  {profileData.candidate.firstName} {profileData.candidate.lastName}
-                </h1>
-              </div>
-              
-              {/* Stats Row */}
-              <div className="flex items-center gap-12 text-sm mb-6">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-orange-50 dark:bg-orange-900/20 flex items-center justify-center border border-orange-200 dark:border-orange-800">
-                    <Target className="w-5 h-5 text-orange-600 dark:text-orange-400" />
-                  </div>
-                  <div>
-                    <div className="font-semibold text-gray-900 dark:text-white text-base">28 Day Streak</div>
-                    <div className="text-gray-500 dark:text-gray-400 text-sm">Learning consistently</div>
-                  </div>
-                </div>
-                
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-green-50 dark:bg-green-900/20 flex items-center justify-center border border-green-200 dark:border-green-800">
-                    <GraduationCap className="w-5 h-5 text-green-600 dark:text-green-400" />
-                  </div>
-                  <div>
-                    <div className="font-semibold text-gray-900 dark:text-white text-base">12 Courses</div>
-                    <div className="text-gray-500 dark:text-gray-400 text-sm">Completed</div>
-                  </div>
-                </div>
-                
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center border border-blue-200 dark:border-blue-800">
-                    <Award className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-                  </div>
-                  <div>
-                    <div className="font-semibold text-gray-900 dark:text-white text-base">8 Badges</div>
-                    <div className="text-gray-500 dark:text-gray-400 text-sm">Earned</div>
-                  </div>
-                </div>
-              </div>
+        {/* User Header Banner - Matching My Pathways Page Aesthetic */}
+        <div className="relative h-[50vh] flex items-center justify-center overflow-hidden rounded-2xl mb-8">
+          {/* Background Image */}
+          <div className="absolute inset-0 z-0">
+            <Image
+              src="https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=1920&h=1080&fit=crop&crop=center"
+              alt="Professional workspace environment"
+              fill
+              className="object-cover"
+              priority
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-black/95 via-black/70 to-black/40" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent" />
+          </div>
 
-              <p className="text-xl text-gray-600 dark:text-gray-400 leading-relaxed max-w-2xl mb-8">
+          {/* Profile Content */}
+          <div className="relative z-10 container mx-auto px-4">
+            <div className="max-w-6xl">
+              {/* Profile Badge and Info */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8 }}
+                className="flex items-center gap-8 mb-8"
+              >
+                {/* Profile Image Badge */}
+                <div className="relative w-28 h-28 md:w-32 md:h-32 rounded-2xl overflow-hidden shadow-2xl shadow-blue-500/25">
+                  <div className="absolute inset-0 bg-gradient-to-r from-blue-500/90 to-purple-600/90" />
+                  <img 
+                    src="/media/Peter_Costa_Bio_2024.jpg"
+                    alt={`${profileData.candidate.firstName} ${profileData.candidate.lastName}`}
+                    className="w-full h-full object-cover relative z-10"
+                  />
+                  <div className="absolute bottom-0 left-0 right-0 bg-black/60 backdrop-blur-sm py-1 z-20">
+                    <span className="text-white font-bold text-sm block text-center">Profile</span>
+                  </div>
+                </div>
+
+                {/* Profile Summary */}
+                <div className="flex-1 max-w-lg">
+                  <div className="flex items-center justify-between mb-4">
+                    <span className="text-white font-medium">Profile Completion</span>
+                    <span className="text-blue-400 font-bold">85% Complete</span>
+                  </div>
+                  <div className="relative h-4 bg-gray-800/50 rounded-full overflow-hidden">
+                    <div 
+                      className="absolute top-0 left-0 h-full bg-gradient-to-r from-blue-500 to-purple-600 transition-all duration-1000 rounded-full"
+                      style={{ width: '85%' }}
+                    />
+                  </div>
+                  <div className="text-gray-400 text-sm mt-1">
+                    2 sections remaining
+                  </div>
+                </div>
+
+                {/* See Employer View Button */}
+                <Button className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white border-0 shadow-lg">
+                  <Users className="w-4 h-4 mr-2" />
+                  See Employer View
+                </Button>
+              </motion.div>
+              
+              {/* Title */}
+              <motion.h1
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.2 }}
+                className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight"
+              >
+                <span className="bg-gradient-to-r from-white via-blue-100 to-purple-100 bg-clip-text text-transparent">
+                  {profileData.candidate.firstName}{" "}
+                </span>
+                <span className="bg-gradient-to-r from-blue-400 via-purple-400 to-blue-300 bg-clip-text text-transparent">
+                  {profileData.candidate.lastName}
+                </span>
+              </motion.h1>
+              
+              {/* Stats */}
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.4 }}
+                className="flex flex-wrap items-center gap-6 text-gray-300 mb-8"
+              >
+                <div className="flex items-center gap-3 bg-black/30 backdrop-blur-sm px-6 py-3 rounded-full">
+                  <Target className="w-6 h-6 text-orange-400" />
+                  <span className="text-lg font-medium">28 Day Streak</span>
+                </div>
+                <div className="flex items-center gap-3 bg-black/30 backdrop-blur-sm px-6 py-3 rounded-full">
+                  <Trophy className="w-6 h-6 text-green-400" />
+                  <span className="text-lg font-medium">12 Courses Complete</span>
+                </div>
+                <div className="flex items-center gap-3 bg-black/30 backdrop-blur-sm px-6 py-3 rounded-full">
+                  <Award className="w-6 h-6 text-blue-400" />
+                  <span className="text-lg font-medium">8 Badges Earned</span>
+                </div>
+              </motion.div>
+
+              <motion.p
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.6 }}
+                className="text-xl text-gray-300 leading-relaxed max-w-3xl"
+              >
                 {profileData.candidate.headline || `I'm a Product Designer based in ${profileData.candidate.city || 'Melbourne'}.`}
-              </p>
+              </motion.p>
             </div>
           </div>
         </div>
-        {/* Navigation Tabs - Fortnite Inspired */}
+        {/* Navigation Tabs - Glass-morphism Design */}
         <div className="mb-8">
-          <div className="bg-[#1e1e1e] rounded-lg border border-[#3a8fb7] p-1">
+          <div className="bg-gradient-to-br from-gray-900/80 to-gray-800/60 backdrop-blur-xl border border-white/20 rounded-lg p-1">
             <div className="flex">
               {tabs.map((tab) => {
                 const IconComponent = tab.icon;
@@ -222,10 +273,10 @@ function ProfilePageContent() {
                     key={tab.id}
                     onClick={() => handleTabChange(tab.id)}
                     className={cn(
-                      "flex-1 flex items-center justify-center gap-2 px-4 py-3 font-bold text-sm transition-all duration-200 relative",
+                      "flex-1 flex items-center justify-center gap-2 px-4 py-3 font-bold text-sm transition-all duration-200 relative rounded-lg",
                       activeTab === tab.id
-                        ? "bg-gradient-to-r from-[#3a8fb7] to-[#6c3e9e] text-white rounded-t-lg"
-                        : "text-gray-400 hover:text-[#3a8fb7]"
+                        ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg"
+                        : "text-gray-300 hover:text-white hover:bg-white/10"
                     )}
                   >
                     <IconComponent className="h-4 w-4" />
@@ -236,7 +287,7 @@ function ProfilePageContent() {
                     {tab.badge && (
                       <Badge 
                         variant="secondary" 
-                        className="ml-1 h-5 px-1.5 text-xs bg-[#6c3e9e] text-white border-0"
+                        className="ml-1 h-5 px-1.5 text-xs bg-purple-600 text-white border-0"
                       >
                         {tab.badge}
                       </Badge>
@@ -248,8 +299,8 @@ function ProfilePageContent() {
           </div>
         </div>
 
-        {/* Tab Content - Fortnite Inspired */}
-        <div className="bg-[#262626] rounded-lg p-6 animate-in fade-in duration-300">
+        {/* Tab Content - Glass-morphism Design */}
+        <div className="bg-gradient-to-br from-gray-900/80 to-gray-800/60 backdrop-blur-xl border border-white/20 rounded-lg p-6 animate-in fade-in duration-300">
           {renderProfileContent()}
         </div>
       </div>

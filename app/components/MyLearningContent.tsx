@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Heart, BookOpen, Star, Zap, Clock, ChevronRight, Play, Eye, ChevronDown, ChevronUp, Trophy } from 'lucide-react';
+import { Heart, BookOpen, Star, Zap, Clock, ChevronRight, Play, Eye, ChevronDown, ChevronUp, Trophy, Building, MapPin, Users, ExternalLink } from 'lucide-react';
 import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
@@ -230,9 +230,128 @@ const mockCareerPathways: CareerPathway[] = [
   }
 ];
 
+// Define Employer interface
+interface Employer {
+  id: number;
+  name: string;
+  logo: string;
+  locations: string[];
+  industry: string;
+  size: string;
+  description: string;
+  salaryRange: string;
+  benefits: string[];
+  technologies: string[];
+  industries: string[];
+  image: string;
+  isHiring: boolean;
+  featured: boolean;
+}
+
+// Job opportunities data - featured employers from the All Employers page
+const jobOpportunityEmployers: Employer[] = [
+  {
+    id: 1,
+    name: 'Taiwan Semiconductor Manufacturing (TSMC)',
+    logo: '/media/organization_logo/Tsmc.svg.png',
+    locations: ['Phoenix, AZ', 'Chandler, AZ'],
+    industry: 'Semiconductor & Microelectronics',
+    size: '5,000+ employees',
+    description: 'Leading semiconductor foundry manufacturing advanced chips for global technology companies. Specializing in cutting-edge process technologies.',
+    salaryRange: '$65K - $120K',
+    benefits: ['Health Insurance', 'Retirement Plan', 'Stock Options', 'Training Programs'],
+    technologies: ['Photolithography', 'EUV Systems', 'Process Control', 'Cleanroom Tech'],
+    industries: ['Semiconductor', 'Microelectronics'],
+    image: 'https://images.unsplash.com/photo-1620714774021-999933e45904?w=600&h=300&fit=crop&crop=center',
+    isHiring: true,
+    featured: true
+  },
+  {
+    id: 2,
+    name: 'Honeywell Aerospace',
+    logo: '/media/organization_logo/honeywell-aerospace.jpg',
+    locations: ['Tempe, AZ'],
+    industry: 'Aerospace & Aviation Technologies',
+    size: '1,000+ employees',
+    description: 'Developing advanced aerospace technologies including avionics, engines, and flight control systems for commercial and defense applications.',
+    salaryRange: '$70K - $135K',
+    benefits: ['Health Insurance', 'Retirement Plan', 'Tuition Reimbursement', 'Flexible Schedule'],
+    technologies: ['Avionics Systems', 'Flight Controls', 'Turbine Engines', 'Navigation Systems'],
+    industries: ['Aerospace', 'Aviation Technologies'],
+    image: 'https://images.unsplash.com/photo-1569629985277-9cb0eb11c2e0?w=600&h=300&fit=crop&crop=center',
+    isHiring: true,
+    featured: true
+  },
+  {
+    id: 3,
+    name: 'Amkor Technology',
+    logo: '/media/organization_logo/amkor_technology.png',
+    locations: ['Tempe, AZ', 'Chandler, AZ'],
+    industry: 'Semiconductor & Microelectronics',
+    size: '2,500+ employees',
+    description: 'Global leader in semiconductor assembly and test services, providing chip packaging solutions for the electronics industry.',
+    salaryRange: '$55K - $95K',
+    benefits: ['Health Insurance', 'Retirement Plan', 'Performance Bonuses', 'Career Development'],
+    technologies: ['IC Packaging', 'Wire Bonding', 'Test Systems', 'Assembly Automation'],
+    industries: ['Semiconductor', 'Electronics Assembly'],
+    image: 'https://images.unsplash.com/photo-1555664424-778a1e5e1b48?w=600&h=300&fit=crop&crop=center',
+    isHiring: true,
+    featured: true
+  },
+  {
+    id: 4,
+    name: 'Phoenix Data Center Solutions',
+    logo: '/media/baltu_technologies_logo_flower_only.png',
+    locations: ['Phoenix, AZ', 'Scottsdale, AZ'],
+    industry: 'Data Centers & Cloud Infrastructure',
+    size: '800+ employees',
+    description: 'Operating state-of-the-art data centers providing cloud infrastructure and colocation services for enterprise clients.',
+    salaryRange: '$60K - $110K',
+    benefits: ['Health Insurance', 'Retirement Plan', 'Remote Work Options', 'Training Programs'],
+    technologies: ['Server Hardware', 'Network Infrastructure', 'HVAC Systems', 'Security Systems'],
+    industries: ['Data Centers', 'Cloud Infrastructure'],
+    image: 'https://images.unsplash.com/photo-1580894908361-967195033215?w=600&h=300&fit=crop&crop=center',
+    isHiring: true,
+    featured: false
+  },
+  {
+    id: 5,
+    name: 'TEKsystems Infrastructure',
+    logo: '/media/organization_logo/tek-systems.webp',
+    locations: ['Scottsdale, AZ', 'Phoenix, AZ', 'Mesa, AZ'],
+    industry: 'Broadband & Fiber Optics',
+    size: '1,200+ employees',
+    description: 'Leading provider of fiber optic network installation and telecommunications infrastructure services across the Southwest.',
+    salaryRange: '$50K - $85K',
+    benefits: ['Health Insurance', 'Retirement Plan', 'Vehicle Allowance', 'Safety Bonuses'],
+    technologies: ['Fiber Optics', 'Network Testing', 'Cable Installation', '5G Infrastructure'],
+    industries: ['Broadband', 'Fiber Optics'],
+    image: 'https://images.unsplash.com/photo-1580570595240-5eE06969528f?w=600&h=300&fit=crop&crop=center',
+    isHiring: true,
+    featured: false
+  },
+  {
+    id: 6,
+    name: 'SolarMax Energy Systems',
+    logo: '/media/baltu_technologies_logo_flower_only.png',
+    locations: ['Mesa, AZ', 'Glendale, AZ'],
+    industry: 'Green Technology & Renewable Energy',
+    size: '600+ employees',
+    description: 'Installing and maintaining large-scale solar energy systems and battery storage solutions for commercial and utility clients.',
+    salaryRange: '$55K - $90K',
+    benefits: ['Health Insurance', 'Retirement Plan', 'Green Energy Bonus', 'Training Certifications'],
+    technologies: ['Solar Panels', 'Battery Storage', 'Grid Integration', 'Power Electronics'],
+    industries: ['Green Technology', 'Renewable Energy'],
+    image: 'https://images.unsplash.com/photo-1509391366360-2e959784a276?w=600&h=300&fit=crop&crop=center',
+    isHiring: true,
+    featured: false
+  }
+];
+
 export default function MyLearningContent() {
   const [favoriteCourses, setFavoriteCourses] = useState<Course[]>(mockFavoriteCourses);
   const [expandedPathways, setExpandedPathways] = useState<number[]>([]);
+  const [favoriteEmployers, setFavoriteEmployers] = useState<number[]>([]);
 
   const toggleFavorite = (courseId: number) => {
     setFavoriteCourses(prev => 
@@ -247,6 +366,14 @@ export default function MyLearningContent() {
       prev.includes(pathwayId)
         ? prev.filter(id => id !== pathwayId)
         : [...prev, pathwayId]
+    );
+  };
+
+  const toggleEmployerFavorite = (employerId: number) => {
+    setFavoriteEmployers(prev => 
+      prev.includes(employerId)
+        ? prev.filter(id => id !== employerId)
+        : [...prev, employerId]
     );
   };
 
@@ -631,6 +758,171 @@ export default function MyLearningContent() {
               </Button>
             </div>
           )}
+        </section>
+
+        {/* Job Opportunities Section */}
+        <section className="mb-12">
+          <div className="flex items-center justify-between mb-8">
+            <div>
+              <h2 className="text-3xl font-bold text-white mb-2">
+                Job Opportunities
+              </h2>
+              <p className="text-gray-400 text-lg">
+                Discover career opportunities with our industry partners
+              </p>
+            </div>
+            <Button 
+              variant="outline" 
+              className="border-blue-500/50 text-blue-400 hover:bg-blue-500/10 hover:text-blue-300 transition-all duration-300"
+            >
+              <ExternalLink className="h-4 w-4 mr-2" />
+              View All Employers
+            </Button>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {jobOpportunityEmployers.map((employer) => (
+              <Card key={employer.id} className="group cursor-pointer overflow-hidden border-2 border-slate-700 bg-slate-800/50 hover:border-blue-400/50 transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/10 flex flex-col h-full">
+                {/* Employer Banner */}
+                <div className="relative h-48 overflow-hidden">
+                  <div className="absolute inset-0 transition-transform duration-[4000ms] ease-out group-hover:scale-125 group-hover:translate-x-3 group-hover:-translate-y-2">
+                    <Image
+                      src={employer.image}
+                      alt={employer.name}
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                  
+                  {/* Featured Badge */}
+                  {employer.featured && (
+                    <div className="absolute top-3 left-3">
+                      <Badge className="bg-orange-500 text-white font-medium">
+                        Featured
+                      </Badge>
+                    </div>
+                  )}
+
+                  {/* Hiring Status */}
+                  {employer.isHiring && (
+                    <div className="absolute top-3 right-3">
+                      <Badge className="bg-green-500 text-white font-medium">
+                        Hiring Now
+                      </Badge>
+                    </div>
+                  )}
+
+                  {/* Heart/Favorite Button */}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleEmployerFavorite(employer.id);
+                    }}
+                    className="absolute bottom-3 right-3 p-2 rounded-full bg-black/50 hover:bg-black/70 transition-all duration-200 group/heart"
+                  >
+                    <Heart 
+                      className={`h-5 w-5 transition-all duration-200 ${
+                        favoriteEmployers.includes(employer.id)
+                          ? 'fill-red-500 text-red-500 scale-110'
+                          : 'text-white group-hover/heart:text-red-400'
+                      }`}
+                    />
+                  </button>
+                </div>
+
+                {/* Company Logo - Overlapping image and content */}
+                <div className="relative -mt-8 ml-6 z-10">
+                  <div className="flex items-end gap-4">
+                    <div className="relative w-32 h-16 bg-white rounded-xl p-3 flex items-center justify-center shadow-xl border-2 border-slate-700">
+                      <Image
+                        src={employer.logo}
+                        alt={employer.name}
+                        width={96}
+                        height={40}
+                        className="object-contain max-h-10"
+                      />
+                    </div>
+                    <div className="pb-3 flex flex-col justify-end gap-1">
+                      {/* Location */}
+                      <div className="flex items-center gap-1 text-gray-300 text-sm">
+                        <MapPin className="h-3 w-3" />
+                        {employer.locations.length === 1 
+                          ? employer.locations[0]
+                          : `${employer.locations[0]} +${employer.locations.length - 1} more`
+                        }
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <CardContent className="p-6 flex flex-col flex-1 pt-4">
+                  <div className="space-y-4 flex-1">
+                    {/* Company Name */}
+                    <h3 className="text-white font-bold text-xl leading-tight">
+                      {employer.name}
+                    </h3>
+
+                    {/* Company Description */}
+                    <p className="text-gray-300 text-sm leading-relaxed line-clamp-2">
+                      {employer.description}
+                    </p>
+
+                    {/* Key Stats Row */}
+                    <div className="flex items-center justify-between text-sm">
+                      <div className="flex items-center text-gray-300">
+                        <Users className="h-4 w-4 mr-1" />
+                        {employer.size}
+                      </div>
+                      <div className="text-green-400 font-semibold">
+                        {employer.salaryRange}
+                      </div>
+                    </div>
+
+                    {/* Technologies and Industries */}
+                    <div className="space-y-3">
+                      <div>
+                        <p className="text-xs text-gray-400 font-medium uppercase tracking-wide mb-2">Technologies</p>
+                        <div className="flex flex-wrap gap-2">
+                          {employer.technologies.slice(0, 2).map((tech, index) => (
+                            <Badge key={index} variant="outline" className="text-xs border-blue-400/50 text-blue-400 bg-blue-400/5">
+                              {tech}
+                            </Badge>
+                          ))}
+                          {employer.technologies.length > 2 && (
+                            <Badge variant="outline" className="text-xs border-gray-500 text-gray-400">
+                              +{employer.technologies.length - 2} more
+                            </Badge>
+                          )}
+                        </div>
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-400 font-medium uppercase tracking-wide mb-2">Industries</p>
+                        <div className="flex flex-wrap gap-2">
+                          {employer.industries.map((industry, index) => (
+                            <Badge key={index} variant="outline" className="text-xs border-orange-400/50 text-orange-400 bg-orange-400/5">
+                              {industry}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Action Button - Always at bottom */}
+                  <div className="pt-4 mt-auto">
+                    <Button 
+                      size="sm" 
+                      className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg hover:shadow-blue-500/25 transition-all duration-300 rounded-xl border-0"
+                    >
+                      <Building className="h-4 w-4 mr-2" />
+                      View Opportunities
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         </section>
       </div>
     </div>
