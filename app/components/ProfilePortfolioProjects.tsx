@@ -59,8 +59,8 @@ const mockProjects: Project[] = [
     technologies: ['PLC Programming', 'Pneumatics', 'Vision Systems', 'HMI Design', 'Industrial Networks'],
     skillsUsed: ['Automation Design', 'Electrical Wiring', 'Mechanical Assembly', 'System Integration'],
     media: [
-      { type: 'image', url: '/api/placeholder/600/400', caption: 'Completed sorting system' },
-      { type: 'image', url: '/api/placeholder/600/400', caption: 'Control panel and HMI' }
+      { type: 'image', url: 'https://images.unsplash.com/photo-1647166545674-ce28ce93bdca?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2340&q=80', caption: 'Completed sorting system' },
+      { type: 'image', url: 'https://images.unsplash.com/photo-1565793298595-6a879b1d9492?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2071&q=80', caption: 'Control panel and HMI' }
     ],
     repoLink: 'https://github.com/username/warehouse-automation',
     liveDemoLink: 'https://demo.sorting-system.com',
@@ -76,7 +76,7 @@ const mockProjects: Project[] = [
     technologies: ['ROS', 'LIDAR', 'Arduino', 'Motor Controllers', 'Wireless Communication'],
     skillsUsed: ['Robotics Programming', 'Mechanical Design', 'Sensor Integration', 'Path Planning'],
     media: [
-      { type: 'image', url: '/api/placeholder/300/600', caption: 'AMR in operation' },
+      { type: 'image', url: 'https://images.unsplash.com/photo-1518624823428-2c5ca44eeef5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80', caption: 'AMR in operation' },
       { type: 'video', url: 'https://youtube.com/embed/demo', caption: 'Navigation demo' }
     ],
     repoLink: 'https://github.com/username/autonomous-mobile-robot',
@@ -91,7 +91,7 @@ const mockProjects: Project[] = [
     technologies: ['CNC Programming', 'Stepper Motors', 'Linear Actuators', 'G-code', 'CAM Software'],
     skillsUsed: ['Mechanical Fabrication', 'Electronics Assembly', 'Precision Machining', 'CAD Design'],
     media: [
-      { type: 'image', url: '/api/placeholder/800/500', caption: 'Completed CNC machine' }
+      { type: 'image', url: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80', caption: 'Completed CNC machine' }
     ],
     liveDemoLink: 'https://cnc-build-demo.com',
     isFeatured: false
@@ -106,8 +106,8 @@ const mockProjects: Project[] = [
     technologies: ['ESP32', 'LoRaWAN', 'PCB Design', 'Industrial Sensors', 'Cloud Analytics'],
     skillsUsed: ['Circuit Design', 'Embedded Programming', 'Wireless Networks', 'Data Analysis'],
     media: [
-      { type: 'image', url: '/api/placeholder/600/400', caption: 'Custom sensor nodes' },
-      { type: 'image', url: '/api/placeholder/600/400', caption: 'PCB layout design' }
+      { type: 'image', url: 'https://images.unsplash.com/photo-1555664424-778a1e5e1b48?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80', caption: 'Custom sensor nodes' },
+      { type: 'image', url: 'https://images.unsplash.com/photo-1518155317743-a8ff43ea6a5f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80', caption: 'PCB layout design' }
     ],
     repoLink: 'https://github.com/username/iot-monitoring',
     liveDemoLink: 'https://monitoring-dashboard.com',
@@ -123,7 +123,7 @@ const mockProjects: Project[] = [
     technologies: ['Robot Programming', 'MIG/TIG Welding', 'Safety Systems', 'Fixture Design', 'Quality Control'],
     skillsUsed: ['Industrial Robotics', 'Welding Technology', 'Safety Engineering', 'Process Optimization'],
     media: [
-      { type: 'image', url: '/api/placeholder/600/400', caption: 'Robotic welding in action' },
+      { type: 'image', url: 'https://images.unsplash.com/photo-1540573133985-87b6da6d54a9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2076&q=80', caption: 'Robotic welding in action' },
       { type: 'video', url: 'https://youtube.com/embed/welding-demo', caption: 'Welding sequence demo' }
     ],
     isFeatured: false

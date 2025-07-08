@@ -118,8 +118,7 @@ export const profileNavigationStructure: ProfileNavigationConfig[] = [
       {
         id: 'portfolio-projects',
         label: 'Portfolio & Projects',
-        icon: FolderOpen,
-        badge: '3'
+        icon: FolderOpen
       }
     ]
   },

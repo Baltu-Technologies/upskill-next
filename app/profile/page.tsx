@@ -73,8 +73,8 @@ import ProfilePortfolioProjects from '../components/ProfilePortfolioProjects';
 const tabs = [
   { id: 'basic', label: 'Basic Information', icon: User },
   { id: 'professional', label: 'Professional Profile', icon: Briefcase },
-  { id: 'education', label: 'Education & Credentials', icon: GraduationCap, badge: '8' },
-  { id: 'portfolio', label: 'Portfolio & Projects', icon: FolderOpen, badge: '3' },
+  { id: 'education', label: 'Education & Credentials', icon: GraduationCap },
+  { id: 'portfolio', label: 'Portfolio & Projects', icon: FolderOpen },
   { id: 'skills', label: 'Skills & Proficiency', icon: Brain },
   { id: 'pathways', label: 'Career Interests & Pathways', icon: Navigation },
 ];
