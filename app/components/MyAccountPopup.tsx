@@ -36,7 +36,7 @@ const LANGUAGES = [
 ];
 
 export default function MyAccountPopup({ isOpen, onClose, anchorEl }: MyAccountPopupProps) {
-  const { theme, setTheme } = useTheme();
+  const { theme, setTheme, isDark } = useTheme();
   const { user, signOut } = useAuth();
   const router = useRouter();
   const [selectedLanguage, setSelectedLanguage] = useState('en');
@@ -58,8 +58,6 @@ export default function MyAccountPopup({ isOpen, onClose, anchorEl }: MyAccountP
   }, [showLanguageDropdown, isOpen]);
 
   if (!isOpen) return null;
-
-
 
   const handleLogout = async () => {
     try {
@@ -116,7 +114,7 @@ export default function MyAccountPopup({ isOpen, onClose, anchorEl }: MyAccountP
       
       {/* Popup */}
       <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
-        <Card className="w-full max-w-md bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm shadow-2xl border border-white/20 dark:border-slate-700/50">
+        <Card className={`w-full max-w-md ${isDark ? 'bg-slate-800/95 border-slate-700/50' : 'bg-white/95 border-white/20'} backdrop-blur-sm shadow-2xl border`}>
           <CardContent className="p-6">
             {/* Header */}
             <div className="flex items-center justify-between mb-6">
@@ -125,11 +123,11 @@ export default function MyAccountPopup({ isOpen, onClose, anchorEl }: MyAccountP
                   <User className="h-5 w-5 text-white" />
                 </div>
                 <div>
-                  <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  <h2 className={`text-lg font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>
                     My Account
                   </h2>
                   {user && (
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                    <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
                       {user.email || user.name || 'User'}
                     </p>
                   )}
@@ -139,7 +137,7 @@ export default function MyAccountPopup({ isOpen, onClose, anchorEl }: MyAccountP
                 variant="ghost"
                 size="icon"
                 onClick={onClose}
-                className="h-8 w-8 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                className={`h-8 w-8 ${isDark ? 'text-gray-400 hover:text-gray-200' : 'text-gray-500 hover:text-gray-700'}`}
               >
                 <X className="h-4 w-4" />
               </Button>
@@ -148,7 +146,7 @@ export default function MyAccountPopup({ isOpen, onClose, anchorEl }: MyAccountP
             <div className="space-y-6">
               {/* Theme Settings */}
               <div>
-                <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-3">
+                <h3 className={`text-sm font-medium ${isDark ? 'text-white' : 'text-gray-900'} mb-3`}>
                   Theme
                 </h3>
                 <Button
@@ -156,14 +154,13 @@ export default function MyAccountPopup({ isOpen, onClose, anchorEl }: MyAccountP
                   onClick={cycleTheme}
                   className={cn(
                     "w-full justify-between h-12 px-4",
-                    "bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700",
-                    "border border-slate-300 dark:border-slate-600",
-                    "transition-all duration-200 hover:scale-[1.02]",
+                    isDark ? "bg-slate-800 hover:bg-slate-700 border-slate-600" : "bg-white hover:bg-slate-50 border-slate-300",
+                    "border transition-all duration-200 hover:scale-[1.02]",
                     "shadow-sm hover:shadow-md"
                   )}
                 >
-                  <div className="flex items-center gap-3">
-                    {getThemeIcon()}
+                  <div className={`flex items-center gap-3 ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                    <span>{getThemeIcon()}</span>
                     <span className="text-sm font-medium">{getThemeLabel()}</span>
                   </div>
                 </Button>
@@ -171,7 +168,7 @@ export default function MyAccountPopup({ isOpen, onClose, anchorEl }: MyAccountP
 
               {/* Language Settings */}
               <div className="relative" ref={dropdownRef}>
-                <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-3">
+                <h3 className={`text-sm font-medium ${isDark ? 'text-white' : 'text-gray-900'} mb-3`}>
                   Language
                 </h3>
                 <Button
@@ -179,28 +176,27 @@ export default function MyAccountPopup({ isOpen, onClose, anchorEl }: MyAccountP
                   onClick={() => setShowLanguageDropdown(!showLanguageDropdown)}
                   className={cn(
                     "w-full justify-between h-12 px-4",
-                    "bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700",
-                    "border border-slate-300 dark:border-slate-600",
-                    "transition-all duration-200 hover:scale-[1.02]",
+                    isDark ? "bg-slate-800 hover:bg-slate-700 border-slate-600" : "bg-white hover:bg-slate-50 border-slate-300",
+                    "border transition-all duration-200 hover:scale-[1.02]",
                     "shadow-sm hover:shadow-md"
                   )}
                 >
-                  <div className="flex items-center gap-3">
-                    <Globe className="h-4 w-4" />
+                  <div className={`flex items-center gap-3 ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                    <Globe className={`h-4 w-4 ${isDark ? 'text-white' : 'text-gray-900'}`} />
                     <div className="flex items-center gap-2">
                       <span className="text-lg">{LANGUAGES.find(l => l.code === selectedLanguage)?.flag}</span>
                       <span className="text-sm font-medium">{LANGUAGES.find(l => l.code === selectedLanguage)?.name}</span>
                     </div>
                   </div>
                   <ChevronDown className={cn(
-                    "h-4 w-4 transition-transform duration-200",
+                    `h-4 w-4 transition-transform duration-200 ${isDark ? 'text-white' : 'text-gray-900'}`,
                     showLanguageDropdown && "rotate-180"
                   )} />
                 </Button>
                 
                 {/* Dropdown */}
                 {showLanguageDropdown && (
-                  <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-lg shadow-lg z-10">
+                  <div className={`absolute top-full left-0 right-0 mt-2 ${isDark ? 'bg-slate-800 border-slate-600' : 'bg-white border-slate-300'} border rounded-lg shadow-lg z-10`}>
                     <div className="py-2">
                       {LANGUAGES.map((language) => (
                         <Button
@@ -211,12 +207,12 @@ export default function MyAccountPopup({ isOpen, onClose, anchorEl }: MyAccountP
                             setShowLanguageDropdown(false);
                           }}
                           className={cn(
-                            "w-full justify-between h-10 px-4 rounded-none",
-                            "hover:bg-slate-50 dark:hover:bg-slate-700",
-                            selectedLanguage === language.code && "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400"
+                            `w-full justify-between h-10 px-4 rounded-none ${isDark ? 'text-white' : 'text-gray-900'}`,
+                            isDark ? "hover:bg-slate-700" : "hover:bg-slate-50",
+                            selectedLanguage === language.code && (isDark ? "bg-blue-900/20 text-blue-400" : "bg-blue-50 text-blue-600")
                           )}
                         >
-                          <div className="flex items-center gap-3">
+                          <div className={`flex items-center gap-3 ${isDark ? 'text-white' : 'text-gray-900'}`}>
                             <span className="text-lg">{language.flag}</span>
                             <span className="text-sm">{language.name}</span>
                           </div>
@@ -231,21 +227,20 @@ export default function MyAccountPopup({ isOpen, onClose, anchorEl }: MyAccountP
               </div>
 
               {/* Action Buttons */}
-              <div className="space-y-3 pt-4 border-t border-slate-200 dark:border-slate-700">
+              <div className={`space-y-3 pt-4 border-t ${isDark ? 'border-slate-700' : 'border-slate-200'}`}>
                 {/* Settings */}
                 <Button
                   variant="outline"
                   onClick={handleSettings}
                   className={cn(
                     "w-full justify-start h-12 px-4",
-                    "bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700",
-                    "border border-slate-300 dark:border-slate-600",
-                    "transition-all duration-200 hover:scale-[1.02]",
+                    isDark ? "bg-slate-800 hover:bg-slate-700 border-slate-600" : "bg-white hover:bg-slate-50 border-slate-300",
+                    "border transition-all duration-200 hover:scale-[1.02]",
                     "shadow-sm hover:shadow-md"
                   )}
                 >
-                  <Settings className="h-4 w-4 mr-3" />
-                  <span className="text-sm font-medium">Settings</span>
+                  <Settings className={`h-4 w-4 mr-3 ${isDark ? 'text-white' : 'text-gray-900'}`} />
+                  <span className={`text-sm font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>Settings</span>
                 </Button>
 
                 {/* Login/Logout */}
@@ -255,9 +250,8 @@ export default function MyAccountPopup({ isOpen, onClose, anchorEl }: MyAccountP
                     onClick={handleLogout}
                     className={cn(
                       "w-full justify-start h-12 px-4",
-                      "bg-white dark:bg-slate-800 hover:bg-red-50 dark:hover:bg-red-900/20",
-                      "border border-slate-300 dark:border-slate-600 hover:border-red-300 dark:hover:border-red-600",
-                      "text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300",
+                      isDark ? "bg-slate-800 hover:bg-red-900/20 border-slate-600 hover:border-red-600" : "bg-white hover:bg-red-50 border-slate-300 hover:border-red-300",
+                      isDark ? "text-red-400 hover:text-red-300" : "text-red-600 hover:text-red-700",
                       "transition-all duration-200 hover:scale-[1.02]",
                       "shadow-sm hover:shadow-md"
                     )}
@@ -271,9 +265,8 @@ export default function MyAccountPopup({ isOpen, onClose, anchorEl }: MyAccountP
                     onClick={handleLogin}
                     className={cn(
                       "w-full justify-start h-12 px-4",
-                      "bg-white dark:bg-slate-800 hover:bg-green-50 dark:hover:bg-green-900/20",
-                      "border border-slate-300 dark:border-slate-600 hover:border-green-300 dark:hover:border-green-600",
-                      "text-green-600 hover:text-green-700 dark:text-green-400 dark:hover:text-green-300",
+                      isDark ? "bg-slate-800 hover:bg-green-900/20 border-slate-600 hover:border-green-600" : "bg-white hover:bg-green-50 border-slate-300 hover:border-green-300",
+                      isDark ? "text-green-400 hover:text-green-300" : "text-green-600 hover:text-green-700",
                       "transition-all duration-200 hover:scale-[1.02]",
                       "shadow-sm hover:shadow-md"
                     )}

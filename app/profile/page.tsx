@@ -181,22 +181,22 @@ function ProfilePageContent() {
                 {/* Profile Image Badge */}
                 <div className="relative w-28 h-28 md:w-32 md:h-32 rounded-2xl overflow-hidden shadow-2xl shadow-blue-500/25">
                   <div className="absolute inset-0 bg-gradient-to-r from-blue-500/90 to-purple-600/90" />
-                  <img 
+                <img 
                     src="/media/Peter_Costa_Bio_2024.jpg"
-                    alt={`${profileData.candidate.firstName} ${profileData.candidate.lastName}`}
+                  alt={`${profileData.candidate.firstName} ${profileData.candidate.lastName}`}
                     className="w-full h-full object-cover relative z-10"
-                  />
+                />
                   <div className="absolute bottom-0 left-0 right-0 bg-black/60 backdrop-blur-sm py-1 z-20">
                     <span className="text-white font-bold text-sm block text-center">Profile</span>
-                  </div>
-                </div>
-
+              </div>
+            </div>
+            
                 {/* Profile Summary */}
                 <div className="flex-1 max-w-lg">
                   <div className="flex items-center justify-between mb-4">
                     <span className="text-white font-medium">Profile Completion</span>
                     <span className="text-blue-400 font-bold">85% Complete</span>
-                  </div>
+              </div>
                   <div className="relative h-4 bg-gray-800/50 rounded-full overflow-hidden">
                     <div 
                       className="absolute top-0 left-0 h-full bg-gradient-to-r from-blue-500 to-purple-600 transition-all duration-1000 rounded-full"
@@ -207,7 +207,7 @@ function ProfilePageContent() {
                     2 sections remaining
                   </div>
                 </div>
-
+                
                 {/* See Employer View Button */}
                 <Button className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white border-0 shadow-lg">
                   <Users className="w-4 h-4 mr-2" />
@@ -240,11 +240,11 @@ function ProfilePageContent() {
                 <div className="flex items-center gap-3 bg-black/30 backdrop-blur-sm px-6 py-3 rounded-full">
                   <Target className="w-6 h-6 text-orange-400" />
                   <span className="text-lg font-medium">28 Day Streak</span>
-                </div>
+                  </div>
                 <div className="flex items-center gap-3 bg-black/30 backdrop-blur-sm px-6 py-3 rounded-full">
                   <Trophy className="w-6 h-6 text-green-400" />
                   <span className="text-lg font-medium">12 Courses Complete</span>
-                </div>
+                  </div>
                 <div className="flex items-center gap-3 bg-black/30 backdrop-blur-sm px-6 py-3 rounded-full">
                   <Award className="w-6 h-6 text-blue-400" />
                   <span className="text-lg font-medium">8 Badges Earned</span>

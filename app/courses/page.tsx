@@ -247,30 +247,30 @@ export default function CoursesPage() {
   });
 
   return (
-    <div className="min-h-screen bg-black dark:from-gray-900 dark:via-gray-900 dark:to-gray-800">
+    <div className="min-h-screen bg-background text-foreground">
       <div className="container mx-auto px-4 py-8">
         {/* Enhanced Header */}
         <div className="relative mb-12 overflow-hidden">
           {/* Background with gradient and glow effects */}
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-900/30 via-purple-900/20 to-blue-900/30 rounded-2xl" />
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-slate-900/10 to-slate-900/30 rounded-2xl" />
+          <div className="absolute inset-0 bg-gradient-to-r from-primary/30 via-accent/20 to-primary/30 rounded-2xl" />
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/10 to-background/30 rounded-2xl" />
           
           {/* Content */}
           <div className="relative p-8 md:p-12">
             <div className="flex items-center gap-3 mb-4">
-              <div className="relative w-16 h-16 rounded-xl overflow-hidden shadow-lg shadow-blue-500/25">
+              <div className="relative w-16 h-16 rounded-xl overflow-hidden shadow-lg shadow-primary/25">
                 <Image
                   src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=100&h=100&fit=crop&crop=center"
                   alt="Technology"
                   fill
                   className="object-cover"
                 />
-                <div className="absolute inset-0 bg-gradient-to-r from-blue-500/80 to-purple-600/80" />
+                <div className="absolute inset-0 bg-gradient-to-r from-primary/80 to-accent/80" />
               </div>
-              <div className="h-px flex-1 bg-gradient-to-r from-blue-500/50 via-purple-500/30 to-transparent" />
+              <div className="h-px flex-1 bg-gradient-to-r from-primary/50 via-accent/30 to-transparent" />
             </div>
             
-            <h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-white via-blue-100 to-purple-100 bg-clip-text text-transparent mb-6 leading-tight">
+            <h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-foreground via-primary to-accent bg-clip-text text-transparent mb-6 leading-tight">
               Explore Courses
             </h1>
             

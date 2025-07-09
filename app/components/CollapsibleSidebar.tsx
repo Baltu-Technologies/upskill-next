@@ -38,6 +38,7 @@ import { useTheme } from '../contexts/ThemeContext';
 import { useAuth } from '../contexts/AuthContext';
 import Image from 'next/image';
 import MyAccountPopup from './MyAccountPopup';
+import { useUserPermissions, type UserNavigation } from '../hooks/useUserPermissions';
 
 interface SidebarProps {
   isCollapsed: boolean;
@@ -53,6 +54,8 @@ interface NavItem {
   color?: string;
   submenu?: SubMenuItem[];
   isProfile?: boolean;
+  // Add role-based access control
+  requiredPermission?: keyof UserNavigation;
 }
 
 interface SubMenuItem {
@@ -62,13 +65,11 @@ interface SubMenuItem {
   badge?: string;
 }
 
-
-
 const bottomNavItems: NavItem[] = [
   // Settings moved to profile dropdown
 ];
 
-// Submenu Item Component
+// SubMenuItem Component with improved theming
 const SubMenuItem = ({ 
   item, 
   isCollapsed 
@@ -101,11 +102,11 @@ const SubMenuItem = ({
           item.href ? "cursor-pointer" : "cursor-default",
           isActive 
             ? "bg-[hsl(217,91%,60%)]/20 text-[hsl(217,91%,60%)] shadow-md border border-[hsl(217,91%,60%)]/20" 
-            : "bg-transparent text-slate-600 hover:bg-[hsl(217,91%,60%)]/10 hover:text-[hsl(217,91%,60%)] hover:shadow-sm hover:border hover:border-[hsl(217,91%,60%)]/20",
+            : "bg-transparent text-foreground/80 hover:bg-[hsl(217,91%,60%)]/10 hover:text-[hsl(217,91%,60%)] hover:shadow-sm hover:border hover:border-[hsl(217,91%,60%)]/20",
           // Dark mode variants
           isActive
             ? "dark:bg-[hsl(217,91%,60%)]/20 dark:text-[hsl(217,91%,60%)] dark:shadow-md dark:border dark:border-[hsl(217,91%,60%)]/30"
-            : "dark:bg-transparent dark:text-[hsl(210,40%,98%)]/80 dark:hover:bg-[hsl(217,91%,60%)]/15 dark:hover:text-[hsl(217,91%,60%)] dark:hover:shadow-sm dark:hover:border dark:hover:border-[hsl(217,91%,60%)]/20"
+            : "dark:bg-transparent dark:text-foreground/90 dark:hover:bg-[hsl(217,91%,60%)]/15 dark:hover:text-[hsl(217,91%,60%)] dark:hover:shadow-sm dark:hover:border dark:hover:border-[hsl(217,91%,60%)]/20"
         )}
         size="sm"
       >
@@ -123,13 +124,13 @@ const SubMenuItem = ({
         </span>
         
         {item.href && (
-          <ChevronRight className="h-3 w-3 text-slate-400 opacity-0 group-hover:opacity-100 group-hover:text-[hsl(217,91%,60%)] transition-all duration-300" />
+          <ChevronRight className="h-3 w-3 text-muted-foreground opacity-0 group-hover:opacity-100 group-hover:text-[hsl(217,91%,60%)] transition-all duration-300" />
         )}
         
         {item.badge && (
           <span className="ml-1 text-xs px-1 py-0.5 rounded-full font-medium
                           bg-[hsl(217,91%,60%)]/70 text-white group-hover:bg-[hsl(217,91%,60%)]
-                          dark:bg-[hsl(222,84%,15%)] dark:text-[hsl(210,40%,98%)]/70 dark:group-hover:bg-[hsl(217,91%,60%)]/20 dark:group-hover:text-[hsl(217,91%,60%)] dark:bg-none
+                          dark:bg-[hsl(222,84%,15%)] dark:text-foreground/70 dark:group-hover:bg-[hsl(217,91%,60%)]/20 dark:group-hover:text-[hsl(217,91%,60%)] dark:bg-none
                           transition-all duration-300 group-hover:scale-110 shrink-0 flex-none">
             {item.badge}
           </span>
@@ -137,8 +138,7 @@ const SubMenuItem = ({
       </Button>
       
       {/* Tooltip for truncated text */}
-      <div className="absolute left-full ml-2 px-2 py-1 bg-slate-200/95 text-slate-700
-                      dark:bg-[hsl(222,84%,15%)] dark:text-[hsl(210,40%,98%)]
+      <div className="absolute left-full ml-2 px-2 py-1 bg-popover/95 text-popover-foreground
                       text-xs rounded-md shadow-lg border-none z-50 opacity-0 group-hover/submenu:opacity-100 
                       transition-opacity duration-300 pointer-events-none whitespace-nowrap backdrop-blur-sm
                       top-1/2 -translate-y-1/2">
@@ -198,11 +198,11 @@ const InteractiveNavButton = ({
           item.isProfile && !isCollapsed ? "py-4 min-h-[4rem]" : "",
           isActive 
             ? "bg-[hsl(217,91%,60%)]/20 text-[hsl(217,91%,60%)] shadow-lg shadow-[hsl(217,91%,60%)]/25 border border-[hsl(217,91%,60%)]/30" 
-            : "bg-transparent hover:bg-[hsl(217,91%,60%)]/10 text-slate-700 hover:text-[hsl(217,91%,60%)] hover:shadow-md hover:border hover:border-[hsl(217,91%,60%)]/20",
+            : "bg-transparent hover:bg-[hsl(217,91%,60%)]/10 text-foreground hover:text-[hsl(217,91%,60%)] hover:shadow-md hover:border hover:border-[hsl(217,91%,60%)]/20",
           // Dark mode variants
           isActive
             ? "dark:bg-[hsl(217,91%,60%)]/20 dark:text-[hsl(217,91%,60%)] dark:shadow-lg dark:shadow-[hsl(217,91%,60%)]/25 dark:border dark:border-[hsl(217,91%,60%)]/40"
-            : "dark:bg-transparent dark:hover:bg-[hsl(217,91%,60%)]/15 dark:text-[hsl(210,40%,98%)] dark:hover:text-[hsl(217,91%,60%)] dark:hover:shadow-md dark:hover:border dark:hover:border-[hsl(217,91%,60%)]/25"
+            : "dark:bg-transparent dark:hover:bg-[hsl(217,91%,60%)]/15 dark:text-foreground dark:hover:text-[hsl(217,91%,60%)] dark:hover:shadow-md dark:hover:border dark:hover:border-[hsl(217,91%,60%)]/25"
         )}
         size={isCollapsed ? "icon" : "default"}
       >
@@ -215,21 +215,21 @@ const InteractiveNavButton = ({
           <div className="flex items-center gap-3 mr-3">
             <div className="relative">
               <div className="w-8 h-8 rounded-full bg-[hsl(217,91%,60%)] p-0.5">
-                <div className="w-full h-full rounded-full bg-slate-100 dark:bg-[hsl(222,84%,12%)] flex items-center justify-center">
+                <div className="w-full h-full rounded-full bg-card dark:bg-[hsl(222,84%,12%)] flex items-center justify-center">
                   <Icon className="h-4 w-4 text-[hsl(217,91%,60%)]" />
                 </div>
               </div>
-              <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-slate-100 dark:border-[hsl(222,84%,12%)]"></div>
+              <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-card dark:border-[hsl(222,84%,12%)]"></div>
             </div>
           </div>
         ) : (
           <Icon className={cn(
             "h-5 w-5 transition-all duration-300 group-hover:scale-110 group-hover:rotate-3",
             !isCollapsed && "mr-3",
-            isActive ? "text-[hsl(217,91%,60%)]" : "text-slate-600",
+            isActive ? "text-[hsl(217,91%,60%)]" : "text-foreground/80",
             "group-hover:text-[hsl(217,91%,60%)] group-hover:drop-shadow-md",
             // Dark mode variants
-            !isActive && "dark:text-[hsl(210,40%,98%)]/70"
+            !isActive && "dark:text-foreground/80"
           )} />
         )}
         
@@ -239,13 +239,13 @@ const InteractiveNavButton = ({
               <span className={cn(
                 "font-semibold text-base transition-all duration-300 leading-tight",
                 "group-hover:text-[hsl(217,91%,60%)]",
-                "text-slate-700 dark:text-[hsl(210,40%,98%)]",
+                "text-foreground dark:text-foreground",
                 item.isProfile ? "text-lg" : ""
               )}>
                 {item.title}
               </span>
               {item.isProfile && (
-                <div className="text-xs text-slate-500 dark:text-[hsl(210,40%,98%)]/50 mt-0.5">
+                <div className="text-xs text-muted-foreground mt-0.5">
                   View & Edit Profile
                 </div>
               )}
@@ -257,10 +257,10 @@ const InteractiveNavButton = ({
                   "text-xs px-2 py-0.5 rounded-full font-semibold",
                   "transition-all duration-300 group-hover:scale-110 group-hover:shadow-sm",
                   isActive 
-                    ? "bg-[hsl(217,91%,60%)] text-[hsl(210,40%,98%)] shadow-md" 
+                    ? "bg-[hsl(217,91%,60%)] text-primary-foreground shadow-md" 
                     : "bg-[hsl(217,91%,60%)]/80 text-white group-hover:bg-[hsl(217,91%,60%)]",
                   // Dark mode variants  
-                  !isActive && "dark:bg-[hsl(222,84%,15%)] dark:text-[hsl(210,40%,98%)] dark:group-hover:bg-[hsl(217,91%,60%)] dark:group-hover:text-[hsl(210,40%,98%)] dark:bg-none"
+                  !isActive && "dark:bg-[hsl(222,84%,15%)] dark:text-foreground dark:group-hover:bg-[hsl(217,91%,60%)] dark:group-hover:text-primary-foreground"
                 )}>
                   {item.badge}
                 </span>
@@ -271,7 +271,7 @@ const InteractiveNavButton = ({
                   "h-3 w-3 transition-all duration-300",
                   isExpanded ? "rotate-180 text-[hsl(217,91%,60%)]" : "rotate-0",
                   "group-hover:text-[hsl(217,91%,60%)]",
-                  "text-slate-600 dark:text-[hsl(210,40%,98%)]/70"
+                  "text-foreground/70 dark:text-foreground/70"
                 )} />
               )}
             </div>
@@ -281,8 +281,7 @@ const InteractiveNavButton = ({
         {/* Tooltip for collapsed state */}
         {isCollapsed && (
           <div className={cn(
-            "absolute left-full ml-2 bg-slate-200/95 text-slate-700",
-            "dark:bg-[hsl(222,84%,15%)] dark:text-[hsl(210,40%,98%)]",
+            "absolute left-full ml-2 bg-popover/95 text-popover-foreground",
             "text-xs rounded-md shadow-lg border-none z-50 opacity-0 group-hover:opacity-100",
             "transition-opacity duration-300 pointer-events-none whitespace-nowrap backdrop-blur-sm",
             item.isProfile ? "px-3 py-2" : "px-2 py-1"
@@ -290,7 +289,7 @@ const InteractiveNavButton = ({
             {item.isProfile ? (
               <div className="flex items-center gap-2">
                 <div className="w-6 h-6 rounded-full bg-[hsl(217,91%,60%)] p-0.5">
-                  <div className="w-full h-full rounded-full bg-slate-100 dark:bg-[hsl(222,84%,15%)] flex items-center justify-center">
+                  <div className="w-full h-full rounded-full bg-card dark:bg-[hsl(222,84%,15%)] flex items-center justify-center">
                     <User className="h-3 w-3 text-[hsl(217,91%,60%)]" />
                   </div>
                 </div>
@@ -303,7 +302,7 @@ const InteractiveNavButton = ({
               <>
                 {item.title}
                 {item.badge && <span className="ml-1 text-[hsl(217,91%,60%)]">({item.badge})</span>}
-                {hasSubmenu && <span className="ml-1 text-[hsl(210,40%,98%)]/50">▼</span>}
+                {hasSubmenu && <span className="ml-1 text-muted-foreground">▼</span>}
               </>
             )}
           </div>
@@ -366,6 +365,7 @@ export default function CollapsibleSidebar({ isCollapsed, onToggle }: SidebarPro
   const [expandedMenus, setExpandedMenus] = useState<Set<string>>(new Set());
   const [isMobile, setIsMobile] = useState(false);
   const [isAccountPopupOpen, setIsAccountPopupOpen] = useState(false);
+  const { permissions: userNavigation, loading, error } = useUserPermissions();
 
   // Define navigation items (active state will be calculated dynamically)
   const mainNavItems: NavItem[] = [
@@ -374,7 +374,8 @@ export default function CollapsibleSidebar({ isCollapsed, onToggle }: SidebarPro
       title: 'Home',
       icon: Home,
       href: '/',
-      color: 'text-blue-500'
+      color: 'text-blue-500',
+      requiredPermission: 'canAccessHome'
     },
     
     // Courses with submenu
@@ -383,6 +384,7 @@ export default function CollapsibleSidebar({ isCollapsed, onToggle }: SidebarPro
       icon: BookOpen,
       color: 'text-purple-500',
       href: '/courses',
+      requiredPermission: 'canAccessCourses',
       submenu: [
         {
           title: 'My Courses',
@@ -405,6 +407,7 @@ export default function CollapsibleSidebar({ isCollapsed, onToggle }: SidebarPro
       icon: Briefcase,
       color: 'text-orange-500',
       href: '/employers',
+      requiredPermission: 'canAccessCareerOpportunities',
       submenu: [
         {
           title: 'All Employers',
@@ -427,6 +430,7 @@ export default function CollapsibleSidebar({ isCollapsed, onToggle }: SidebarPro
       icon: GraduationCap,
       color: 'text-blue-600',
       href: '/courses/test',
+      requiredPermission: 'canAccessCourseTest',
       submenu: [
         {
           title: 'Course Overview',
@@ -446,32 +450,7 @@ export default function CollapsibleSidebar({ isCollapsed, onToggle }: SidebarPro
         }
       ]
     },
-    
-    // Employer Access - For employers to create profiles and manage pipeline
-    {
-      title: 'Employer Access',
-      icon: Building2,
-      color: 'text-indigo-600',
-      href: '/employer-access',
-      submenu: [
-        {
-          title: 'Dashboard',
-          href: '/employer-access'
-        },
-        {
-          title: 'Create Profile',
-          href: '/employer-access/profile'
-        },
-        {
-          title: 'Manage Pipeline',
-          href: '/employer-access/pipeline'
-        },
-        {
-          title: 'Analytics',
-          href: '/employer-access/analytics'
-        }
-      ]
-    },
+
     
     // Guide Access - For teachers, instructors, case managers
     {
@@ -479,6 +458,7 @@ export default function CollapsibleSidebar({ isCollapsed, onToggle }: SidebarPro
       icon: UserCheck,
       color: 'text-emerald-600',
       href: '/guide-access',
+      requiredPermission: 'canAccessGuideAccess',
       submenu: [
         {
           title: 'Dashboard',
@@ -505,6 +485,7 @@ export default function CollapsibleSidebar({ isCollapsed, onToggle }: SidebarPro
       icon: Edit3,
       color: 'text-violet-600',
       href: '/course-creator',
+      requiredPermission: 'canAccessCourseCreator',
       submenu: [
         {
           title: 'Dashboard',
@@ -529,6 +510,26 @@ export default function CollapsibleSidebar({ isCollapsed, onToggle }: SidebarPro
       ]
     }
   ];
+
+  // Filter navigation items based on user permissions
+  const filteredMainNavItems = mainNavItems.filter(item => {
+    if (!item.requiredPermission) return true;
+    return userNavigation[item.requiredPermission];
+  });
+
+  // Debug logging
+  useEffect(() => {
+    console.log('🔍 Debug - User permissions:', userNavigation);
+    console.log('🔍 Debug - Loading state:', loading);
+    console.log('🔍 Debug - Error state:', error);
+    console.log('🔍 Debug - Filtered items:', filteredMainNavItems.map(item => item.title));
+  }, [userNavigation, loading, error, filteredMainNavItems]);
+
+  // Load user navigation permissions
+  useEffect(() => {
+    // The useUserPermissions hook already handles loading and updating userNavigation
+    // No need to call getNavigationForUser() here.
+  }, []);
 
   // Function to check if a main nav item is active
   const isMainNavItemActive = (item: NavItem): boolean => {
@@ -600,10 +601,7 @@ export default function CollapsibleSidebar({ isCollapsed, onToggle }: SidebarPro
       newExpandedMenus.add('Course Test');
     }
     
-    // Employer Access pages
-    if (pathname.startsWith('/employer-access')) {
-      newExpandedMenus.add('Employer Access');
-    }
+
     
     // Guide Access pages
     if (pathname.startsWith('/guide-access')) {
@@ -656,13 +654,7 @@ export default function CollapsibleSidebar({ isCollapsed, onToggle }: SidebarPro
     <div 
         className={cn(
           "fixed left-0 top-0 flex flex-col h-screen transition-all duration-300 ease-in-out shrink-0",
-          "bg-slate-200/95",
-          "dark:bg-[hsl(222,84%,8%)]",
-          "backdrop-blur-xl border-r border-slate-300/80 dark:border-[hsl(217,33%,17%)]/20",
-          "shadow-[0_0_30px_rgba(0,0,0,0.08)] shadow-slate-200/50",
-          "dark:shadow-[0_0_50px_rgba(0,0,0,0.5)] dark:shadow-black/20",
-          // Simple shadow without glow
-          "shadow-lg",
+          "bg-card/95 backdrop-blur-xl border-r border-border shadow-lg",
           "font-['Inter_Variable',system-ui,sans-serif]",
           // Responsive width: extra wide to accommodate longer menu text
           isCollapsed ? "w-16" : isMobile ? "w-72" : "w-80",
@@ -676,7 +668,7 @@ export default function CollapsibleSidebar({ isCollapsed, onToggle }: SidebarPro
         }}
       >
       {/* Logo Section with Toggle Button */}
-      <div className="px-4 py-6 border-b border-slate-300/50 dark:border-[hsl(217,33%,17%)]/30 bg-slate-200/95 dark:bg-[hsl(222,84%,8%)] backdrop-blur-sm">
+      <div className="px-4 py-6 border-b border-border bg-card/95 backdrop-blur-sm">
         {isCollapsed ? (
           /* Collapsed State - Show flower logo and toggle button */
           <div className="flex flex-col items-center gap-3">
@@ -694,8 +686,7 @@ export default function CollapsibleSidebar({ isCollapsed, onToggle }: SidebarPro
               variant="ghost"
               size="icon"
               onClick={onToggle}
-              className="h-6 w-6 bg-slate-300/80 hover:bg-slate-400/80 text-slate-600 hover:text-[hsl(217,91%,60%)]
-                        dark:bg-[hsl(222,84%,12%)] dark:hover:bg-[hsl(222,84%,15%)] dark:text-[hsl(210,40%,98%)] dark:hover:text-[hsl(217,91%,60%)]
+              className="h-6 w-6 bg-muted hover:bg-muted/80 text-muted-foreground hover:text-primary
                         hover:scale-105 transition-all duration-200 rounded-full border-none"
             >
               <ChevronRight className="h-3 w-3" />
@@ -718,8 +709,7 @@ export default function CollapsibleSidebar({ isCollapsed, onToggle }: SidebarPro
               variant="ghost"
               size="icon"
               onClick={onToggle}
-              className="h-8 w-8 bg-slate-300/80 hover:bg-slate-400/80 text-slate-600 hover:text-[hsl(217,91%,60%)]
-                        dark:bg-[hsl(222,84%,12%)] dark:hover:bg-[hsl(222,84%,15%)] dark:text-[hsl(210,40%,98%)] dark:hover:text-[hsl(217,91%,60%)]
+              className="h-8 w-8 bg-muted hover:bg-muted/80 text-muted-foreground hover:text-primary
                         hover:scale-105 transition-all duration-200 rounded-full border-none flex-shrink-0"
             >
               <ChevronLeft className="h-4 w-4" />
@@ -729,81 +719,83 @@ export default function CollapsibleSidebar({ isCollapsed, onToggle }: SidebarPro
       </div>
 
       {/* User Profile Section */}
-      <div className="px-3 py-4 border-b border-slate-300/50 dark:border-[hsl(217,33%,17%)]/30">
-        {isCollapsed ? (
-          /* Collapsed State - Show only avatar */
-          <div className="flex justify-center">
+      {userNavigation.canAccessProfile && (
+        <div className="px-3 py-4 border-b border-border">
+          {isCollapsed ? (
+            /* Collapsed State - Show only avatar */
+            <div className="flex justify-center">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => handleToggleSubmenu('Profile')}
+                className="w-12 h-12 p-0 rounded-full hover:scale-105 transition-all duration-200
+                          bg-muted hover:bg-muted/80"
+              >
+                <div className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 p-0.5">
+                  <Image 
+                    src="/media/Peter_Costa_Bio_2024.jpg" 
+                    alt="Peter Costa" 
+                    width={40} 
+                    height={40}
+                    className="w-full h-full object-cover rounded-full"
+                  />
+                </div>
+              </Button>
+            </div>
+          ) : (
+            /* Expanded State - Show full profile info as clickable menu item */
             <Button
               variant="ghost"
-              size="icon"
               onClick={() => handleToggleSubmenu('Profile')}
-              className="w-12 h-12 p-0 rounded-full hover:scale-105 transition-all duration-200
-                        bg-slate-200/60 hover:bg-slate-300/80 dark:bg-[hsl(222,84%,12%)] dark:hover:bg-[hsl(222,84%,15%)]"
+              className={cn(
+                "w-full justify-start relative overflow-hidden group transition-all duration-300 ease-out",
+                "px-4 py-4 mx-0 rounded-xl",
+                "hover:scale-105 active:scale-95 transition-transform",
+                "backdrop-blur-sm shadow-sm border-none min-h-[5rem]",
+                expandedMenus.has('Profile')
+                  ? "bg-[hsl(217,91%,60%)]/20 text-[hsl(217,91%,60%)] shadow-lg shadow-[hsl(217,91%,60%)]/25 border border-[hsl(217,91%,60%)]/30" 
+                  : "bg-transparent hover:bg-[hsl(217,91%,60%)]/10 text-foreground hover:text-[hsl(217,91%,60%)] hover:shadow-md hover:border hover:border-[hsl(217,91%,60%)]/20",
+                // Dark mode variants
+                expandedMenus.has('Profile')
+                  ? "dark:bg-[hsl(217,91%,60%)]/20 dark:text-[hsl(217,91%,60%)] dark:shadow-lg dark:shadow-[hsl(217,91%,60%)]/25 dark:border dark:border-[hsl(217,91%,60%)]/40"
+                  : "dark:bg-transparent dark:hover:bg-[hsl(217,91%,60%)]/15 dark:text-foreground/80 dark:hover:text-[hsl(217,91%,60%)] dark:hover:shadow-md dark:hover:border dark:hover:border-[hsl(217,91%,60%)]/25"
+              )}
             >
-              <div className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 p-0.5">
-                <Image 
-                  src="/media/Peter_Costa_Bio_2024.jpg" 
-                  alt="Peter Costa" 
-                  width={40} 
-                  height={40}
-                  className="w-full h-full object-cover rounded-full"
+              <div className="flex items-center gap-4 w-full">
+                <div className="w-12 h-12 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 p-0.5 shadow-lg">
+                  <Image 
+                    src="/media/Peter_Costa_Bio_2024.jpg" 
+                    alt="Peter Costa" 
+                    width={48} 
+                    height={48}
+                    className="w-full h-full object-cover rounded-full"
+                  />
+                </div>
+                <div className="flex-1 min-w-0 text-left">
+                  <h3 className="text-base font-semibold truncate">
+                    Peter Costa
+                  </h3>
+                </div>
+                <ChevronDown 
+                  className={cn(
+                    "h-4 w-4 transition-transform duration-300",
+                    expandedMenus.has('Profile') ? "rotate-180" : ""
+                  )} 
                 />
               </div>
             </Button>
-          </div>
-        ) : (
-          /* Expanded State - Show full profile info as clickable menu item */
-          <Button
-            variant="ghost"
-            onClick={() => handleToggleSubmenu('Profile')}
-            className={cn(
-              "w-full justify-start relative overflow-hidden group transition-all duration-300 ease-out",
-              "px-4 py-4 mx-0 rounded-xl",
-              "hover:scale-105 active:scale-95 transition-transform",
-              "backdrop-blur-sm shadow-sm border-none min-h-[5rem]",
-              expandedMenus.has('Profile')
-                ? "bg-[hsl(217,91%,60%)]/20 text-[hsl(217,91%,60%)] shadow-lg shadow-[hsl(217,91%,60%)]/25 border border-[hsl(217,91%,60%)]/30" 
-                : "bg-transparent hover:bg-[hsl(217,91%,60%)]/10 text-slate-700 hover:text-[hsl(217,91%,60%)] hover:shadow-md hover:border hover:border-[hsl(217,91%,60%)]/20",
-              // Dark mode variants
-              expandedMenus.has('Profile')
-                ? "dark:bg-[hsl(217,91%,60%)]/20 dark:text-[hsl(217,91%,60%)] dark:shadow-lg dark:shadow-[hsl(217,91%,60%)]/25 dark:border dark:border-[hsl(217,91%,60%)]/40"
-                : "dark:bg-transparent dark:hover:bg-[hsl(217,91%,60%)]/15 dark:text-[hsl(210,40%,98%)]/80 dark:hover:text-[hsl(217,91%,60%)] dark:hover:shadow-md dark:hover:border dark:hover:border-[hsl(217,91%,60%)]/25"
-            )}
-          >
-            <div className="flex items-center gap-4 w-full">
-              <div className="w-12 h-12 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 p-0.5 shadow-lg">
-                <Image 
-                  src="/media/Peter_Costa_Bio_2024.jpg" 
-                  alt="Peter Costa" 
-                  width={48} 
-                  height={48}
-                  className="w-full h-full object-cover rounded-full"
-                />
-              </div>
-              <div className="flex-1 min-w-0 text-left">
-                <h3 className="text-base font-semibold truncate">
-                  Peter Costa
-                </h3>
-              </div>
-              <ChevronDown 
-                className={cn(
-                  "h-4 w-4 transition-transform duration-300",
-                  expandedMenus.has('Profile') ? "rotate-180" : ""
-                )} 
-              />
+          )}
+          
+          {/* Profile Submenu */}
+          {expandedMenus.has('Profile') && !isCollapsed && (
+            <div className="mt-2 space-y-1">
+              {profileSubmenuItems.map((item) => (
+                <SubMenuItem key={item.title} item={item} isCollapsed={false} />
+              ))}
             </div>
-          </Button>
-        )}
-        
-        {/* Profile Submenu */}
-        {expandedMenus.has('Profile') && !isCollapsed && (
-          <div className="mt-2 space-y-1">
-            {profileSubmenuItems.map((item) => (
-              <SubMenuItem key={item.title} item={item} isCollapsed={false} />
-            ))}
-          </div>
-        )}
-      </div>
+          )}
+        </div>
+      )}
 
       {/* Main Navigation */}
       <nav className="flex-1 px-3 pt-6 pb-3 overflow-y-auto 
@@ -811,21 +803,34 @@ export default function CollapsibleSidebar({ isCollapsed, onToggle }: SidebarPro
                       dark:scrollbar-track-slate-800/50 dark:scrollbar-thumb-blue-400/60
                       hover:scrollbar-thumb-blue-600/90 dark:hover:scrollbar-thumb-blue-300/80">
         <div className="space-y-2">
-          {mainNavItems.map((item, index) => (
-            <InteractiveNavButton
-              key={index}
-              item={item}
-              isCollapsed={isCollapsed}
-              isActive={isMainNavItemActive(item)}
-              expandedMenus={expandedMenus}
-              onToggleSubmenu={handleToggleSubmenu}
-            />
-          ))}
+          {loading ? (
+            <div className="flex items-center justify-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+              {!isCollapsed && <span className="ml-2 text-sm text-muted-foreground">Loading...</span>}
+            </div>
+          ) : filteredMainNavItems.length > 0 ? (
+            filteredMainNavItems.map((item, index) => (
+              <InteractiveNavButton
+                key={index}
+                item={item}
+                isCollapsed={isCollapsed}
+                isActive={isMainNavItemActive(item)}
+                expandedMenus={expandedMenus}
+                onToggleSubmenu={handleToggleSubmenu}
+              />
+            ))
+          ) : (
+            <div className="flex items-center justify-center py-8">
+              <div className="text-sm text-muted-foreground text-center">
+                {error ? 'Error loading menu' : 'No menu items available'}
+              </div>
+            </div>
+          )}
         </div>
       </nav>
 
       {/* Bottom Navigation */}
-      <div className="p-3 space-y-3 mt-auto border-t border-slate-300/50 dark:border-[hsl(217,33%,17%)]/30">
+      <div className="p-3 space-y-3 mt-auto border-t border-border">
         <div className="space-y-2">
           {/* My Account Button */}
           <Button 
@@ -836,8 +841,7 @@ export default function CollapsibleSidebar({ isCollapsed, onToggle }: SidebarPro
               isCollapsed 
                 ? "w-10 h-10 p-0" 
                 : "w-full justify-start h-10 px-3",
-              "bg-transparent hover:bg-slate-300/40 text-slate-600 hover:text-[hsl(217,91%,60%)]",
-              "dark:bg-transparent dark:hover:bg-[hsl(222,84%,10%)] dark:text-[hsl(210,40%,98%)]/80 dark:hover:text-[hsl(217,91%,60%)]"
+              "bg-transparent hover:bg-muted/40 text-muted-foreground hover:text-primary"
             )}
             onClick={() => {
               setIsAccountPopupOpen(true);
@@ -856,8 +860,7 @@ export default function CollapsibleSidebar({ isCollapsed, onToggle }: SidebarPro
               isCollapsed 
                 ? "w-10 h-10 p-0" 
                 : "w-full justify-start h-10 px-3",
-              "bg-transparent hover:bg-slate-300/40 text-slate-600 hover:text-[hsl(217,91%,60%)]",
-              "dark:bg-transparent dark:hover:bg-[hsl(222,84%,10%)] dark:text-[hsl(210,40%,98%)]/80 dark:hover:text-[hsl(217,91%,60%)]"
+              "bg-transparent hover:bg-muted/40 text-muted-foreground hover:text-primary"
             )}
             onClick={() => {
               router.push('/settings');
@@ -865,6 +868,27 @@ export default function CollapsibleSidebar({ isCollapsed, onToggle }: SidebarPro
           >
             <Settings className="h-4 w-4 fill-current" />
             {!isCollapsed && <span className="ml-2">Settings</span>}
+          </Button>
+
+          {/* Search Button */}
+          <Button 
+            variant="ghost" 
+            size={isCollapsed ? "icon" : "default"}
+            className={cn(
+              "transition-all duration-300 hover:scale-105",
+              isCollapsed 
+                ? "w-10 h-10 p-0" 
+                : "w-full justify-start h-10 px-3",
+              "bg-transparent hover:bg-muted/40 text-muted-foreground hover:text-primary"
+            )}
+            onClick={() => {
+              // For now, just navigate to a search page or open search modal
+              console.log('Opening search...');
+              // You can add search functionality here
+            }}
+          >
+            <Search className="h-4 w-4 fill-current" />
+            {!isCollapsed && <span className="ml-2">Search</span>}
           </Button>
 
           {/* Help & Support Button */}
@@ -876,8 +900,7 @@ export default function CollapsibleSidebar({ isCollapsed, onToggle }: SidebarPro
               isCollapsed 
                 ? "w-10 h-10 p-0" 
                 : "w-full justify-start h-10 px-3",
-              "bg-transparent hover:bg-slate-300/40 text-slate-600 hover:text-[hsl(217,91%,60%)]",
-              "dark:bg-transparent dark:hover:bg-[hsl(222,84%,10%)] dark:text-[hsl(210,40%,98%)]/80 dark:hover:text-[hsl(217,91%,60%)]"
+              "bg-transparent hover:bg-muted/40 text-muted-foreground hover:text-primary"
             )}
             onClick={() => {
               // Open Help & Support page or modal

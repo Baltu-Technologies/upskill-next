@@ -1,0 +1,273 @@
+
+# 🏗️ Multi-Tenant Architecture Rule
+
+## **Overview**
+This application uses a **subdomain-based multi-tenant architecture** where each employer organization gets their own isolated data space. Every database operation MUST respect tenant boundaries.
+
+## **🔒 Critical Tenant Isolation Requirements**
+
+### **1. Every Database Query MUST Include Organization Filter**
+
+**✅ ALWAYS DO:**
+```typescript
+// API Route Example
+export async function GET(request: NextRequest) {
+  const tenantContext = await getTenantContext(request);
+  
+  // ✅ GOOD: Always filter by organization_id
+  const jobs = await db.job_postings.findMany({
+    where: {
+      organization_id: tenantContext.organizationId,  // 🔥 REQUIRED
+      status: 'active'
+    }
+  });
+}
+```
+
+**❌ NEVER DO:**
+```typescript
+// ❌ BAD: Cross-tenant data leak
+const jobs = await db.job_postings.findMany({
+  where: { status: 'active' }  // Missing organization_id filter!
+});
+```
+
+### **2. Database Schema Requirements**
+
+**Every employer-related table MUST have `organization_id`:**
+```sql
+-- ✅ REQUIRED PATTERN for all employer tables
+CREATE TABLE job_postings (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  organization_id VARCHAR(50) NOT NULL,  -- 🔥 MANDATORY
+  created_by VARCHAR(50) NOT NULL,       -- User who created it
+  title VARCHAR(255) NOT NULL,
+  -- ... other fields
+  
+  -- Add constraint for data integrity
+  FOREIGN KEY (organization_id) REFERENCES organizations(id)
+);
+
+-- ✅ REQUIRED: Create indexes for performance
+CREATE INDEX idx_job_postings_org ON job_postings(organization_id);
+```
+
+**❌ Never create employer tables without organization_id:**
+```sql
+-- ❌ BAD: Missing organization_id
+CREATE TABLE candidates (
+  id UUID PRIMARY KEY,
+  name VARCHAR(255),
+  email VARCHAR(255)
+  -- Missing organization_id!
+);
+```
+
+### **3. Tenant Context Pattern**
+
+**Use this pattern in ALL API routes:**
+```typescript
+import { getTenantContext } from '@/lib/tenant-context';
+
+export async function POST(request: NextRequest) {
+  // ✅ ALWAYS get tenant context first
+  const tenantContext = await getTenantContext(request);
+  
+  // Validate organization access
+  if (!tenantContext.organizationId) {
+    return NextResponse.json({ error: 'Organization not found' }, { status: 404 });
+  }
+  
+  const data = await request.json();
+  
+  // ✅ ALWAYS include organization_id in creates
+  const record = await db.table.create({
+    data: {
+      ...data,
+      organization_id: tenantContext.organizationId,  // 🔥 REQUIRED
+      created_by: tenantContext.userId
+    }
+  });
+}
+```
+
+### **4. DynamoDB Multi-Tenant Pattern**
+
+**Use organization-prefixed partition keys:**
+```typescript
+// ✅ GOOD: Organization-scoped DynamoDB operations
+const params = {
+  TableName: 'employer-analytics',
+  Key: {
+    PK: `ORG#${tenantContext.organizationId}`,     // 🔥 Organization prefix
+    SK: `METRIC#${date}`
+  }
+};
+
+// ✅ GOOD: Query with organization filter
+const queryParams = {
+  TableName: 'employer-data',
+  KeyConditionExpression: 'PK = :pk',
+  ExpressionAttributeValues: {
+    ':pk': `ORG#${tenantContext.organizationId}`   // 🔥 Organization scoped
+  }
+};
+```
+
+**❌ Never use global DynamoDB keys for employer data:**
+```typescript
+// ❌ BAD: No organization isolation
+const params = {
+  TableName: 'metrics',
+  Key: {
+    PK: `METRIC#${date}`,  // Missing organization scope!
+    SK: 'job_views'
+  }
+};
+```
+
+## **🏗️ Development vs Production Context**
+
+### **Tenant Context Implementation**
+```typescript
+// lib/tenant-context.ts
+export async function getTenantContext(request: NextRequest): Promise<TenantContext> {
+  // Development mode: Use mock data
+  if (process.env.NODE_ENV === 'development' && !process.env.FORCE_AUTH0) {
+    const tenantInfo = extractTenantContext(request);
+    return {
+      userId: 'dev_user_123',
+      organizationId: tenantInfo.organization?.id || 'org_ayHu5XNaTNHMasO5',
+      role: 'admin',
+      email: 'dev@baltutech.com',
+      organizationName: tenantInfo.organization?.name || 'Development Org'
+    };
+  }
+  
+  // Production mode: Use real Auth0 data
+  const session = await auth0.getSession(request);
+  return {
+    userId: session.user.sub,
+    organizationId: session.user.org_id,
+    role: session.user.role,
+    email: session.user.email,
+    organizationName: session.user.org_name
+  };
+}
+```
+
+## **🔍 API Route Checklist**
+
+Before implementing any employer API route, ensure:
+
+- [ ] **Import tenant context**: `import { getTenantContext } from '@/lib/tenant-context';`
+- [ ] **Get tenant context**: `const tenantContext = await getTenantContext(request);`
+- [ ] **Validate organization**: Check `tenantContext.organizationId` exists
+- [ ] **Filter all queries**: Include `organization_id` in WHERE clauses
+- [ ] **Scope all creates**: Include `organization_id` and `created_by`
+- [ ] **Test cross-tenant isolation**: Verify data doesn't leak between organizations
+
+## **🚨 Security Patterns**
+
+### **Row-Level Security (Advanced)**
+```sql
+-- Optional: PostgreSQL RLS for automatic tenant isolation
+ALTER TABLE job_postings ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY tenant_isolation ON job_postings
+  USING (organization_id = current_setting('app.current_organization'));
+```
+
+### **API Response Filtering**
+```typescript
+// ✅ ALWAYS filter responses by organization
+export async function GET(request: NextRequest) {
+  const tenantContext = await getTenantContext(request);
+  
+  const candidates = await db.candidates.findMany({
+    where: {
+      organization_id: tenantContext.organizationId,  // 🔥 REQUIRED
+      job_posting_id: jobId
+    },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      // Never select organization_id in response (internal only)
+    }
+  });
+  
+  return NextResponse.json(candidates);
+}
+```
+
+## **🧪 Testing Multi-Tenancy**
+
+### **Required Test Cases**
+```typescript
+// ✅ Test tenant isolation
+describe('Job Postings API', () => {
+  test('should only return jobs for current organization', async () => {
+    // Create jobs for different organizations
+    await createJob({ org: 'org_A', title: 'Job A' });
+    await createJob({ org: 'org_B', title: 'Job B' });
+    
+    // Request with org A context
+    const response = await request.get('/api/jobs')
+      .set('mock-org-id', 'org_A');
+    
+    // Should only see org A jobs
+    expect(response.body).toHaveLength(1);
+    expect(response.body[0].title).toBe('Job A');
+  });
+});
+```
+
+## **📊 Data Migration Patterns**
+
+### **Adding Organization ID to Existing Tables**
+```sql
+-- Migration script template
+ALTER TABLE existing_table 
+ADD COLUMN organization_id VARCHAR(50);
+
+-- Backfill with default organization (if needed)
+UPDATE existing_table 
+SET organization_id = 'org_default_123' 
+WHERE organization_id IS NULL;
+
+-- Make it required after backfill
+ALTER TABLE existing_table 
+ALTER COLUMN organization_id SET NOT NULL;
+
+-- Add foreign key constraint
+ALTER TABLE existing_table 
+ADD CONSTRAINT fk_existing_table_org 
+FOREIGN KEY (organization_id) REFERENCES organizations(id);
+```
+
+## **🎯 Implementation Priorities**
+
+1. **Always implement tenant context first** in any new API route
+2. **Never query employer data without organization_id filter**
+3. **Test cross-tenant isolation** before considering feature complete
+4. **Use mock data for development** to maintain velocity
+5. **Design schema for multi-tenancy from day 1**
+
+## **📚 Related Files**
+
+- **Tenant Context**: `lib/tenant-context.ts`
+- **Organization Registry**: `lib/organizations.ts`
+- **Middleware**: `middleware.ts` (tenant detection)
+- **Auth0 Routes**: `app/api/auth0/[...routes]/route.ts`
+
+## **🔄 Migration Strategy**
+
+**Current Status**: Auth0 disabled, using mock tenant context
+**Next Phase**: Enable Auth0 with `FORCE_AUTH0=true`
+**Production**: Real multi-tenant Auth0 organizations
+
+Remember: **Every employer feature must respect tenant boundaries!**
+
+
+Remember: **Every employer feature must respect tenant boundaries!**

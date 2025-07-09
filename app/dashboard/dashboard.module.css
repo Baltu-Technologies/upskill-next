@@ -157,13 +157,13 @@
   align-items: center;
   gap: var(--space-4);
   padding: var(--space-4);
-  background: rgba(255, 255, 255, 0.05);
+  background: hsl(var(--muted) / 0.1);
   border-radius: var(--radius-lg);
   transition: background var(--duration-fast) var(--ease-out);
 }
 
 .activityItem:hover {
-  background: rgba(255, 255, 255, 0.08);
+  background: hsl(var(--muted) / 0.2);
 }
 
 .activityIcon {
@@ -208,7 +208,7 @@
 }
 
 .courseCard {
-  background: rgba(255, 255, 255, 0.05);
+  background: hsl(var(--muted) / 0.1);
   border-radius: var(--radius-lg);
   overflow: hidden;
   transition: transform var(--duration-fast) var(--ease-out);

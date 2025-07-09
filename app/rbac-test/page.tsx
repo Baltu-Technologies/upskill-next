@@ -1,226 +1,450 @@
-'use client'
+'use client';
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react';
+import { useAuth } from '@/app/contexts/AuthContext';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { CheckCircle, XCircle, AlertCircle, Loader2, Shield, User, Settings, Book, Briefcase, UserCheck, Edit3, Home } from 'lucide-react';
 
-interface ApiResponse {
-  success: boolean;
+interface TestResult {
+  name: string;
+  status: 'pass' | 'fail' | 'pending';
   message: string;
-  data?: any;
-  error?: string;
-  userRoles?: string[];
-  userPermissions?: string[];
-  requiredRole?: string;
-  requiredPermission?: string;
+  details?: any;
+}
+
+interface UserPermissions {
+  canAccessHome: boolean;
+  canAccessCourses: boolean;
+  canAccessCareerOpportunities: boolean;
+  canAccessCourseTest: boolean;
+  canAccessGuideAccess: boolean;
+  canAccessCourseCreator: boolean;
+  canAccessProfile: boolean;
 }
 
 export default function RBACTestPage() {
-  const [results, setResults] = useState<Record<string, ApiResponse>>({});
-  const [loading, setLoading] = useState<Record<string, boolean>>({});
+  const { user } = useAuth();
+  const [testResults, setTestResults] = useState<TestResult[]>([]);
+  const [currentUserRoles, setCurrentUserRoles] = useState<string[]>([]);
+  const [userPermissions, setUserPermissions] = useState<UserPermissions | null>(null);
+  const [testing, setTesting] = useState(false);
+  const [allUsers, setAllUsers] = useState<any[]>([]);
+  const [adminStats, setAdminStats] = useState<any>(null);
 
-  const testEndpoint = async (name: string, url: string, method: string = 'GET', body?: any) => {
-    setLoading(prev => ({ ...prev, [name]: true }));
+  const rolePermissionMapping = {
+    admin: ['home', 'courses', 'career_opportunities', 'course_test', 'guide_access', 'course_creator', 'profile', 'settings', 'admin'],
+    guide: ['home', 'courses', 'career_opportunities', 'guide_access', 'profile'],
+    content_creator: ['home', 'courses', 'career_opportunities', 'course_creator', 'profile'],
+    learner: ['home', 'courses', 'career_opportunities', 'profile']
+  };
+
+  const testCases = [
+    {
+      name: 'User Authentication',
+      test: async () => {
+        if (!user) throw new Error('User not authenticated');
+        return { user: user.email };
+      }
+    },
+    {
+      name: 'User Permissions API',
+      test: async () => {
+        const response = await fetch('/api/user-permissions');
+        if (!response.ok) throw new Error(`API returned ${response.status}`);
+        const permissions = await response.json();
+        setUserPermissions(permissions);
+        return permissions;
+      }
+    },
+    {
+      name: 'Admin Panel Access',
+      test: async () => {
+        const response = await fetch('/api/jasminedragon/stats');
+        if (response.status === 403) {
+          return { access: false, message: 'Correctly blocked non-admin access' };
+        }
+        if (!response.ok) throw new Error(`API returned ${response.status}`);
+        const stats = await response.json();
+        setAdminStats(stats);
+        return { access: true, stats };
+      }
+    },
+    {
+      name: 'User Management API',
+      test: async () => {
+        const response = await fetch('/api/jasminedragon/users');
+        if (response.status === 403) {
+          return { access: false, message: 'Correctly blocked non-admin access' };
+        }
+        if (!response.ok) throw new Error(`API returned ${response.status}`);
+        const users = await response.json();
+        setAllUsers(users);
+        return { access: true, userCount: users.length };
+      }
+    },
+    {
+      name: 'Role-Based Navigation',
+      test: async () => {
+        if (!userPermissions) throw new Error('User permissions not loaded');
+        const navigationItems = [
+          { name: 'Home', permission: 'canAccessHome', icon: Home },
+          { name: 'Courses', permission: 'canAccessCourses', icon: Book },
+          { name: 'Career Opportunities', permission: 'canAccessCareerOpportunities', icon: Briefcase },
+          { name: 'Course Test', permission: 'canAccessCourseTest', icon: Book },
+          { name: 'Guide Access', permission: 'canAccessGuideAccess', icon: UserCheck },
+          { name: 'Course Creator', permission: 'canAccessCourseCreator', icon: Edit3 },
+          { name: 'Profile', permission: 'canAccessProfile', icon: User },
+        ];
+        
+        const accessibleItems = navigationItems.filter(item => 
+          userPermissions[item.permission as keyof UserPermissions]
+        );
+        
+        return { 
+          totalItems: navigationItems.length, 
+          accessibleItems: accessibleItems.length,
+          items: accessibleItems.map(item => item.name)
+        };
+      }
+    },
+    {
+      name: 'Route Protection',
+      test: async () => {
+        const protectedRoutes = [
+          '/jasminedragon',
+          '/jasminedragon/users',
+          '/jasminedragon/settings'
+        ];
+        
+        const results = await Promise.all(
+          protectedRoutes.map(async (route) => {
+            try {
+              const response = await fetch(route);
+              return {
+                route,
+                status: response.status,
+                accessible: response.status !== 403 && response.status !== 401
+              };
+            } catch (error) {
+              return {
+                route,
+                status: 'error',
+                accessible: false
+              };
+            }
+          })
+        );
+        
+        return results;
+      }
+    }
+  ];
+
+  const runTests = async () => {
+    setTesting(true);
+    setTestResults([]);
     
-    try {
-      const response = await fetch(url, {
-        method,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: body ? JSON.stringify(body) : undefined,
-      });
+    for (const testCase of testCases) {
+      try {
+        const result = await testCase.test();
+        setTestResults(prev => [...prev, {
+          name: testCase.name,
+          status: 'pass',
+          message: 'Test passed',
+          details: result
+        }]);
+      } catch (error) {
+        setTestResults(prev => [...prev, {
+          name: testCase.name,
+          status: 'fail',
+          message: error instanceof Error ? error.message : 'Test failed',
+          details: error
+        }]);
+      }
+    }
+    
+    setTesting(false);
+  };
+
+  useEffect(() => {
+    // Load current user roles
+    const loadUserRoles = async () => {
+      if (!user) return;
       
-      const data = await response.json();
-      setResults(prev => ({ ...prev, [name]: data }));
-    } catch (error) {
-      setResults(prev => ({ 
-        ...prev, 
-        [name]: { 
-          success: false, 
-          message: 'Network error', 
-          error: error instanceof Error ? error.message : 'Unknown error' 
-        } 
-      }));
-    } finally {
-      setLoading(prev => ({ ...prev, [name]: false }));
+      try {
+        const response = await fetch('/api/user-permissions');
+        if (response.ok) {
+          const permissions = await response.json();
+          setUserPermissions(permissions);
+        }
+      } catch (error) {
+        console.error('Error loading user permissions:', error);
+      }
+    };
+
+    loadUserRoles();
+  }, [user]);
+
+  const getStatusIcon = (status: TestResult['status']) => {
+    switch (status) {
+      case 'pass':
+        return <CheckCircle className="w-5 h-5 text-green-500" />;
+      case 'fail':
+        return <XCircle className="w-5 h-5 text-red-500" />;
+      default:
+        return <AlertCircle className="w-5 h-5 text-yellow-500" />;
     }
   };
 
-  const testAll = async () => {
-    await Promise.all([
-      testEndpoint('Profile', '/api/test-auth/profile'),
-      testEndpoint('Admin Only', '/api/test-auth/admin-only'),
-      testEndpoint('Job Listings', '/api/test-auth/create-job'),
-      testEndpoint('Create Job', '/api/test-auth/create-job', 'POST', {
-        title: 'Full Stack Developer',
-        description: 'Join our amazing team!'
-      })
-    ]);
+  const getStatusColor = (status: TestResult['status']) => {
+    switch (status) {
+      case 'pass':
+        return 'bg-green-100 text-green-800 border-green-200';
+      case 'fail':
+        return 'bg-red-100 text-red-800 border-red-200';
+      default:
+        return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+    }
   };
 
-  const ResultCard = ({ title, result, testKey }: { 
-    title: string; 
-    result?: ApiResponse; 
-    testKey: string;
-  }) => (
-    <div className="border rounded-lg p-4 space-y-3">
-      <div className="flex justify-between items-center">
-        <h3 className="font-semibold text-lg">{title}</h3>
-        <button
-          onClick={() => {
-            if (testKey === 'Profile') testEndpoint('Profile', '/api/test-auth/profile');
-            if (testKey === 'Admin Only') testEndpoint('Admin Only', '/api/test-auth/admin-only');
-            if (testKey === 'Job Listings') testEndpoint('Job Listings', '/api/test-auth/create-job');
-            if (testKey === 'Create Job') testEndpoint('Create Job', '/api/test-auth/create-job', 'POST', {
-              title: 'Full Stack Developer',
-              description: 'Join our amazing team!'
-            });
-          }}
-          disabled={loading[testKey]}
-          className="px-3 py-1 bg-blue-500 text-white rounded text-sm hover:bg-blue-600 disabled:opacity-50"
-        >
-          {loading[testKey] ? 'Testing...' : 'Test'}
-        </button>
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Card className="w-full max-w-md">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Shield className="w-6 h-6" />
+              RBAC Test Suite
+            </CardTitle>
+            <CardDescription>
+              Please sign in to test the role-based access control system
+            </CardDescription>
+          </CardHeader>
+        </Card>
       </div>
-      
-      {result && (
-        <div className={`p-3 rounded-md ${result.success ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'}`}>
-          <div className={`font-medium ${result.success ? 'text-green-800' : 'text-red-800'}`}>
-            {result.success ? '✅ Success' : '❌ Failed'}
-          </div>
-          <div className={`mt-1 ${result.success ? 'text-green-700' : 'text-red-700'}`}>
-            {result.message}
-          </div>
-          
-          {result.error && (
-            <div className="mt-2 text-red-600 text-sm">
-              <strong>Error:</strong> {result.error}
-            </div>
-          )}
-          
-          {result.userRoles && (
-            <div className="mt-2 text-sm">
-              <strong>Your Roles:</strong> {result.userRoles.join(', ')}
-            </div>
-          )}
-          
-          {result.userPermissions && (
-            <div className="mt-2 text-sm">
-              <strong>Your Permissions:</strong> {result.userPermissions.join(', ')}
-            </div>
-          )}
-          
-          {result.requiredRole && (
-            <div className="mt-2 text-sm text-orange-600">
-              <strong>Required Role:</strong> {result.requiredRole}
-            </div>
-          )}
-          
-          {result.requiredPermission && (
-            <div className="mt-2 text-sm text-orange-600">
-              <strong>Required Permission:</strong> {result.requiredPermission}
-            </div>
-          )}
-          
-          {result.data && (
-            <details className="mt-2">
-              <summary className="cursor-pointer text-sm font-medium">View Data</summary>
-              <pre className="mt-1 text-xs bg-gray-100 p-2 rounded overflow-auto">
-                {JSON.stringify(result.data, null, 2)}
-              </pre>
-            </details>
-          )}
-        </div>
-      )}
-    </div>
-  );
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-4xl mx-auto px-4">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">
-            🔐 Role-Based Access Control (RBAC) Test
-          </h1>
-          <p className="text-gray-600 max-w-2xl mx-auto">
-            Test the employer portal's role-based access control system. Different endpoints require different roles and permissions.
-          </p>
-          
-          <button
-            onClick={testAll}
-            className="mt-4 px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium"
-          >
-            🚀 Test All Endpoints
-          </button>
-        </div>
-
-        <div className="grid gap-6 md:grid-cols-2">
-          <ResultCard 
-            title="👤 User Profile" 
-            result={results['Profile']} 
-            testKey="Profile"
-          />
-          
-          <ResultCard 
-            title="🔑 Admin Only Access" 
-            result={results['Admin Only']} 
-            testKey="Admin Only"
-          />
-          
-          <ResultCard 
-            title="📋 View Job Postings" 
-            result={results['Job Listings']} 
-            testKey="Job Listings"
-          />
-          
-          <ResultCard 
-            title="➕ Create Job Posting" 
-            result={results['Create Job']} 
-            testKey="Create Job"
-          />
-        </div>
-
-        <div className="mt-8 bg-white rounded-lg p-6 shadow-sm">
-          <h2 className="text-xl font-semibold mb-4">🎭 Role Definitions</h2>
-          <div className="grid gap-4 md:grid-cols-2">
-            <div className="space-y-3">
-              <div className="p-3 bg-red-50 rounded-md">
-                <h3 className="font-medium text-red-800">Employer Admin</h3>
-                <p className="text-sm text-red-600">Full access to all features and settings</p>
-                <div className="text-xs text-red-500 mt-1">All 9 permissions</div>
-              </div>
-              
-              <div className="p-3 bg-blue-50 rounded-md">
-                <h3 className="font-medium text-blue-800">Employer Recruiter</h3>
-                <p className="text-sm text-blue-600">Manage job postings and candidate pipeline</p>
-                <div className="text-xs text-blue-500 mt-1">6 permissions</div>
-              </div>
-            </div>
-            
-            <div className="space-y-3">
-              <div className="p-3 bg-green-50 rounded-md">
-                <h3 className="font-medium text-green-800">Employer Marketing</h3>
-                <p className="text-sm text-green-600">Analytics and content management</p>
-                <div className="text-xs text-green-500 mt-1">4 permissions</div>
-              </div>
-              
-              <div className="p-3 bg-gray-50 rounded-md">
-                <h3 className="font-medium text-gray-800">Employer Viewer</h3>
-                <p className="text-sm text-gray-600">Read-only access to data and analytics</p>
-                <div className="text-xs text-gray-500 mt-1">2 permissions</div>
-              </div>
-            </div>
+    <div className="min-h-screen bg-background p-6">
+      <div className="max-w-6xl mx-auto space-y-6">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold flex items-center gap-2">
+              <Shield className="w-8 h-8 text-blue-600" />
+              RBAC Test Suite
+            </h1>
+            <p className="text-muted-foreground">
+              Comprehensive testing of Role-Based Access Control implementation
+            </p>
           </div>
+          <Button 
+            onClick={runTests} 
+            disabled={testing}
+            className="bg-blue-600 hover:bg-blue-700"
+          >
+            {testing ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                Running Tests...
+              </>
+            ) : (
+              'Run All Tests'
+            )}
+          </Button>
         </div>
 
-        <div className="mt-6 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-          <h3 className="font-medium text-yellow-800 mb-2">🧪 Testing Notes</h3>
-          <ul className="text-sm text-yellow-700 space-y-1">
-            <li>• Currently using mock data for testing - roles/permissions are hardcoded</li>
-            <li>• In production, these will come from verified Auth0 JWT tokens</li>
-            <li>• Change the mock data in API files to test different role scenarios</li>
-            <li>• Green = Success, Red = Permission Denied</li>
-          </ul>
-        </div>
+        {/* Current User Info */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <User className="w-5 h-5" />
+              Current User
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <p className="text-sm text-muted-foreground">Email</p>
+                <p className="font-medium">{user.email}</p>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Name</p>
+                <p className="font-medium">{user.name || 'Not set'}</p>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">User ID</p>
+                <p className="font-mono text-sm">{user.id}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Tabs defaultValue="tests" className="w-full">
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="tests">Test Results</TabsTrigger>
+            <TabsTrigger value="permissions">Permissions</TabsTrigger>
+            <TabsTrigger value="users">Users</TabsTrigger>
+            <TabsTrigger value="admin">Admin Data</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="tests" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Test Results</CardTitle>
+                <CardDescription>
+                  Results of RBAC system tests
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {testResults.length === 0 ? (
+                  <div className="text-center py-8 text-muted-foreground">
+                    Click "Run All Tests" to begin testing
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {testResults.map((result, index) => (
+                      <div key={index} className="flex items-start gap-3 p-3 rounded-lg border">
+                        {getStatusIcon(result.status)}
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2">
+                            <h3 className="font-medium">{result.name}</h3>
+                            <Badge className={getStatusColor(result.status)}>
+                              {result.status}
+                            </Badge>
+                          </div>
+                          <p className="text-sm text-muted-foreground mt-1">
+                            {result.message}
+                          </p>
+                          {result.details && (
+                            <details className="mt-2">
+                              <summary className="text-sm cursor-pointer text-blue-600 hover:text-blue-800">
+                                View Details
+                              </summary>
+                              <pre className="mt-2 text-xs bg-muted p-2 rounded overflow-x-auto">
+                                {JSON.stringify(result.details, null, 2)}
+                              </pre>
+                            </details>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="permissions" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>User Permissions</CardTitle>
+                <CardDescription>
+                  Current user's access permissions
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {userPermissions ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {Object.entries(userPermissions).map(([key, hasPermission]) => (
+                      <div key={key} className="flex items-center gap-2 p-3 rounded-lg border">
+                        {hasPermission ? (
+                          <CheckCircle className="w-5 h-5 text-green-500" />
+                        ) : (
+                          <XCircle className="w-5 h-5 text-red-500" />
+                        )}
+                        <span className={hasPermission ? 'text-foreground' : 'text-muted-foreground'}>
+                          {key.replace('canAccess', '').replace(/([A-Z])/g, ' $1').trim()}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8 text-muted-foreground">
+                    Run tests to load permissions
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="users" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>All Users</CardTitle>
+                <CardDescription>
+                  All users in the system (admin access required)
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {allUsers.length > 0 ? (
+                  <div className="space-y-3">
+                    {allUsers.map((user) => (
+                      <div key={user.id} className="flex items-center justify-between p-3 rounded-lg border">
+                        <div>
+                          <p className="font-medium">{user.name || user.email}</p>
+                          <p className="text-sm text-muted-foreground">{user.email}</p>
+                        </div>
+                        <div className="flex gap-1">
+                          {(user.roles || []).map((role: string) => (
+                            <Badge key={role} variant="outline">
+                              {role}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8 text-muted-foreground">
+                    Run tests to load users (admin access required)
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="admin" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Admin Statistics</CardTitle>
+                <CardDescription>
+                  System statistics (admin access required)
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {adminStats ? (
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="text-center p-4 rounded-lg border">
+                      <div className="text-2xl font-bold text-blue-600">{adminStats.totalUsers}</div>
+                      <div className="text-sm text-muted-foreground">Total Users</div>
+                    </div>
+                    <div className="text-center p-4 rounded-lg border">
+                      <div className="text-2xl font-bold text-green-600">{adminStats.activeUsers}</div>
+                      <div className="text-sm text-muted-foreground">Active Users</div>
+                    </div>
+                    <div className="text-center p-4 rounded-lg border">
+                      <div className="text-2xl font-bold text-purple-600">{adminStats.adminUsers}</div>
+                      <div className="text-sm text-muted-foreground">Admin Users</div>
+                    </div>
+                    <div className="text-center p-4 rounded-lg border">
+                      <div className="text-2xl font-bold text-orange-600">{adminStats.newUsersToday}</div>
+                      <div className="text-sm text-muted-foreground">New Today</div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-center py-8 text-muted-foreground">
+                    Run tests to load admin statistics (admin access required)
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );

@@ -101,9 +101,9 @@ const semiconductorMicrolessons: LessonConfig[] = [
   {
     id: 'wafer-fabrication-basics',
     title: 'Wafer Fabrication Process Overview',
-    description: 'Understanding the fundamental steps of wafer fabrication from silicon ingots to finished wafers.',
-    totalSlides: 6,
-    duration: '15 minutes',
+    description: 'Comprehensive exploration of wafer fabrication from silicon ingots to finished wafers using interactive multimedia content.',
+    totalSlides: 10,
+    duration: '25 minutes',
     course: 'Advanced Manufacturing',
     lesson: 'Semiconductor Fundamentals',
     theme: {
@@ -122,75 +122,210 @@ const semiconductorMicrolessons: LessonConfig[] = [
         backgroundColor: '#0F172A'
       },
       {
+        id: 'visual-intro',
+        type: 'TitleWithImage',
+        title: 'Silicon Wafer Foundation',
+        caption: 'Semiconductor devices begin with ultra-pure silicon wafers that serve as the foundation for all microelectronic circuits.',
+        imageUrl: '/media/semiconductor/Technician-with-wafer-in-semiconductor-FAB.jpg',
+        imagePosition: 'right',
+        duration: 60,
+        backgroundColor: '#0F172A'
+      },
+      {
         id: 'overview',
         type: 'TitleWithSubtext',
         title: 'Fabrication Overview',
-        content: 'The complete process of creating semiconductor wafers ready for device manufacturing.',
+        content: 'The complete process of creating semiconductor wafers ready for device manufacturing involves precise control at every step.',
         bullets: [
-          'Crystal growth and ingot formation',
-          'Wafer slicing and shaping',
-          'Surface preparation and polishing',
-          'Quality inspection and testing'
+          'Crystal growth and ingot formation using Czochralski process',
+          'Precision wafer slicing with diamond wire technology',
+          'Multi-stage surface preparation and polishing',
+          'Quality inspection and metrology testing',
+          'Clean room packaging and storage'
         ],
         duration: 90,
         backgroundColor: '#0F172A'
       },
       {
+        id: 'fabrication-video',
+        type: 'VideoSlide',
+        title: 'Wafer Manufacturing in Action',
+        videoUrl: 'https://www.youtube.com/embed/aWdXCmSQ5Xw',
+        description: 'Watch the complete wafer fabrication process from crystal growth to final inspection.',
+        duration: 180,
+        backgroundColor: '#0F172A'
+      },
+      {
         id: 'processes',
         type: 'MarkdownSlide',
-        title: 'Wafer Fabrication Steps',
+        title: 'Detailed Process Steps',
         content: `
 # Complete Wafer Fabrication Process
 
 ## 1. Silicon Ingot Growth
-- **Czochralski Process**: Single crystal growth
-- **Float Zone**: Ultra-pure silicon ingots
-- **Diameter**: 200mm, 300mm, or 450mm
-- **Crystal Orientation**: <100> or <111>
+- **Czochralski Process**: Single crystal growth at 1450°C
+- **Float Zone**: Ultra-pure silicon ingots (>99.9999%)
+- **Diameter**: 200mm, 300mm, or 450mm standard sizes
+- **Crystal Orientation**: <100> or <111> lattice planes
+- **Dopant Control**: Boron (p-type) or Phosphorus (n-type)
 
-## 2. Ingot Preparation
-- **X-ray Orientation**: Crystal axis alignment
-- **Grinding**: Cylindrical shaping
-- **Slicing**: Diamond wire cutting
-- **Thickness**: 725μm ± 25μm
+## 2. Ingot Preparation & Slicing
+- **X-ray Orientation**: Crystal axis alignment ±0.5°
+- **Grinding**: Cylindrical shaping to precise diameter
+- **Diamond Wire Slicing**: 150-180μm wire, 0.5mm kerf
+- **Thickness**: 725μm ± 25μm for 300mm wafers
 
-## 3. Wafer Shaping
-- **Edge Grinding**: Rounded edge profile
-- **Lapping**: Thickness uniformity
-- **Etching**: Damage removal
-- **Cleaning**: Particle and metal removal
+## 3. Wafer Shaping & Lapping
+- **Edge Grinding**: Rounded edge profile (1-3mm radius)
+- **Lapping**: Al₂O₃ slurry for thickness uniformity
+- **Damage Etching**: HF/HNO₃ solution removal
+- **Edge Polishing**: Mirror finish on wafer perimeter
 
-## 4. Surface Polishing
-- **Chemical Mechanical Polishing (CMP)**
-- **Surface Roughness**: <0.1nm RMS
-- **Flatness**: <0.25μm
-- **Final Cleaning**: SC1/SC2 clean
+## 4. Chemical Mechanical Polishing (CMP)
+- **Primary Polish**: Colloidal silica slurry
+- **Final Polish**: <0.1nm RMS surface roughness
+- **Flatness Control**: <0.25μm total thickness variation
+- **Nanotopography**: <0.05nm peak-to-valley
         `,
         maxWidth: 'lg',
-        duration: 180,
+        duration: 200,
         backgroundColor: '#1E293B'
+      },
+      {
+        id: 'equipment-hotspots',
+        type: 'HotspotActivitySlide',
+        title: 'Fabrication Equipment Explorer',
+        instruction: 'Click on each numbered component to learn about the key equipment used in wafer fabrication.',
+        imageUrl: '/media/semiconductor/Advanced-semiconductor-fab-equipment-lined-up-in-a-semiconductor-manufacturing-facility.jpg',
+        hotspots: [
+          {
+            id: 'czochralski',
+            x: 25,
+            y: 35,
+            label: 'Czochralski Crystal Puller',
+            description: 'Single-crystal silicon ingot growth system operating at 1450°C with precise rotation control for defect-free crystals.'
+          },
+          {
+            id: 'wire-saw',
+            x: 50,
+            y: 45,
+            label: 'Diamond Wire Saw',
+            description: 'Multi-wire slicing system with 150μm diamond-embedded wire for precision wafer cutting with minimal material loss.'
+          },
+          {
+            id: 'cmp-station',
+            x: 75,
+            y: 30,
+            label: 'CMP Polishing Station',
+            description: 'Chemical Mechanical Polishing system combining colloidal silica chemistry with mechanical action for mirror-finish surfaces.'
+          },
+          {
+            id: 'metrology',
+            x: 60,
+            y: 65,
+            label: 'Metrology & Inspection',
+            description: 'Automated optical inspection and thickness measurement systems ensuring sub-nanometer surface quality control.'
+          }
+        ],
+        duration: 150,
+        backgroundColor: '#0F172A'
+      },
+      {
+        id: 'crystal-structure',
+        type: 'AR3DModelSlide',
+        title: 'Silicon Crystal Structure',
+        modelUrl: '/models/silicon-crystal-lattice.glb',
+        arEnabled: true,
+        hotspots: [
+          {
+            label: 'Silicon Atom',
+            position: [0, 0, 0]
+          },
+          {
+            label: 'Covalent Bond',
+            position: [1.4, 0, 0]
+          },
+          {
+            label: 'Crystal Plane <100>',
+            position: [0, 2, 0]
+          },
+          {
+            label: 'Unit Cell',
+            position: [2.8, 2.8, 0]
+          }
+        ],
+        duration: 120,
+        backgroundColor: '#0F172A'
+      },
+      {
+        id: 'process-flow',
+        type: 'CustomHTMLSlide',
+        rawHtml: `
+<div class="h-full flex flex-col items-center justify-center bg-slate-900 text-white p-8">
+  <h2 class="text-3xl font-bold mb-8 text-center">Interactive Process Flow</h2>
+  <div class="max-w-4xl w-full">
+    <div class="grid grid-cols-4 gap-4 mb-8">
+      <div class="bg-blue-600 p-4 rounded-lg text-center cursor-pointer hover:bg-blue-500 transition-all duration-300" onclick="highlightStep(1)">
+        <div class="text-2xl mb-2">🔮</div>
+        <div class="font-semibold">Crystal Growth</div>
+        <div class="text-sm opacity-80">1450°C Czochralski</div>
+      </div>
+      <div class="bg-purple-600 p-4 rounded-lg text-center cursor-pointer hover:bg-purple-500 transition-all duration-300" onclick="highlightStep(2)">
+        <div class="text-2xl mb-2">⚙️</div>
+        <div class="font-semibold">Slicing</div>
+        <div class="text-sm opacity-80">Diamond Wire</div>
+      </div>
+      <div class="bg-green-600 p-4 rounded-lg text-center cursor-pointer hover:bg-green-500 transition-all duration-300" onclick="highlightStep(3)">
+        <div class="text-2xl mb-2">💎</div>
+        <div class="font-semibold">Polishing</div>
+        <div class="text-sm opacity-80">CMP Process</div>
+      </div>
+      <div class="bg-orange-600 p-4 rounded-lg text-center cursor-pointer hover:bg-orange-500 transition-all duration-300" onclick="highlightStep(4)">
+        <div class="text-2xl mb-2">🔍</div>
+        <div class="font-semibold">Inspection</div>
+        <div class="text-sm opacity-80">Quality Control</div>
+      </div>
+    </div>
+    <div id="step-details" class="bg-slate-800 p-6 rounded-xl min-h-32 flex items-center justify-center">
+      <p class="text-gray-400 text-center">Click on any step above to see detailed information</p>
+    </div>
+  </div>
+  <script>
+    function highlightStep(step) {
+      const details = {
+        1: '<h3 class="text-xl font-bold text-blue-400 mb-2">Crystal Growth</h3><p>Ultra-pure silicon (99.9999%) is melted and slowly cooled to form single-crystal ingots up to 450mm diameter. The Czochralski process ensures perfect atomic alignment.</p>',
+        2: '<h3 class="text-xl font-bold text-purple-400 mb-2">Diamond Wire Slicing</h3><p>Precision cutting with 150μm diamond wire creates wafers 725μm thick. Multi-wire systems slice entire ingots simultaneously with minimal material waste.</p>',
+        3: '<h3 class="text-xl font-bold text-green-400 mb-2">Chemical Mechanical Polishing</h3><p>Colloidal silica slurry combined with mechanical pressure creates mirror-smooth surfaces with <0.1nm roughness - essential for nanoscale device fabrication.</p>',
+        4: '<h3 class="text-xl font-bold text-orange-400 mb-2">Quality Inspection</h3><p>Automated metrology systems measure thickness, flatness, and surface quality. Only wafers meeting strict specifications proceed to device manufacturing.</p>'
+      };
+      document.getElementById('step-details').innerHTML = details[step];
+    }
+  </script>
+</div>`,
+        duration: 120,
+        backgroundColor: '#0F172A'
       },
       {
         id: 'quiz',
         type: 'QuickCheckSlide',
-        title: 'Process Check',
-        question: 'What is the primary purpose of Chemical Mechanical Polishing (CMP)?',
+        title: 'Knowledge Check',
+        question: 'What is the primary purpose of Chemical Mechanical Polishing (CMP) in wafer fabrication?',
         options: [
-          'Remove surface particles',
-          'Achieve ultra-smooth surface finish',
-          'Control wafer thickness',
-          'Add protective coating'
+          'Remove surface particles only',
+          'Achieve ultra-smooth surface finish (<0.1nm roughness)',
+          'Control wafer thickness uniformity',
+          'Add protective coating layers'
         ],
         correctAnswer: 1,
-        explanation: 'CMP combines chemical etching with mechanical polishing to achieve the ultra-smooth surface finish required for subsequent processing steps.',
-        duration: 60,
+        explanation: 'CMP combines chemical etching with mechanical polishing to achieve the ultra-smooth surface finish (<0.1nm RMS roughness) required for nanoscale device fabrication. This process is critical for ensuring proper photolithography and device performance.',
+        duration: 90,
         backgroundColor: '#0F172A'
       },
       {
         id: 'completion',
         type: 'TitleSlide',
         title: 'Module Complete!',
-        subtitle: 'You understand wafer fabrication fundamentals.',
+        subtitle: 'You have mastered wafer fabrication fundamentals through interactive multimedia learning.',
         duration: 30,
         backgroundColor: '#059669'
       }

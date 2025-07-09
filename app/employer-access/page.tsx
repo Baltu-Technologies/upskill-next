@@ -1,278 +1,354 @@
 'use client';
 
-import { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { 
   Building2, 
   Users, 
   Plus, 
   Search,
-  MapPin,
-  Briefcase,
   TrendingUp,
   Settings,
-  Eye,
   Calendar,
   FileText,
   Target,
-  ChevronRight,
-  Zap,
-  Star
+  Briefcase,
+  UserCheck,
+  BarChart3,
+  Mail,
+  MessageSquare,
+  Clock,
+  CheckCircle,
+  XCircle,
+  AlertCircle,
+  DollarSign,
+  Eye,
+  Filter,
+  Download,
+  Edit,
+  Trash2,
+  MoreVertical,
+  Star,
+  MapPin,
+  Zap
 } from 'lucide-react';
 
-export default function EmployerAccessPage() {
-  const [searchTerm, setSearchTerm] = useState('');
+export default function EmployerDashboard() {
+  const mockStats = {
+    totalJobs: 12,
+    activeJobs: 8,
+    applications: 247,
+    interviews: 28,
+    hires: 6,
+    candidates: 189,
+    newApplications: 34,
+    pendingReviews: 15
+  };
 
-  const quickActions = [
+  const mockJobs = [
     {
-      title: 'Create Company Profile',
-      description: 'Set up your organization profile and showcase your opportunities',
-      icon: Building2,
-      color: 'from-blue-600 to-purple-600',
-      href: '/employer-access/profile/create'
+      id: 1,
+      title: "Senior Software Engineer",
+      location: "San Francisco, CA",
+      type: "Full-time",
+      applicants: 42,
+      status: "Active",
+      posted: "2 days ago",
+      priority: "High",
+      department: "Engineering"
     },
     {
-      title: 'Manage Job Pipeline',
-      description: 'Track candidates through your hiring process',
-      icon: Users,
-      color: 'from-purple-600 to-pink-600', 
-      href: '/employer-access/pipeline'
+      id: 2,
+      title: "Product Manager",
+      location: "New York, NY",
+      type: "Full-time",
+      applicants: 28,
+      status: "Active",
+      posted: "5 days ago",
+      priority: "Medium",
+      department: "Product"
     },
     {
-      title: 'Post New Opportunity',
-      description: 'Create and publish new job openings',
-      icon: Plus,
-      color: 'from-green-600 to-blue-600',
-      href: '/employer-access/jobs/create'
-    },
-    {
-      title: 'Analytics Dashboard',
-      description: 'View performance metrics and hiring insights',
-      icon: TrendingUp,
-      color: 'from-orange-600 to-red-600',
-      href: '/employer-access/analytics'
+      id: 3,
+      title: "UX Designer",
+      location: "Remote",
+      type: "Contract",
+      applicants: 67,
+      status: "Paused",
+      posted: "1 week ago",
+      priority: "Low",
+      department: "Design"
     }
   ];
 
   const recentActivity = [
-    {
-      id: 1,
-      action: 'New application received',
-      candidate: 'Sarah Martinez',
-      position: 'Semiconductor Technician',
-      time: '2 hours ago',
-      status: 'pending'
-    },
-    {
-      id: 2,
-      action: 'Interview scheduled',
-      candidate: 'Michael Chen',
-      position: 'Process Engineer',
-      time: '4 hours ago',
-      status: 'scheduled'
-    },
-    {
-      id: 3,
-      action: 'Profile updated',
-      candidate: 'Your Company Profile',
-      position: 'System Update',
-      time: '1 day ago',
-      status: 'completed'
-    }
+    { type: "application", message: "New application for Senior Software Engineer", time: "2 hours ago" },
+    { type: "interview", message: "Interview scheduled with John Doe", time: "4 hours ago" },
+    { type: "hire", message: "Offer accepted by Jane Smith", time: "1 day ago" },
+    { type: "review", message: "Application needs review - Product Manager", time: "2 days ago" }
   ];
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 
-                    dark:from-[hsl(222,84%,4%)] dark:via-[hsl(222,84%,6%)] dark:to-[hsl(222,84%,8%)]">
-      
-      {/* Header Section */}
-      <div className="relative pt-16 pb-12 px-6">
-        <div className="max-w-7xl mx-auto">
-          {/* Hero Content */}
-          <div className="text-center mb-12">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full 
-                          bg-blue-100/80 text-blue-700 text-sm font-medium mb-6
-                          dark:bg-blue-900/30 dark:text-blue-300 border border-blue-200/50 dark:border-blue-800/50">
-              <Building2 className="w-4 h-4" />
-              Employer Portal
-            </div>
-            
-            <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 
-                          dark:from-white dark:via-slate-200 dark:to-white bg-clip-text text-transparent mb-6">
-              Employer Access
-            </h1>
-            
-            <p className="text-xl text-slate-600 dark:text-slate-400 max-w-3xl mx-auto leading-relaxed">
-              Create your company profile, manage your talent pipeline, and connect with skilled professionals
-              in semiconductor, manufacturing, and emerging technology sectors.
-            </p>
-          </div>
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'Active':
+        return 'bg-green-500';
+      case 'Paused':
+        return 'bg-yellow-500';
+      case 'Closed':
+        return 'bg-red-500';
+      default:
+        return 'bg-gray-500';
+    }
+  };
 
-          {/* Search Bar */}
-          <div className="max-w-2xl mx-auto mb-12">
-            <div className="relative">
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5" />
-              <Input
-                type="text"
-                placeholder="Search candidates, positions, or pipeline..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-12 pr-4 py-4 text-lg rounded-2xl border-0 
-                          bg-white/80 dark:bg-slate-800/50 
-                          shadow-lg shadow-slate-200/50 dark:shadow-black/20
-                          focus:ring-2 focus:ring-blue-500/30 focus:shadow-xl
-                          backdrop-blur-sm transition-all duration-300"
-              />
-            </div>
+  const getPriorityColor = (priority: string) => {
+    switch (priority) {
+      case 'High':
+        return 'text-red-600 bg-red-100';
+      case 'Medium':
+        return 'text-yellow-600 bg-yellow-100';
+      case 'Low':
+        return 'text-green-600 bg-green-100';
+      default:
+        return 'text-gray-600 bg-gray-100';
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Development Notice */}
+      <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
+        <div className="flex items-center gap-3">
+          <AlertCircle className="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
+          <div>
+            <h3 className="font-semibold text-yellow-800 dark:text-yellow-200">Development Access</h3>
+            <p className="text-sm text-yellow-700 dark:text-yellow-300">
+              You are accessing the employer portal without authentication. In production, this will require Auth0 login with proper organization setup.
+            </p>
           </div>
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-6 pb-12">
-        
-        {/* Quick Actions Grid */}
-        <div className="mb-16">
-          <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-8">Quick Actions</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {quickActions.map((action, index) => (
-              <Card key={index} className="group relative overflow-hidden border-0 
-                                         bg-white/80 dark:bg-slate-800/50 
-                                         shadow-lg shadow-slate-200/50 dark:shadow-black/20
-                                         hover:shadow-xl hover:shadow-slate-300/50 dark:hover:shadow-black/30
-                                         hover:scale-105 transition-all duration-300 cursor-pointer
-                                         backdrop-blur-sm">
-                <div className={`absolute inset-0 bg-gradient-to-br ${action.color} opacity-0 
-                                group-hover:opacity-10 transition-opacity duration-300`} />
-                <CardHeader className="pb-2">
-                  <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${action.color} 
-                                  flex items-center justify-center mb-4 
-                                  shadow-lg shadow-slate-300/30 dark:shadow-black/30
-                                  group-hover:scale-110 transition-transform duration-300`}>
-                    <action.icon className="w-6 h-6 text-white" />
-                  </div>
-                  <CardTitle className="text-lg group-hover:text-blue-600 dark:group-hover:text-blue-400 
-                                      transition-colors duration-300">
-                    {action.title}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <CardDescription className="text-slate-600 dark:text-slate-400 mb-4">
-                    {action.description}
-                  </CardDescription>
-                  <div className="flex items-center text-blue-600 dark:text-blue-400 font-medium
-                                group-hover:translate-x-1 transition-transform duration-300">
-                    Get Started
-                    <ChevronRight className="w-4 h-4 ml-1" />
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-foreground">
+            Employer Dashboard
+          </h1>
+          <p className="text-muted-foreground">
+            Manage your company profile, job postings, and candidate pipeline.
+          </p>
         </div>
+        <div className="flex gap-4">
+          <Button variant="outline" className="flex items-center gap-2">
+            <Plus className="h-4 w-4" />
+            Post New Job
+          </Button>
+          <Button className="flex items-center gap-2">
+            <Search className="h-4 w-4" />
+            Find Candidates
+          </Button>
+        </div>
+      </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          
-          {/* Recent Activity */}
-          <div className="lg:col-span-2">
-            <Card className="border-0 bg-white/80 dark:bg-slate-800/50 
-                           shadow-lg shadow-slate-200/50 dark:shadow-black/20
-                           backdrop-blur-sm">
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle className="flex items-center gap-2">
-                    <Zap className="w-5 h-5 text-blue-600" />
-                    Recent Activity
-                  </CardTitle>
-                  <Button variant="ghost" size="sm" className="text-blue-600 hover:text-blue-700">
-                    View All
-                  </Button>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {recentActivity.map((item) => (
-                  <div key={item.id} className="flex items-center justify-between p-4 rounded-xl
-                                               bg-slate-50/80 dark:bg-slate-700/30 
-                                               hover:bg-slate-100/80 dark:hover:bg-slate-700/50
-                                               transition-colors duration-200">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="font-medium text-slate-900 dark:text-white">
-                          {item.action}
-                        </span>
-                        <Badge variant={item.status === 'pending' ? 'default' : 
-                                      item.status === 'scheduled' ? 'secondary' : 'outline'}
-                               className="text-xs">
-                          {item.status}
+      {/* Stats Overview */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <Card className="border-l-4 border-l-blue-500">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Total Jobs</p>
+                <p className="text-3xl font-bold text-foreground">{mockStats.totalJobs}</p>
+              </div>
+              <Briefcase className="h-8 w-8 text-blue-500" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-l-4 border-l-green-500">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Applications</p>
+                <p className="text-3xl font-bold text-foreground">{mockStats.applications}</p>
+              </div>
+              <Users className="h-8 w-8 text-green-500" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-l-4 border-l-yellow-500">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Interviews</p>
+                <p className="text-3xl font-bold text-foreground">{mockStats.interviews}</p>
+              </div>
+              <Calendar className="h-8 w-8 text-yellow-500" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-l-4 border-l-purple-500">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Hires</p>
+                <p className="text-3xl font-bold text-foreground">{mockStats.hires}</p>
+              </div>
+              <UserCheck className="h-8 w-8 text-purple-500" />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Main Content Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Job Listings */}
+        <div className="lg:col-span-2">
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle className="flex items-center gap-2">
+                  <Briefcase className="h-5 w-5" />
+                  Active Job Postings
+                </CardTitle>
+                <Button variant="outline" size="sm">
+                  <Plus className="h-4 w-4 mr-2" />
+                  New Job
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {mockJobs.map((job) => (
+                  <div key={job.id} className="p-4 border border-border rounded-lg hover:shadow-md transition-shadow">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-3">
+                        <div className={`w-3 h-3 rounded-full ${getStatusColor(job.status)}`}></div>
+                        <h3 className="font-semibold text-lg text-foreground">{job.title}</h3>
+                        <Badge variant="secondary" className={getPriorityColor(job.priority)}>
+                          {job.priority}
                         </Badge>
                       </div>
-                      <p className="text-sm text-slate-600 dark:text-slate-400">
-                        {item.candidate} • {item.position}
-                      </p>
-                      <p className="text-xs text-slate-500 dark:text-slate-500 mt-1">
-                        {item.time}
-                      </p>
+                      <Button variant="ghost" size="sm">
+                        <MoreVertical className="h-4 w-4" />
+                      </Button>
                     </div>
-                    <ChevronRight className="w-4 h-4 text-slate-400" />
+                    <div className="flex items-center gap-6 text-sm text-muted-foreground mb-3">
+                      <div className="flex items-center gap-1">
+                        <MapPin className="h-4 w-4" />
+                        {job.location}
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Building2 className="h-4 w-4" />
+                        {job.department}
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Clock className="h-4 w-4" />
+                        {job.posted}
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-medium text-blue-600 dark:text-blue-400">
+                        {job.applicants} applicants
+                      </span>
+                      <div className="flex gap-2">
+                        <Button variant="outline" size="sm">
+                          <Eye className="h-4 w-4" />
+                          View
+                        </Button>
+                        <Button variant="outline" size="sm">
+                          <Edit className="h-4 w-4" />
+                          Edit
+                        </Button>
+                      </div>
+                    </div>
                   </div>
                 ))}
-              </CardContent>
-            </Card>
-          </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
 
-          {/* Quick Stats */}
-          <div className="space-y-6">
-            <Card className="border-0 bg-white/80 dark:bg-slate-800/50 
-                           shadow-lg shadow-slate-200/50 dark:shadow-black/20
-                           backdrop-blur-sm">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Target className="w-5 h-5 text-green-600" />
-                  Pipeline Overview
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex justify-between items-center">
-                  <span className="text-slate-600 dark:text-slate-400">Active Positions</span>
-                  <span className="font-bold text-xl text-slate-900 dark:text-white">12</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-slate-600 dark:text-slate-400">Total Applications</span>
-                  <span className="font-bold text-xl text-slate-900 dark:text-white">84</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-slate-600 dark:text-slate-400">Interviews Scheduled</span>
-                  <span className="font-bold text-xl text-slate-900 dark:text-white">7</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-slate-600 dark:text-slate-400">Offers Extended</span>
-                  <span className="font-bold text-xl text-slate-900 dark:text-white">3</span>
-                </div>
-              </CardContent>
-            </Card>
+        {/* Sidebar */}
+        <div className="space-y-6">
+          {/* Recent Activity */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Zap className="h-5 w-5" />
+                Recent Activity
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {recentActivity.map((activity, index) => (
+                  <div key={index} className="flex items-start gap-3">
+                    <div className="w-2 h-2 rounded-full bg-blue-500 mt-2"></div>
+                    <div className="flex-1">
+                      <p className="text-sm font-medium text-foreground">{activity.message}</p>
+                      <p className="text-xs text-muted-foreground">{activity.time}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
 
-            <Card className="border-0 bg-white/80 dark:bg-slate-800/50 
-                           shadow-lg shadow-slate-200/50 dark:shadow-black/20
-                           backdrop-blur-sm">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Star className="w-5 h-5 text-orange-600" />
-                  Top Matches
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 
-                                hover:from-blue-700 hover:to-purple-700 
-                                text-white border-0 shadow-lg hover:shadow-xl
-                                transition-all duration-300 hover:scale-105">
-                  View Recommended Candidates
+          {/* Quick Actions */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Quick Actions</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                <Button className="w-full justify-start" variant="outline">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Post New Job
                 </Button>
-              </CardContent>
-            </Card>
-          </div>
+                <Button className="w-full justify-start" variant="outline">
+                  <Search className="h-4 w-4 mr-2" />
+                  Search Candidates
+                </Button>
+                <Button className="w-full justify-start" variant="outline">
+                  <BarChart3 className="h-4 w-4 mr-2" />
+                  View Analytics
+                </Button>
+                <Button className="w-full justify-start" variant="outline">
+                  <Settings className="h-4 w-4 mr-2" />
+                  Company Settings
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Performance Metrics */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <TrendingUp className="h-5 w-5" />
+                This Month
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-muted-foreground">New Applications</span>
+                  <span className="font-semibold text-foreground">{mockStats.newApplications}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-muted-foreground">Pending Reviews</span>
+                  <span className="font-semibold text-foreground">{mockStats.pendingReviews}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-muted-foreground">Active Jobs</span>
+                  <span className="font-semibold text-foreground">{mockStats.activeJobs}</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>

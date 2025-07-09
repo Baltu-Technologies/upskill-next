@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
+import { useTheme } from '../contexts/ThemeContext';
 import { 
   MessageSquare, 
   Search,
@@ -20,6 +21,7 @@ interface MessagesModalProps {
 }
 
 export default function MessagesModal({ isOpen, onClose }: MessagesModalProps) {
+  const { isDark } = useTheme();
   const [selectedConversation, setSelectedConversation] = useState('ai-assistant');
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [renamingConversation, setRenamingConversation] = useState<string | null>(null);
@@ -125,13 +127,13 @@ export default function MessagesModal({ isOpen, onClose }: MessagesModalProps) {
             animate={{ opacity: 1, scale: 1, x: 0 }}
             exit={{ opacity: 0, scale: 0.95, x: 300 }}
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            className="fixed top-4 right-4 bottom-4 w-[900px] max-w-[calc(100vw-2rem)] md:max-w-[900px] bg-white dark:bg-gray-900 rounded-2xl shadow-2xl z-[101] flex overflow-hidden border border-slate-200 dark:border-gray-700 max-md:top-2 max-md:right-2 max-md:bottom-2 max-md:left-2"
+            className={`fixed top-4 right-4 bottom-4 w-[900px] max-w-[calc(100vw-2rem)] md:max-w-[900px] ${isDark ? 'bg-slate-900' : 'bg-white'} rounded-2xl shadow-2xl z-[101] flex overflow-hidden border ${isDark ? 'border-slate-700' : 'border-slate-200'} max-md:top-2 max-md:right-2 max-md:bottom-2 max-md:left-2`}
           >
             {/* Sidebar - Conversations List */}
-            <div className="w-80 max-md:w-72 border-r border-slate-200 dark:border-gray-700 flex flex-col">
+            <div className={`w-80 max-md:w-72 border-r ${isDark ? 'border-slate-700 bg-slate-800' : 'border-slate-200 bg-slate-50'} flex flex-col`}>
               {/* Header */}
-              <div className="px-6 py-4 border-b border-slate-200 dark:border-gray-700 flex items-center justify-between">
-                <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
+              <div className={`px-6 py-4 border-b ${isDark ? 'border-slate-700 bg-slate-900' : 'border-slate-200 bg-white'} flex items-center justify-between`}>
+                <h1 className={`text-2xl font-bold ${isDark ? 'text-slate-100' : 'text-slate-800'} flex items-center gap-2`}>
                   <MessageSquare className="w-6 h-6" />
                   Messages
                 </h1>
@@ -139,20 +141,20 @@ export default function MessagesModal({ isOpen, onClose }: MessagesModalProps) {
                   variant="ghost"
                   size="sm"
                   onClick={onClose}
-                  className="h-8 w-8 p-0 hover:bg-slate-100 dark:hover:bg-gray-800 rounded-lg"
+                  className={`h-8 w-8 p-0 ${isDark ? 'hover:bg-slate-800' : 'hover:bg-slate-100'} rounded-lg`}
                 >
                   <X className="h-4 w-4" />
                 </Button>
               </div>
               
               {/* Search */}
-              <div className="px-6 py-3 border-b border-slate-200 dark:border-gray-700">
+              <div className={`px-6 py-3 border-b ${isDark ? 'border-slate-700 bg-slate-800' : 'border-slate-200 bg-slate-50'}`}>
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
                   <input 
                     type="text" 
                     placeholder="Search conversations..."
-                    className="w-full pl-10 pr-4 py-2 bg-slate-100 dark:bg-gray-800 border border-slate-200 dark:border-gray-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                    className={`w-full pl-10 pr-4 py-2 ${isDark ? 'bg-slate-800 border-slate-700 text-slate-100 placeholder-slate-400' : 'bg-slate-100 border-slate-200 text-slate-900 placeholder-slate-500'} border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50`}
                   />
                 </div>
               </div>
@@ -166,8 +168,8 @@ export default function MessagesModal({ isOpen, onClose }: MessagesModalProps) {
                       onClick={() => setSelectedConversation(conversation.id)}
                       className={`group flex items-center gap-3 p-3 rounded-xl transition-all duration-200 cursor-pointer ${
                         selectedConversation === conversation.id 
-                          ? 'bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-700'
-                          : 'hover:bg-slate-100 dark:hover:bg-gray-800'
+                          ? isDark ? 'bg-blue-950/30 border border-blue-700' : 'bg-blue-50 border border-blue-200'
+                          : isDark ? 'hover:bg-slate-800' : 'hover:bg-slate-100'
                       }`}
                     >
                       <div className="relative">
@@ -175,23 +177,23 @@ export default function MessagesModal({ isOpen, onClose }: MessagesModalProps) {
                           {conversation.avatar}
                         </div>
                         {conversation.isOnline && (
-                          <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-white dark:border-gray-900 rounded-full"></div>
+                          <div className={`absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 ${isDark ? 'border-slate-900' : 'border-white'} rounded-full`}></div>
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between">
-                          <div className="font-semibold text-slate-800 dark:text-slate-100 text-sm truncate">
+                          <div className={`font-semibold ${isDark ? 'text-slate-100' : 'text-slate-800'} text-sm truncate`}>
                             {conversation.name}
                           </div>
-                          <div className="text-xs text-slate-500 dark:text-slate-500">
+                          <div className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
                             {conversation.timestamp}
                           </div>
                         </div>
-                        <div className="text-xs text-slate-600 dark:text-slate-400 truncate">
+                        <div className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-600'} truncate`}>
                           {conversation.lastMessage}
                         </div>
                         {conversation.role && (
-                          <div className="text-xs text-blue-600 dark:text-blue-400 mt-1">
+                          <div className={`text-xs ${isDark ? 'text-blue-400' : 'text-blue-600'} mt-1`}>
                             {conversation.role}
                           </div>
                         )}
@@ -212,18 +214,18 @@ export default function MessagesModal({ isOpen, onClose }: MessagesModalProps) {
             {/* Main Chat Area */}
             <div className="flex-1 flex flex-col">
               {/* Chat Header */}
-              <div className="px-6 py-4 border-b border-slate-200 dark:border-gray-700">
+              <div className={`px-6 py-4 border-b ${isDark ? 'border-slate-700 bg-slate-900' : 'border-slate-200 bg-white'}`}>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4">
                     <div className={`w-10 h-10 bg-gradient-to-br ${activeConversation?.gradient} rounded-full flex items-center justify-center text-white font-bold shadow-lg`}>
                       {activeConversation?.avatar}
                     </div>
                     <div>
-                      <div className="font-semibold text-slate-800 dark:text-slate-100">
+                      <div className={`font-semibold ${isDark ? 'text-slate-100' : 'text-slate-800'}`}>
                         {activeConversation?.name}
                       </div>
                       {activeConversation?.isOnline && (
-                        <div className="text-xs text-green-600 dark:text-green-400 flex items-center gap-1">
+                        <div className={`text-xs ${isDark ? 'text-green-400' : 'text-green-600'} flex items-center gap-1`}>
                           <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                           Online
                         </div>
@@ -234,7 +236,7 @@ export default function MessagesModal({ isOpen, onClose }: MessagesModalProps) {
               </div>
               
               {/* Messages */}
-              <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4">
+              <div className={`flex-1 overflow-y-auto px-6 py-4 space-y-4 ${isDark ? 'bg-slate-900' : 'bg-white'}`}>
                 {messages.map((message) => (
                   <div key={message.id} className={`flex items-start gap-3 ${message.isUser ? 'justify-end' : ''}`}>
                     {!message.isUser && (
@@ -247,13 +249,13 @@ export default function MessagesModal({ isOpen, onClose }: MessagesModalProps) {
                       <div className={`rounded-2xl p-4 max-w-md ${
                         message.isUser 
                           ? 'bg-blue-500 text-white rounded-tr-md' 
-                          : 'bg-slate-100 dark:bg-gray-800 text-slate-800 dark:text-slate-100 rounded-tl-md'
+                          : isDark ? 'bg-slate-800 text-slate-100 rounded-tl-md' : 'bg-slate-100 text-slate-800 rounded-tl-md'
                       }`}>
                         <div className="text-sm whitespace-pre-wrap">
                           {message.hasCode ? (
                             <div>
                               {message.content.split('useEffect')[0]}
-                              <div className="mt-2 p-3 bg-slate-200 dark:bg-gray-700 rounded-lg font-mono text-xs">
+                              <div className={`mt-2 p-3 ${isDark ? 'bg-slate-700' : 'bg-slate-200'} rounded-lg font-mono text-xs`}>
                                 useEffect(() =&gt; {'{'}
                                 <br />
                                 &nbsp;&nbsp;// Your side effect here
@@ -269,7 +271,7 @@ export default function MessagesModal({ isOpen, onClose }: MessagesModalProps) {
                           )}
                         </div>
                       </div>
-                      <div className={`text-xs text-slate-500 dark:text-slate-500 mt-1 ${message.isUser ? 'mr-1' : 'ml-1'}`}>
+                      <div className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'} mt-1 ${message.isUser ? 'mr-1' : 'ml-1'}`}>
                         {message.timestamp}
                       </div>
                     </div>
@@ -278,7 +280,7 @@ export default function MessagesModal({ isOpen, onClose }: MessagesModalProps) {
               </div>
               
               {/* Message Input */}
-              <div className="p-6 border-t border-slate-200 dark:border-gray-700">
+              <div className={`p-6 border-t ${isDark ? 'border-slate-700 bg-slate-900' : 'border-slate-200 bg-white'}`}>
                 <div className="flex items-center gap-3">
                   <Button variant="ghost" size="icon" className="h-9 w-9">
                     <Paperclip className="h-4 w-4" />
@@ -288,7 +290,7 @@ export default function MessagesModal({ isOpen, onClose }: MessagesModalProps) {
                     <input 
                       type="text" 
                       placeholder="Type a message..."
-                      className="w-full px-4 py-3 bg-slate-100 dark:bg-gray-800 border border-slate-200 dark:border-gray-700 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 pr-20"
+                      className={`w-full px-4 py-3 ${isDark ? 'bg-slate-800 border-slate-700 text-slate-100 placeholder-slate-400' : 'bg-slate-100 border-slate-200 text-slate-900 placeholder-slate-500'} border rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 pr-20`}
                     />
                     <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center gap-1">
                       <Button variant="ghost" size="icon" className="h-8 w-8">

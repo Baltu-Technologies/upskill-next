@@ -17,7 +17,6 @@ import {
   MessageSquare,
   Bot,
   X,
-  Search,
   BookOpen
 } from 'lucide-react';
 import CollapsibleSidebar from './CollapsibleSidebar';
@@ -34,14 +33,13 @@ export default function PersistentLayout({ children }: PersistentLayoutProps) {
   const router = useRouter();
   const pathname = usePathname();
   const { user, signOut } = useAuth();
-  const { theme, setTheme } = useTheme();
+  const { theme, setTheme, isDark } = useTheme();
   const { showMessagesModal, openMessagesModal, closeMessagesModal } = useMessages();
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(true); // Start as mobile to prevent sidebar flash
   const [showStatsPanel, setShowStatsPanel] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
-  const [showSearchBar, setShowSearchBar] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
+
   const [showStudyModal, setShowStudyModal] = useState(false);
 
   // Refs for click outside detection
@@ -94,7 +92,7 @@ export default function PersistentLayout({ children }: PersistentLayoutProps) {
         {/* Top Navigation - Mobile Only */}
         {isMobile && (
           <div className="fixed top-0 left-0 right-0 z-40">
-            <nav className="bg-white/95 dark:bg-[hsl(222,84%,8%)]/95 backdrop-blur-xl border-b border-slate-300/50 dark:border-[hsl(217,33%,17%)]/30 px-4 py-3 shadow-lg">
+            <nav className="bg-card/95 backdrop-blur-xl border-b border-border px-4 py-3 shadow-lg">
               <div className="flex items-center justify-between">
                 {/* Baltu Logo (Left) */}
                 <div className="flex-1 flex justify-start">
@@ -112,11 +110,11 @@ export default function PersistentLayout({ children }: PersistentLayoutProps) {
 
                 {/* Points Display (Right) */}
                 <div className="flex items-center gap-2">
-                  <div className="flex items-center gap-1 px-2 py-1 rounded-lg bg-slate-200/60 dark:bg-[hsl(222,84%,12%)] hover:scale-105 transition-all duration-200">
+                  <div className="flex items-center gap-1 px-2 py-1 rounded-lg bg-muted/60 hover:scale-105 transition-all duration-200">
                     <Flame className="h-3 w-3 text-orange-600" />
                     <span className="text-xs font-bold text-orange-600">15</span>
                   </div>
-                  <div className="flex items-center gap-1 px-2 py-1 rounded-lg bg-slate-200/60 dark:bg-[hsl(222,84%,12%)] hover:scale-105 transition-all duration-200">
+                  <div className="flex items-center gap-1 px-2 py-1 rounded-lg bg-muted/60 hover:scale-105 transition-all duration-200">
                     <Zap className="h-3 w-3 text-purple-600" />
                     <span className="text-xs font-bold text-purple-600">1.8k</span>
                   </div>
@@ -128,60 +126,34 @@ export default function PersistentLayout({ children }: PersistentLayoutProps) {
 
         {/* Floating Navigation Bar - Desktop/Tablet Only */}
         {!isMobile && (
-          <div className="fixed top-6 right-4 xl:right-6 z-40" style={{ width: 'fit-content', maxWidth: '380px' }}>
-            <nav className="bg-white/80 dark:bg-[hsl(222,84%,8%)]/80 backdrop-blur-xl rounded-2xl border border-slate-300/50 dark:border-[hsl(217,33%,17%)]/30 hover:shadow-xl transition-all duration-300 hover:scale-[1.02] shadow-lg before:content-[''] before:absolute before:inset-0 before:bg-gradient-to-b before:from-white/20 before:via-transparent before:to-transparent before:backdrop-blur-[2px] before:z-[-1] before:rounded-2xl dark:before:from-black/20">
+          <div className="fixed top-6 right-4 xl:right-6 z-40" style={{ width: 'fit-content', maxWidth: '420px' }}>
+            <nav className="bg-card/80 backdrop-blur-xl rounded-2xl border border-border hover:shadow-xl transition-all duration-300 hover:scale-[1.02] shadow-lg before:content-[''] before:absolute before:inset-0 before:bg-gradient-to-b before:from-background/20 before:via-transparent before:to-transparent before:backdrop-blur-[2px] before:z-[-1] before:rounded-2xl">
               <div className="flex items-center gap-4 px-4 py-3">
                 {/* Points Display */}
                 <div className="flex items-center gap-2">
-                  <div className="flex items-center gap-1 px-2 py-1 rounded-lg bg-slate-200/60 dark:bg-[hsl(222,84%,12%)] hover:scale-105 transition-all duration-200">
+                  <div className="flex items-center gap-1 px-2 py-1 rounded-lg bg-muted/60 hover:scale-105 transition-all duration-200">
                     <Flame className="h-3 w-3 text-orange-600" />
                     <span className="text-xs font-bold text-orange-600">15</span>
                   </div>
-                  <div className="flex items-center gap-1 px-2 py-1 rounded-lg bg-slate-200/60 dark:bg-[hsl(222,84%,12%)] hover:scale-105 transition-all duration-200">
+                  <div className="flex items-center gap-1 px-2 py-1 rounded-lg bg-muted/60 hover:scale-105 transition-all duration-200">
                     <Zap className="h-3 w-3 text-purple-600" />
                     <span className="text-xs font-bold text-purple-600">1.8k</span>
                   </div>
                 </div>
 
-                {/* Expandable Search Bar */}
-                <div className="flex items-center overflow-hidden transition-all duration-500 ease-in-out">
-                  {/* Search Button */}
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-10 px-3 hover:bg-gradient-to-r hover:from-blue-500/10 hover:to-purple-500/10 dark:hover:from-blue-400/10 dark:hover:to-purple-400/10 rounded-xl transition-all duration-300 hover:scale-105 border border-transparent hover:border-blue-200/30 dark:hover:border-blue-400/20 bg-slate-200/40 dark:bg-[hsl(222,84%,12%)] flex-shrink-0"
-                    onClick={() => setShowSearchBar(!showSearchBar)}
-                  >
-                    <Search className="h-4 w-4 text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-300" />
-                  </Button>
 
-                  {/* Expandable Search Input */}
-                  <div 
-                    className={`transition-all duration-500 ease-in-out overflow-hidden ${
-                      showSearchBar ? 'w-64 ml-2 opacity-100' : 'w-0 ml-0 opacity-0'
-                    }`}
-                  >
-                    <Input
-                      placeholder="Search Upskill..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className="w-full bg-slate-200/60 dark:bg-[hsl(222,84%,12%)] border border-slate-300/50 dark:border-[hsl(217,33%,17%)]/30 rounded-xl h-10 text-sm placeholder-slate-500 dark:placeholder-slate-400 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-300 dark:focus:border-blue-600 transition-all duration-300"
-                      autoFocus={showSearchBar}
-                    />
-                  </div>
-                </div>
 
                 {/* Enhanced Study Button */}
                 <div className="relative">
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="relative group h-10 px-4 hover:bg-gradient-to-r hover:from-green-500/10 hover:to-emerald-500/10 dark:hover:from-green-400/10 dark:hover:to-emerald-400/10 rounded-xl transition-all duration-300 hover:scale-105 border border-transparent hover:border-green-200/30 dark:hover:border-green-400/20 bg-slate-200/40 dark:bg-[hsl(222,84%,12%)]"
+                    className="relative group h-10 px-4 hover:bg-gradient-to-r hover:from-green-500/10 hover:to-emerald-500/10 rounded-xl transition-all duration-300 hover:scale-105 border border-transparent hover:border-green-200/30 bg-muted/40"
                     onClick={() => setShowStudyModal(true)}
                   >
                     {/* Study Icon with Enhanced Styling */}
                     <div className="relative flex items-center gap-2">
-                      <BookOpen className="h-4 w-4 text-slate-600 dark:text-slate-400 group-hover:text-green-600 dark:group-hover:text-green-400 transition-colors duration-300" />
+                      <BookOpen className={`h-4 w-4 ${isDark ? 'text-slate-300 group-hover:text-green-400' : 'text-slate-600 group-hover:text-green-600'} transition-colors duration-300`} />
                       
                       {/* Study Items Count */}
                       <div className="absolute -top-1 -right-1 flex items-center justify-center">
@@ -193,7 +165,7 @@ export default function PersistentLayout({ children }: PersistentLayoutProps) {
                       </div>
                       
                       {/* Label */}
-                      <span className="text-sm font-medium text-slate-700 dark:text-slate-300 group-hover:text-green-600 dark:group-hover:text-green-400 transition-colors duration-300">
+                      <span className={`text-sm font-medium ${isDark ? 'text-slate-200 group-hover:text-green-400' : 'text-slate-700 group-hover:text-green-600'} transition-colors duration-300`}>
                         Study
                       </span>
                     </div>
@@ -205,12 +177,12 @@ export default function PersistentLayout({ children }: PersistentLayoutProps) {
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="relative group h-10 px-4 hover:bg-gradient-to-r hover:from-blue-500/10 hover:to-purple-500/10 dark:hover:from-blue-400/10 dark:hover:to-purple-400/10 rounded-xl transition-all duration-300 hover:scale-105 border border-transparent hover:border-blue-200/30 dark:hover:border-blue-400/20 bg-slate-200/40 dark:bg-[hsl(222,84%,12%)]"
+                    className="relative group h-10 px-4 hover:bg-gradient-to-r hover:from-blue-500/10 hover:to-purple-500/10 rounded-xl transition-all duration-300 hover:scale-105 border border-transparent hover:border-blue-200/30 bg-muted/40"
                     onClick={() => openMessagesModal()}
                   >
                     {/* Message Icon with Enhanced Styling */}
                     <div className="relative flex items-center gap-2">
-                      <MessageSquare className="h-4 w-4 text-slate-600 dark:text-slate-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-300 fill-current" />
+                      <MessageSquare className={`h-4 w-4 ${isDark ? 'text-slate-300 group-hover:text-blue-400' : 'text-slate-600 group-hover:text-blue-600'} transition-colors duration-300 fill-current`} />
                       
                       {/* New Message Count */}
                       <div className="absolute -top-1 -right-1 flex items-center justify-center">
@@ -223,7 +195,7 @@ export default function PersistentLayout({ children }: PersistentLayoutProps) {
                       </div>
                       
                       {/* Label */}
-                      <span className="text-sm font-medium text-slate-700 dark:text-slate-300 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-300">
+                      <span className={`text-sm font-medium ${isDark ? 'text-slate-200 group-hover:text-blue-400' : 'text-slate-700 group-hover:text-blue-600'} transition-colors duration-300`}>
                         Messages
                       </span>
                     </div>

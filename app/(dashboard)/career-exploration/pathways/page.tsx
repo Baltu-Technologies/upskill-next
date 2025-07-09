@@ -145,27 +145,27 @@ const MyPathwaysPage = () => {
                 </div>
                 <div className="absolute bottom-0 left-0 right-0 bg-black/60 backdrop-blur-sm py-1">
                   <span className="text-white font-bold text-sm block text-center">{stats.averageProgress}% Avg</span>
-                </div>
-              </div>
+          </div>
+        </div>
 
               {/* Progress Summary */}
               <div className="flex-1 max-w-md">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-white font-medium">Overall Progress</span>
                   <span className="text-blue-400 font-bold">{stats.completedCourses} / {stats.totalCourses} Courses</span>
-                </div>
+          </div>
                 <div className="relative h-4 bg-gray-800/50 rounded-full overflow-hidden">
                   <div 
                     className="absolute top-0 left-0 h-full bg-gradient-to-r from-blue-500 to-purple-600 transition-all duration-1000 rounded-full"
                     style={{ width: `${(stats.completedCourses / stats.totalCourses) * 100}%` }}
                   />
-                </div>
+          </div>
                 <div className="text-gray-400 text-sm mt-1">
                   {stats.totalCourses - stats.completedCourses} courses remaining
-                </div>
-              </div>
+          </div>
+        </div>
             </motion.div>
-            
+
             {/* Title */}
             <motion.h1
               initial={{ opacity: 0, y: 30 }}
@@ -178,7 +178,7 @@ const MyPathwaysPage = () => {
               </span>
               <span className="bg-gradient-to-r from-blue-400 via-purple-400 to-blue-300 bg-clip-text text-transparent">
                 Pathways
-              </span>
+                </span>
             </motion.h1>
             
             {/* Stats */}
@@ -261,7 +261,7 @@ const MyPathwaysPage = () => {
                           fill
                           className="object-cover"
                         />
-                      </div>
+        </div>
                       <div className={`absolute inset-0 bg-gradient-to-r ${pathway.gradient} opacity-80`} />
                       <div className="absolute inset-0 bg-black/20" />
                       
@@ -269,12 +269,12 @@ const MyPathwaysPage = () => {
                       <div className="absolute top-4 left-4 right-4 flex justify-between items-start">
                         <Badge className="bg-black/50 text-white border-white/20">
                           {pathway.timeline}
-                        </Badge>
+                  </Badge>
                         <div className="flex items-center gap-2 bg-black/50 px-3 py-1 rounded-full">
                           <Zap className="w-4 h-4 text-yellow-400" />
                           <span className="text-white font-bold text-sm">{pathway.xpEarned} XP</span>
-                        </div>
-                      </div>
+              </div>
+            </div>
 
                       {/* Bottom info */}
                       <div className="absolute bottom-4 left-4 right-4">
@@ -282,7 +282,7 @@ const MyPathwaysPage = () => {
                           <div className={`w-12 h-12 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center`}>
                             <Icon className="w-6 h-6 text-white" />
                           </div>
-                          <div>
+            <div>
                             <h3 className="text-white font-bold text-lg leading-tight">
                               {pathway.title}
                             </h3>
@@ -307,7 +307,7 @@ const MyPathwaysPage = () => {
                           value={pathway.progress} 
                           className="h-2 bg-gray-700" 
                         />
-                      </div>
+            </div>
 
                       {/* Stats row */}
                       <div className="grid grid-cols-3 gap-4 text-center text-sm mb-4">
@@ -323,7 +323,7 @@ const MyPathwaysPage = () => {
                           </div>
                           <div className="text-gray-500">In Progress</div>
                         </div>
-                        <div>
+            <div>
                           <div className="text-gray-400 font-bold">
                             {pathway.courses.filter(c => c.progress === 0).length}
                           </div>
@@ -359,9 +359,9 @@ const MyPathwaysPage = () => {
                                   </div>
                                   <Progress value={course.progress} className="h-1.5 bg-gray-800" />
                                 </div>
-                              </div>
-                            ))}
-                          </div>
+                  </div>
+                ))}
+              </div>
                           
                           <Button className="w-full mt-4 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white border-0">
                             <Play className="w-4 h-4 mr-2" />
@@ -379,9 +379,9 @@ const MyPathwaysPage = () => {
                           View Details
                           <ArrowRight className="w-4 h-4 ml-2" />
                         </Button>
-                      )}
-                    </CardContent>
-                  </Card>
+        )}
+      </CardContent>
+    </Card>
                 </motion.div>
               );
             })}
@@ -417,7 +417,7 @@ const MyPathwaysPage = () => {
                   <div className="w-12 h-12 rounded-full bg-blue-500/20 flex items-center justify-center">
                     <Target className="h-6 w-6 text-blue-400" />
                   </div>
-                </div>
+        </div>
               </CardContent>
             </Card>
 
@@ -432,7 +432,7 @@ const MyPathwaysPage = () => {
                   <div className="w-12 h-12 rounded-full bg-purple-500/20 flex items-center justify-center">
                     <Zap className="h-6 w-6 text-purple-400" />
                   </div>
-                </div>
+        </div>
               </CardContent>
             </Card>
 
@@ -447,9 +447,9 @@ const MyPathwaysPage = () => {
                   <div className="w-12 h-12 rounded-full bg-orange-500/20 flex items-center justify-center">
                     <BarChart3 className="h-6 w-6 text-orange-400" />
                   </div>
-                </div>
-              </CardContent>
-            </Card>
+              </div>
+            </CardContent>
+          </Card>
           </div>
         </div>
       </div>

@@ -41,6 +41,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
+import { useTheme } from '../contexts/ThemeContext';
 
 // Enhanced mock data with gamification elements
 const mockDashboardData = {
@@ -176,17 +177,17 @@ interface Employer {
 const jobOpportunityEmployers: Employer[] = [
   {
     id: 1,
-    name: 'Taiwan Semiconductor Manufacturing (TSMC)',
-    logo: '/media/organization_logo/Tsmc.svg.png',
-    locations: ['Phoenix, AZ', 'Chandler, AZ'],
-    industry: 'Semiconductor & Microelectronics',
-    size: '5,000+ employees',
-    description: 'Leading semiconductor foundry manufacturing advanced chips for global technology companies. Specializing in cutting-edge process technologies.',
-    salaryRange: '$65K - $120K',
-    benefits: ['Health Insurance', 'Retirement Plan', 'Stock Options', 'Training Programs'],
-    technologies: ['Photolithography', 'EUV Systems', 'Process Control', 'Cleanroom Tech'],
-    industries: ['Semiconductor', 'Microelectronics'],
-    image: '/media/semiconductor/Technician-with-wafer-in-semiconductor-FAB.jpg',
+    name: 'Stream Data Centers',
+    logo: '/media/organization_logo/stream_data_centers-fa2d930e-6990-4ac9-ae91-a6118f19be54.png',
+    locations: ['Phoenix, AZ', 'Chicago, IL', 'Columbus, OH', 'Virginia Beach, VA'],
+    industry: 'Data Centers & Cloud Infrastructure',
+    size: '3,000+ employees',
+    description: 'Leading hyperscale data center operator providing mission-critical infrastructure for cloud computing, enterprise, and government clients. Seeking Data Center Technicians for server deployment, maintenance, and operations.',
+    salaryRange: '$55K - $95K',
+    benefits: ['Health Insurance', 'Retirement Plan', '24/7 Operations Bonus', 'Technical Certifications'],
+    technologies: ['Server Hardware', 'Network Infrastructure', 'Cooling Systems', 'Power Distribution'],
+    industries: ['Data Centers', 'Cloud Infrastructure'],
+    image: 'https://images.unsplash.com/photo-1580894908361-967195033215?w=600&h=300&fit=crop&crop=center',
     isHiring: true,
     featured: true
   },
@@ -208,6 +209,22 @@ const jobOpportunityEmployers: Employer[] = [
   },
   {
     id: 3,
+    name: 'TEKsystems',
+    logo: '/media/organization_logo/tek-systems.webp',
+    locations: ['Scottsdale, AZ', 'Phoenix, AZ', 'Mesa, AZ'],
+    industry: 'Broadband & Fiber Optics',
+    size: '1,200+ employees',
+    description: 'Leading provider of fiber optic network installation and telecommunications infrastructure services across the Southwest.',
+    salaryRange: '$50K - $85K',
+    benefits: ['Health Insurance', 'Retirement Plan', 'Vehicle Allowance', 'Safety Bonuses'],
+    technologies: ['Fiber Optics', 'Network Testing', 'Cable Installation', '5G Infrastructure'],
+    industries: ['Broadband', 'Fiber Optics'],
+    image: '/media/peterbaltutech_A_massive_cutting_edge_data_center_that_shows__0e591871-e0a2-4fdd-8856-3e839b1c35ba_1.png',
+    isHiring: true,
+    featured: true
+  },
+  {
+    id: 4,
     name: 'Amkor Technology',
     logo: '/media/organization_logo/amkor_technology.png',
     locations: ['Tempe, AZ', 'Chandler, AZ'],
@@ -220,10 +237,10 @@ const jobOpportunityEmployers: Employer[] = [
     industries: ['Semiconductor', 'Electronics Assembly'],
     image: 'https://images.unsplash.com/photo-1555664424-778a1e5e1b48?w=600&h=300&fit=crop&crop=center',
     isHiring: true,
-    featured: true
+    featured: false
   },
   {
-    id: 4,
+    id: 5,
     name: 'Phoenix Data Center Solutions',
     logo: '/media/baltu_technologies_logo_flower_only.png',
     locations: ['Phoenix, AZ', 'Scottsdale, AZ'],
@@ -235,22 +252,6 @@ const jobOpportunityEmployers: Employer[] = [
     technologies: ['Server Hardware', 'Network Infrastructure', 'HVAC Systems', 'Security Systems'],
     industries: ['Data Centers', 'Cloud Infrastructure'],
     image: 'https://images.unsplash.com/photo-1580894908361-967195033215?w=600&h=300&fit=crop&crop=center',
-    isHiring: true,
-    featured: false
-  },
-  {
-    id: 5,
-    name: 'TEKsystems Infrastructure',
-    logo: '/media/organization_logo/tek-systems.webp',
-    locations: ['Scottsdale, AZ', 'Phoenix, AZ', 'Mesa, AZ'],
-    industry: 'Broadband & Fiber Optics',
-    size: '1,200+ employees',
-    description: 'Leading provider of fiber optic network installation and telecommunications infrastructure services across the Southwest.',
-    salaryRange: '$50K - $85K',
-    benefits: ['Health Insurance', 'Retirement Plan', 'Vehicle Allowance', 'Safety Bonuses'],
-    technologies: ['Fiber Optics', 'Network Testing', 'Cable Installation', '5G Infrastructure'],
-    industries: ['Broadband', 'Fiber Optics'],
-    image: 'https://images.unsplash.com/photo-1580570595240-5eE06969528f?w=600&h=300&fit=crop&crop=center',
     isHiring: true,
     featured: false
   },
@@ -278,6 +279,7 @@ export default function LearnerDashboard() {
   const [showCourses, setShowCourses] = useState(false);
   const [favoriteEmployers, setFavoriteEmployers] = useState<number[]>([]);
   const data = mockDashboardData;
+  const { isDark } = useTheme();
 
   const copyReferralCode = () => {
     navigator.clipboard.writeText(data.inviteRewards.referralCode);
@@ -294,25 +296,25 @@ export default function LearnerDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-black dark:from-gray-900 dark:via-slate-800 dark:to-gray-900 overflow-x-hidden w-full" style={{ maxWidth: '100vw', boxSizing: 'border-box' }}>
+    <div className="min-h-screen bg-background text-foreground overflow-x-hidden w-full" style={{ maxWidth: '100vw', boxSizing: 'border-box' }}>
       {/* Floating background elements */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-1/3 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl animate-pulse delay-1000" />
-        <div className="absolute top-1/2 right-1/3 w-48 h-48 bg-green-500/10 rounded-full blur-3xl animate-pulse delay-500" />
+        <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-primary/10 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-1/3 right-1/4 w-96 h-96 bg-accent/10 rounded-full blur-3xl animate-pulse delay-1000" />
+        <div className="absolute top-1/2 right-1/3 w-48 h-48 bg-success/10 rounded-full blur-3xl animate-pulse delay-500" />
       </div>
 
       {/* Top Profile Bar - Completely flush with window top */}
-      <div className="relative z-10 bg-gradient-to-r from-slate-900 via-blue-900 to-slate-900 shadow-2xl shadow-blue-900/50 -mx-0 xs:-mx-1 sm:-mx-2 md:-mx-4 lg:-mx-6 xl:-mx-0 -mt-0">
+      <div className={`relative z-10 ${isDark ? 'bg-gradient-to-r from-slate-700/90 via-primary/90 to-slate-700/90' : 'bg-gradient-to-r from-slate-300/90 via-primary/90 to-slate-300/90'} shadow-2xl shadow-primary/20 -mx-0 xs:-mx-1 sm:-mx-2 md:-mx-4 lg:-mx-6 xl:-mx-0 -mt-0`}>
         {/* Glow effect behind the bar */}
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 via-indigo-600/30 to-blue-600/20 blur-xl"></div>
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/20"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-primary/20 via-primary/30 to-primary/20 blur-xl"></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background/20"></div>
         
         <div className="relative max-w-7xl mx-auto px-1 xs:px-2 sm:px-4 md:px-6 lg:px-8 xl:px-6 py-4 sm:py-6 md:py-8">
           <div className="flex flex-col items-center sm:items-start gap-4">
             {/* Avatar and Name Section */}
             <div className="flex items-center gap-4">
-              <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full overflow-hidden ring-2 ring-blue-400/50 shadow-lg shadow-blue-500/25 flex-shrink-0">
+              <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full overflow-hidden ring-2 ring-primary/50 shadow-lg shadow-primary/25 flex-shrink-0">
                 <Image 
                   src={data.user.avatar} 
                   alt={data.user.name} 
@@ -323,10 +325,10 @@ export default function LearnerDashboard() {
               </div>
               
               <div className="min-w-0">
-                <h1 className="text-xl sm:text-2xl font-bold text-white drop-shadow-lg truncate">
+                <h1 className="text-xl sm:text-2xl font-bold text-primary-foreground drop-shadow-lg truncate">
                   {data.user.name}
                 </h1>
-                <p className="text-blue-200/80 text-sm">Member since {data.user.joinedDate}</p>
+                <p className="text-primary-foreground/80 text-sm">Member since {data.user.joinedDate}</p>
               </div>
             </div>
             
@@ -338,19 +340,19 @@ export default function LearnerDashboard() {
                 <span className="text-xs opacity-90 hidden sm:inline">day streak</span>
               </div>
               
-              <div className="flex items-center gap-1.5 sm:gap-2 bg-gradient-to-r from-yellow-500/90 to-amber-500/90 text-white px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-full shadow-lg shadow-yellow-500/25 backdrop-blur-sm">
+              <div className="flex items-center gap-1.5 sm:gap-2 bg-gradient-to-r from-warning/90 to-warning/90 text-warning-foreground px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-full shadow-lg shadow-warning/25 backdrop-blur-sm">
                 <Zap className="h-3.5 w-3.5 sm:h-4 sm:w-4 drop-shadow-sm" />
                 <span className="font-semibold text-sm sm:text-base">{data.stats.totalXP}</span>
                 <span className="text-xs opacity-90 hidden sm:inline">XP</span>
               </div>
               
-              <div className="flex items-center gap-1.5 sm:gap-2 bg-gradient-to-r from-purple-500/90 to-indigo-500/90 text-white px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-full shadow-lg shadow-purple-500/25 backdrop-blur-sm">
+              <div className="flex items-center gap-1.5 sm:gap-2 bg-gradient-to-r from-accent/90 to-accent/90 text-accent-foreground px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-full shadow-lg shadow-accent/25 backdrop-blur-sm">
                 <Crown className="h-3.5 w-3.5 sm:h-4 sm:w-4 drop-shadow-sm" />
                 <span className="font-semibold text-sm sm:text-base">{data.certifications.earned}</span>
                 <span className="text-xs opacity-90 hidden sm:inline">badges</span>
               </div>
               
-              <div className="flex items-center gap-1.5 sm:gap-2 bg-gradient-to-r from-emerald-500/90 to-green-500/90 text-white px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-full shadow-lg shadow-emerald-500/25 backdrop-blur-sm">
+              <div className="flex items-center gap-1.5 sm:gap-2 bg-gradient-to-r from-success/90 to-success/90 text-success-foreground px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-full shadow-lg shadow-success/25 backdrop-blur-sm">
                 <Medal className="h-3.5 w-3.5 sm:h-4 sm:w-4 drop-shadow-sm" />
                 <span className="font-semibold text-sm sm:text-base">{data.stats.achievements}</span>
                 <span className="text-xs opacity-90 hidden sm:inline">achievements</span>
@@ -367,7 +369,7 @@ export default function LearnerDashboard() {
 
         {/* VARIATION 2: Card-Based Layout (Commented out - uncomment to try) */}
         {/* 
-        <div className="bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-slate-800 dark:to-slate-900 px-4 md:px-6 py-8 rounded-2xl mb-6">
+        <div className="bg-gradient-to-br from-secondary to-secondary/50 px-4 md:px-6 py-8 rounded-2xl mb-6">
           <div className="flex flex-col lg:flex-row items-start lg:items-center gap-6">
             <div className="flex items-center gap-4">
               <div className="w-20 h-20 rounded-2xl overflow-hidden shadow-lg">
@@ -380,37 +382,37 @@ export default function LearnerDashboard() {
                 />
               </div>
               <div>
-                <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-1">
+                <h1 className="text-3xl font-bold text-foreground mb-1">
                   {data.user.name}
                 </h1>
-                <p className="text-slate-600 dark:text-slate-400">Joined {data.user.joinedDate}</p>
+                <p className="text-muted-foreground">Joined {data.user.joinedDate}</p>
               </div>
             </div>
             
             <div className="flex-1 lg:ml-8">
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                <div className="bg-white dark:bg-slate-800 rounded-xl p-4 text-center shadow-sm">
+                <div className="bg-card rounded-xl p-4 text-center shadow-sm">
                   <Flame className="h-6 w-6 text-orange-500 mx-auto mb-2" />
-                  <div className="text-xl font-bold text-slate-900 dark:text-white">{data.stats.currentStreak}</div>
-                  <div className="text-xs text-slate-600 dark:text-slate-400">Day Streak</div>
+                  <div className="text-xl font-bold text-foreground">{data.stats.currentStreak}</div>
+                  <div className="text-xs text-muted-foreground">Day Streak</div>
                 </div>
                 
-                <div className="bg-white dark:bg-slate-800 rounded-xl p-4 text-center shadow-sm">
-                  <Zap className="h-6 w-6 text-yellow-500 mx-auto mb-2" />
-                  <div className="text-xl font-bold text-slate-900 dark:text-white">{data.stats.totalXP}</div>
-                  <div className="text-xs text-slate-600 dark:text-slate-400">Total XP</div>
+                <div className="bg-card rounded-xl p-4 text-center shadow-sm">
+                  <Zap className="h-6 w-6 text-warning mx-auto mb-2" />
+                  <div className="text-xl font-bold text-foreground">{data.stats.totalXP}</div>
+                  <div className="text-xs text-muted-foreground">Total XP</div>
                 </div>
                 
-                <div className="bg-white dark:bg-slate-800 rounded-xl p-4 text-center shadow-sm">
-                  <Crown className="h-6 w-6 text-purple-500 mx-auto mb-2" />
-                  <div className="text-xl font-bold text-slate-900 dark:text-white">{data.stats.crowns}</div>
-                  <div className="text-xs text-slate-600 dark:text-slate-400">Crowns</div>
+                <div className="bg-card rounded-xl p-4 text-center shadow-sm">
+                  <Crown className="h-6 w-6 text-accent mx-auto mb-2" />
+                  <div className="text-xl font-bold text-foreground">{data.stats.crowns}</div>
+                  <div className="text-xs text-muted-foreground">Crowns</div>
                 </div>
                 
-                <div className="bg-white dark:bg-slate-800 rounded-xl p-4 text-center shadow-sm">
-                  <Trophy className="h-6 w-6 text-amber-500 mx-auto mb-2" />
-                  <div className="text-lg font-bold text-slate-900 dark:text-white">#{data.stats.leaguePosition}</div>
-                  <div className="text-xs text-slate-600 dark:text-slate-400">Bronze League</div>
+                <div className="bg-card rounded-xl p-4 text-center shadow-sm">
+                  <Trophy className="h-6 w-6 text-warning mx-auto mb-2" />
+                  <div className="text-lg font-bold text-foreground">#{data.stats.leaguePosition}</div>
+                  <div className="text-xs text-muted-foreground">Bronze League</div>
                 </div>
               </div>
             </div>
@@ -420,7 +422,7 @@ export default function LearnerDashboard() {
 
         {/* VARIATION 3: Sidebar Style (Commented out - uncomment to try) */}
         {/* 
-        <div className="flex items-center justify-between bg-slate-50 dark:bg-slate-800/50 px-6 py-4 rounded-xl border border-slate-200 dark:border-slate-700">
+        <div className="flex items-center justify-between bg-muted/50 px-6 py-4 rounded-xl border border-border">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 rounded-full overflow-hidden">
               <Image 
@@ -432,29 +434,29 @@ export default function LearnerDashboard() {
               />
             </div>
             <div>
-              <h1 className="text-xl font-semibold text-slate-900 dark:text-white">
+              <h1 className="text-xl font-semibold text-foreground">
                 {data.user.name}
               </h1>
-              <p className="text-slate-500 dark:text-slate-400 text-sm">Level 12 • {data.user.joinedDate}</p>
+              <p className="text-muted-foreground text-sm">Level 12 • {data.user.joinedDate}</p>
             </div>
           </div>
 
           <div className="flex items-center gap-6">
             <div className="text-center">
-              <div className="text-lg font-bold text-orange-600">{data.stats.currentStreak}</div>
-              <div className="text-xs text-slate-500">Streak</div>
+              <div className="text-lg font-bold text-orange-500">{data.stats.currentStreak}</div>
+              <div className="text-xs text-muted-foreground">Streak</div>
             </div>
             <div className="text-center">
-              <div className="text-lg font-bold text-yellow-600">{data.stats.totalXP}</div>
-              <div className="text-xs text-slate-500">XP</div>
+              <div className="text-lg font-bold text-warning">{data.stats.totalXP}</div>
+              <div className="text-xs text-muted-foreground">XP</div>
             </div>
             <div className="text-center">
-              <div className="text-lg font-bold text-purple-600">{data.stats.crowns}</div>
-              <div className="text-xs text-slate-500">Crowns</div>
+              <div className="text-lg font-bold text-accent">{data.stats.crowns}</div>
+              <div className="text-xs text-muted-foreground">Crowns</div>
             </div>
             <div className="text-center">
-              <div className="text-lg font-bold text-amber-600">#{data.stats.leaguePosition}</div>
-              <div className="text-xs text-slate-500">Rank</div>
+              <div className="text-lg font-bold text-warning">#{data.stats.leaguePosition}</div>
+              <div className="text-xs text-muted-foreground">Rank</div>
             </div>
           </div>
         </div>
@@ -464,15 +466,15 @@ export default function LearnerDashboard() {
         <div className="space-y-6">
           
           {/* 1. Career Pathway - MOST IMPORTANT (Full Width) */}
-          <Card className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm shadow-xl border-2 border-blue-200/60 dark:border-blue-400/30 hover:border-blue-300/80 dark:hover:border-blue-300/50 transition-all duration-300 hover:shadow-2xl hover:shadow-blue-500/10 w-full min-w-0">
+          <Card className="bg-card/90 backdrop-blur-sm shadow-xl border-2 border-primary/20 hover:border-primary/40 transition-all duration-300 hover:shadow-2xl hover:shadow-primary/10 w-full min-w-0">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Target className="h-5 w-5 text-blue-600" />
+                <Target className="h-5 w-5 text-primary" />
                 Career Pathway
                 </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="relative p-6 rounded-lg border border-blue-200 dark:border-blue-800 overflow-hidden">
+              <div className="relative p-6 rounded-lg border border-primary/20 overflow-hidden">
                 {/* Data Center Background Image */}
                 <div 
                   className="absolute inset-0 bg-cover bg-center opacity-30"
@@ -481,22 +483,22 @@ export default function LearnerDashboard() {
                   }}
                 ></div>
                 {/* Dark overlay for better text contrast */}
-                <div className="absolute inset-0 bg-gradient-to-br from-slate-900/80 via-blue-900/70 to-indigo-900/80"></div>
-                <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 via-transparent to-purple-600/20"></div>
+                <div className="absolute inset-0 bg-gradient-to-br from-background/80 via-primary/70 to-primary/80"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-primary/20 via-transparent to-accent/20"></div>
                 
                 {/* Content with improved contrast */}
                 <div className="relative z-10 flex flex-col items-center text-center md:flex-row md:items-center md:text-left md:gap-6">
                   <div className="flex-1 mb-4 md:mb-0">
-                    <h3 className="font-bold text-white text-xl md:text-2xl mb-2">Data Center Technician</h3>
-                    <p className="text-blue-100 text-sm md:text-base mb-4">Server Hardware & Infrastructure Track</p>
+                    <h3 className="font-bold text-primary-foreground text-xl md:text-2xl mb-2">Data Center Technician</h3>
+                    <p className="text-primary-foreground/80 text-sm md:text-base mb-4">Server Hardware & Infrastructure Track</p>
                     
                     {/* Progress info - responsive layout */}
                     <div className="flex flex-col items-center md:flex-row md:items-center gap-3 md:gap-6">
                       <div className="flex items-center gap-2">
-                        <div className="text-3xl font-bold text-white">68%</div>
-                        <span className="text-sm text-blue-100">pathway complete</span>
+                        <div className="text-3xl font-bold text-primary-foreground">68%</div>
+                        <span className="text-sm text-primary-foreground/80">pathway complete</span>
                       </div>
-                      <div className="flex items-center gap-2 text-sm text-blue-100">
+                      <div className="flex items-center gap-2 text-sm text-primary-foreground/80">
                         <Clock className="h-4 w-4" />
                         <span>82/120 hours</span>
                       </div>
@@ -505,7 +507,7 @@ export default function LearnerDashboard() {
                   
                   {/* Continue button - responsive positioning */}
                   <div className="flex-shrink-0">
-                    <Button className="bg-white/20 hover:bg-white/30 text-white border border-white/30 backdrop-blur-sm px-6 py-3">
+                    <Button className="bg-primary-foreground/20 hover:bg-primary-foreground/30 text-primary-foreground border border-primary-foreground/30 backdrop-blur-sm px-6 py-3">
                       <Play className="h-4 w-4 mr-2" />
                       Continue
                     </Button>
@@ -519,7 +521,7 @@ export default function LearnerDashboard() {
                   variant="ghost" 
                   size="sm"
                   onClick={() => setShowCourses(!showCourses)}
-                  className="flex items-center gap-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-300 px-4 py-2 rounded-lg font-medium transition-all duration-200"
+                  className="flex items-center gap-2 bg-secondary hover:bg-secondary/80 text-secondary-foreground px-4 py-2 rounded-lg font-medium transition-all duration-200"
                 >
                   <BookOpen className="h-4 w-4" />
                   Courses
@@ -529,86 +531,86 @@ export default function LearnerDashboard() {
 
               {/* Accordion Courses List */}
               {showCourses && (
-                <div className="space-y-3 pt-4 border-t border-gray-200 dark:border-gray-700">
-                  <h4 className="font-medium text-gray-900 dark:text-white mb-3">Pathway Courses</h4>
+                <div className="space-y-3 pt-4 border-t border-border">
+                  <h4 className="font-medium text-foreground mb-3">Pathway Courses</h4>
                   
                   <div className="space-y-3">
-                    <div className="flex items-center gap-3 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
-                      <CheckCircle className="h-5 w-5 text-green-600" />
+                    <div className="flex items-center gap-3 p-3 bg-success/10 rounded-lg border border-success/20">
+                      <CheckCircle className="h-5 w-5 text-success" />
                       <div className="flex-1">
                         <div className="flex items-center justify-between">
-                          <p className="font-medium text-gray-900 dark:text-white">Data Center Fundamentals</p>
-                          <span className="text-xs text-gray-500 bg-white dark:bg-gray-800 px-2 py-1 rounded">24 hours</span>
+                          <p className="font-medium text-foreground">Data Center Fundamentals</p>
+                          <span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded">24 hours</span>
                         </div>
                         <div className="flex items-center gap-2 mt-1">
-                          <div className="w-32 bg-green-200 dark:bg-green-800 rounded-full h-2">
-                            <div className="bg-green-600 h-2 rounded-full w-full" />
+                          <div className="w-32 bg-success/20 rounded-full h-2">
+                            <div className="bg-success h-2 rounded-full w-full" />
                           </div>
-                          <span className="text-sm font-semibold text-green-600">100%</span>
+                          <span className="text-sm font-semibold text-success">100%</span>
                         </div>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
-                      <Clock className="h-5 w-5 text-blue-600" />
+                    <div className="flex items-center gap-3 p-3 bg-info/10 rounded-lg border border-info/20">
+                      <Clock className="h-5 w-5 text-info" />
                       <div className="flex-1">
                         <div className="flex items-center justify-between">
-                          <p className="font-medium text-gray-900 dark:text-white">Server Hardware & Maintenance</p>
-                          <span className="text-xs text-gray-500 bg-white dark:bg-gray-800 px-2 py-1 rounded">32 hours</span>
+                          <p className="font-medium text-foreground">Server Hardware & Maintenance</p>
+                          <span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded">32 hours</span>
                         </div>
                         <div className="flex items-center gap-2 mt-1">
-                          <div className="w-32 bg-blue-200 dark:bg-blue-800 rounded-full h-2">
-                            <div className="bg-blue-600 h-2 rounded-full" style={{ width: '75%' }} />
+                          <div className="w-32 bg-info/20 rounded-full h-2">
+                            <div className="bg-info h-2 rounded-full" style={{ width: '75%' }} />
                           </div>
-                          <span className="text-sm font-semibold text-blue-600">75%</span>
+                          <span className="text-sm font-semibold text-info">75%</span>
                         </div>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-                      <div className="h-5 w-5 rounded-full border-2 border-gray-400" />
+                    <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg border border-border">
+                      <div className="h-5 w-5 rounded-full border-2 border-muted-foreground" />
                       <div className="flex-1">
                         <div className="flex items-center justify-between">
-                          <p className="font-medium text-gray-900 dark:text-white">Network Infrastructure</p>
-                          <span className="text-xs text-gray-500 bg-white dark:bg-gray-800 px-2 py-1 rounded">28 hours</span>
+                          <p className="font-medium text-foreground">Network Infrastructure</p>
+                          <span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded">28 hours</span>
                         </div>
                         <div className="flex items-center gap-2 mt-1">
-                          <div className="w-32 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                            <div className="bg-gray-400 h-2 rounded-full" style={{ width: '0%' }} />
+                          <div className="w-32 bg-muted/50 rounded-full h-2">
+                            <div className="bg-muted-foreground h-2 rounded-full" style={{ width: '0%' }} />
                           </div>
-                          <span className="text-sm font-semibold text-gray-500">0%</span>
+                          <span className="text-sm font-semibold text-muted-foreground">0%</span>
                         </div>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-                      <div className="h-5 w-5 rounded-full border-2 border-gray-400" />
+                    <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg border border-border">
+                      <div className="h-5 w-5 rounded-full border-2 border-muted-foreground" />
                       <div className="flex-1">
                         <div className="flex items-center justify-between">
-                          <p className="font-medium text-gray-900 dark:text-white">Power & Cooling Systems</p>
-                          <span className="text-xs text-gray-500 bg-white dark:bg-gray-800 px-2 py-1 rounded">20 hours</span>
+                          <p className="font-medium text-foreground">Power & Cooling Systems</p>
+                          <span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded">20 hours</span>
                         </div>
                         <div className="flex items-center gap-2 mt-1">
-                          <div className="w-32 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                            <div className="bg-gray-400 h-2 rounded-full" style={{ width: '0%' }} />
+                          <div className="w-32 bg-muted/50 rounded-full h-2">
+                            <div className="bg-muted-foreground h-2 rounded-full" style={{ width: '0%' }} />
                           </div>
-                          <span className="text-sm font-semibold text-gray-500">0%</span>
+                          <span className="text-sm font-semibold text-muted-foreground">0%</span>
                         </div>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-                      <div className="h-5 w-5 rounded-full border-2 border-gray-400" />
+                    <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg border border-border">
+                      <div className="h-5 w-5 rounded-full border-2 border-muted-foreground" />
                       <div className="flex-1">
                         <div className="flex items-center justify-between">
-                          <p className="font-medium text-gray-900 dark:text-white">Safety & Compliance</p>
-                          <span className="text-xs text-gray-500 bg-white dark:bg-gray-800 px-2 py-1 rounded">16 hours</span>
+                          <p className="font-medium text-foreground">Safety & Compliance</p>
+                          <span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded">16 hours</span>
                         </div>
                         <div className="flex items-center gap-2 mt-1">
-                          <div className="w-32 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                            <div className="bg-gray-400 h-2 rounded-full" style={{ width: '0%' }} />
+                          <div className="w-32 bg-muted/50 rounded-full h-2">
+                            <div className="bg-muted-foreground h-2 rounded-full" style={{ width: '0%' }} />
                           </div>
-                          <span className="text-sm font-semibold text-gray-500">0%</span>
+                          <span className="text-sm font-semibold text-muted-foreground">0%</span>
                         </div>
                       </div>
                     </div>
@@ -622,16 +624,16 @@ export default function LearnerDashboard() {
           <div className="w-full">
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h2 className="text-2xl font-bold text-white mb-2">
+                <h2 className="text-2xl font-bold text-foreground mb-2">
                   Job Opportunities
                 </h2>
-                <p className="text-gray-300 text-lg">
+                <p className="text-muted-foreground text-lg">
                   Discover career opportunities with our industry partners
                 </p>
               </div>
               <Button 
                 variant="outline" 
-                className="border-blue-500/50 text-blue-400 hover:bg-blue-500/10 hover:text-blue-300 transition-all duration-300"
+                className="border-primary/50 text-primary hover:bg-primary/10 hover:text-primary transition-all duration-300"
               >
                 <ExternalLink className="h-4 w-4 mr-2" />
                 View All Employers
@@ -640,7 +642,7 @@ export default function LearnerDashboard() {
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {jobOpportunityEmployers.map((employer) => (
-                <Card key={employer.id} className="group cursor-pointer overflow-hidden border-2 border-slate-700 bg-slate-800/50 hover:border-blue-400/50 transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/10 flex flex-col h-full">
+                <Card key={employer.id} className="group cursor-pointer overflow-hidden border-2 border-border bg-card/50 hover:border-primary/50 transition-all duration-300 hover:shadow-xl hover:shadow-primary/10 flex flex-col h-full">
                   {/* Employer Banner */}
                   <div className="relative h-40 overflow-hidden">
                     <div className="absolute inset-0 transition-transform duration-[4000ms] ease-out group-hover:scale-125 group-hover:translate-x-3 group-hover:-translate-y-2">
@@ -651,12 +653,12 @@ export default function LearnerDashboard() {
                         className="object-cover"
                       />
                     </div>
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-background/20 to-transparent" />
                     
                     {/* Featured Badge */}
                     {employer.featured && (
                       <div className="absolute top-3 left-3">
-                        <div className="bg-orange-500 text-white font-medium px-2 py-1 rounded text-xs">
+                        <div className={`${isDark ? 'bg-yellow-600 text-yellow-100' : 'bg-yellow-500 text-yellow-900'} font-medium px-2 py-1 rounded text-xs shadow-lg`}>
                           Featured
                         </div>
                       </div>
@@ -665,7 +667,7 @@ export default function LearnerDashboard() {
                     {/* Hiring Status */}
                     {employer.isHiring && (
                       <div className="absolute top-3 right-3">
-                        <div className="bg-green-500 text-white font-medium px-2 py-1 rounded text-xs">
+                        <div className={`${isDark ? 'bg-green-600 text-green-100' : 'bg-green-500 text-green-900'} font-medium px-2 py-1 rounded text-xs shadow-lg`}>
                           Hiring Now
                         </div>
                       </div>
@@ -677,13 +679,13 @@ export default function LearnerDashboard() {
                         e.stopPropagation();
                         toggleEmployerFavorite(employer.id);
                       }}
-                      className="absolute bottom-3 right-3 p-2 rounded-full bg-black/50 hover:bg-black/70 transition-all duration-200 group/heart"
+                      className="absolute bottom-3 right-3 p-2 rounded-full bg-background/50 hover:bg-background/70 transition-all duration-200 group/heart"
                     >
                       <Heart 
                         className={`h-4 w-4 transition-all duration-200 ${
                           favoriteEmployers.includes(employer.id)
-                            ? 'fill-red-500 text-red-500 scale-110'
-                            : 'text-white group-hover/heart:text-red-400'
+                            ? 'fill-destructive text-destructive scale-110'
+                            : 'text-foreground group-hover/heart:text-destructive'
                         }`}
                       />
                     </button>
@@ -692,7 +694,7 @@ export default function LearnerDashboard() {
                   {/* Company Logo - Overlapping image and content */}
                   <div className="relative -mt-6 ml-4 z-10">
                     <div className="flex items-end gap-3">
-                      <div className="relative w-24 h-12 bg-white rounded-lg p-2 flex items-center justify-center shadow-lg border border-slate-700">
+                      <div className="relative w-24 h-12 bg-background rounded-lg p-2 flex items-center justify-center shadow-lg border border-border">
                         <Image
                           src={employer.logo}
                           alt={employer.name}
@@ -703,7 +705,7 @@ export default function LearnerDashboard() {
                       </div>
                       <div className="pb-2 flex flex-col justify-end gap-1">
                         {/* Location */}
-                        <div className="flex items-center gap-1 text-gray-300 text-xs">
+                        <div className="flex items-center gap-1 text-muted-foreground text-xs">
                           <MapPin className="h-3 w-3" />
                           {employer.locations.length === 1 
                             ? employer.locations[0]
@@ -717,37 +719,37 @@ export default function LearnerDashboard() {
                   <CardContent className="p-4 flex flex-col flex-1 pt-3">
                     <div className="space-y-3 flex-1">
                       {/* Company Name */}
-                      <h3 className="text-white font-bold text-lg leading-tight">
+                      <h3 className="text-foreground font-bold text-lg leading-tight">
                         {employer.name}
                       </h3>
 
                       {/* Company Description */}
-                      <p className="text-gray-300 text-sm leading-relaxed line-clamp-2">
+                      <p className="text-muted-foreground text-sm leading-relaxed line-clamp-2">
                         {employer.description}
                       </p>
 
                       {/* Key Stats Row */}
                       <div className="flex items-center justify-between text-sm">
-                        <div className="flex items-center text-gray-300">
+                        <div className="flex items-center text-muted-foreground">
                           <Users className="h-4 w-4 mr-1" />
                           {employer.size}
                         </div>
-                        <div className="text-green-400 font-semibold">
+                        <div className="text-success-foreground font-semibold">
                           {employer.salaryRange}
                         </div>
                       </div>
 
                       {/* Technologies */}
                       <div>
-                        <p className="text-xs text-gray-400 font-medium uppercase tracking-wide mb-2">Technologies</p>
+                        <p className="text-xs text-muted-foreground font-medium uppercase tracking-wide mb-2">Technologies</p>
                         <div className="flex flex-wrap gap-1">
                           {employer.technologies.slice(0, 2).map((tech, index) => (
-                            <div key={index} className="text-xs border-blue-400/50 text-blue-400 bg-blue-400/5 border px-2 py-1 rounded">
+                            <div key={index} className="text-xs border-primary/50 text-primary bg-primary/5 border px-2 py-1 rounded">
                               {tech}
                             </div>
                           ))}
                           {employer.technologies.length > 2 && (
-                            <div className="text-xs border-gray-500 text-gray-400 bg-gray-500/5 border px-2 py-1 rounded">
+                            <div className="text-xs border-muted-foreground text-muted-foreground bg-muted-foreground/5 border px-2 py-1 rounded">
                               +{employer.technologies.length - 2} more
                             </div>
                           )}
@@ -759,10 +761,15 @@ export default function LearnerDashboard() {
                     <div className="pt-3 mt-auto">
                       <Button 
                         size="sm" 
-                        className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg hover:shadow-blue-500/25 transition-all duration-300 rounded-lg border-0"
+                        className={`w-full ${isDark ? 'bg-gradient-to-r from-primary/80 to-accent/80 hover:from-primary/70 hover:to-accent/70' : 'bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90'} text-white shadow-lg hover:shadow-primary/25 transition-all duration-300 rounded-lg border-0`}
+                        onClick={() => {
+                          if (employer.name === 'Honeywell Aerospace') {
+                            window.location.href = '/employers/honeywell';
+                          }
+                        }}
                       >
                         <Building className="h-4 w-4 mr-2" />
-                        View Opportunities
+                        Learn More
                       </Button>
                     </div>
                   </CardContent>
@@ -775,64 +782,64 @@ export default function LearnerDashboard() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-4 md:gap-6 w-full min-w-0">
             
             {/* Recent Activity */}
-            <Card className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm shadow-xl border-2 border-green-200/60 dark:border-green-400/30 hover:border-green-300/80 dark:hover:border-green-300/50 transition-all duration-300 hover:shadow-2xl hover:shadow-green-500/10 w-full min-w-0">
+            <Card className="bg-card/90 backdrop-blur-sm shadow-xl border-2 border-success/20 hover:border-success/40 transition-all duration-300 hover:shadow-2xl hover:shadow-success/10 w-full min-w-0">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <Activity className="h-5 w-5 text-green-600" />
+                  <Activity className="h-5 w-5 text-success" />
                   Recent Activity
                 </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
                 {/* Today's Summary */}
                 <div className="grid grid-cols-2 gap-2 sm:gap-4 text-center mb-4">
-                  <div className="p-2 sm:p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
-                    <div className="text-lg sm:text-xl font-bold text-green-600">{data.recentActivity.actionsToday}</div>
-                    <div className="text-xs text-gray-600 dark:text-gray-400">Actions Today</div>
+                  <div className="p-2 sm:p-3 bg-success/10 rounded-lg">
+                    <div className="text-lg sm:text-xl font-bold text-success">{data.recentActivity.actionsToday}</div>
+                    <div className="text-xs text-muted-foreground">Actions Today</div>
                   </div>
-                  <div className="p-2 sm:p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
-                    <div className="text-lg sm:text-xl font-bold text-yellow-600">{data.recentActivity.xpEarnedToday}</div>
-                    <div className="text-xs text-gray-600 dark:text-gray-400">XP Earned</div>
+                  <div className="p-2 sm:p-3 bg-warning/10 rounded-lg">
+                    <div className="text-lg sm:text-xl font-bold text-warning">{data.recentActivity.xpEarnedToday}</div>
+                    <div className="text-xs text-muted-foreground">XP Earned</div>
               </div>
                 </div>
 
                 {/* Activity Timeline */}
                 <div className="space-y-2">
-                  <div className="flex items-start gap-3 p-2 hover:bg-gray-50 dark:hover:bg-gray-800/50 rounded-lg transition-colors">
-                    <div className="w-2 h-2 bg-green-500 rounded-full mt-1.5 flex-shrink-0"></div>
+                  <div className="flex items-start gap-3 p-2 hover:bg-muted/50 rounded-lg transition-colors">
+                    <div className="w-2 h-2 bg-success rounded-full mt-1.5 flex-shrink-0"></div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-gray-900 dark:text-white">Completed "Server Hardware Basics" lesson</p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">2 hours ago • +50 XP</p>
+                      <p className="text-sm font-medium text-foreground">Completed "Server Hardware Basics" lesson</p>
+                      <p className="text-xs text-muted-foreground">2 hours ago • +50 XP</p>
                     </div>
                   </div>
                   
-                  <div className="flex items-start gap-3 p-2 hover:bg-gray-50 dark:hover:bg-gray-800/50 rounded-lg transition-colors">
-                    <div className="w-2 h-2 bg-blue-500 rounded-full mt-1.5 flex-shrink-0"></div>
+                  <div className="flex items-start gap-3 p-2 hover:bg-muted/50 rounded-lg transition-colors">
+                    <div className="w-2 h-2 bg-primary rounded-full mt-1.5 flex-shrink-0"></div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-gray-900 dark:text-white">Started "Network Infrastructure" course</p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">5 hours ago • +25 XP</p>
+                      <p className="text-sm font-medium text-foreground">Started "Network Infrastructure" course</p>
+                      <p className="text-xs text-muted-foreground">5 hours ago • +25 XP</p>
                     </div>
                   </div>
                   
-                  <div className="flex items-start gap-3 p-2 hover:bg-gray-50 dark:hover:bg-gray-800/50 rounded-lg transition-colors">
-                    <div className="w-2 h-2 bg-purple-500 rounded-full mt-1.5 flex-shrink-0"></div>
+                  <div className="flex items-start gap-3 p-2 hover:bg-muted/50 rounded-lg transition-colors">
+                    <div className="w-2 h-2 bg-accent rounded-full mt-1.5 flex-shrink-0"></div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-gray-900 dark:text-white">Earned "First Week" badge</p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">Yesterday • +100 XP</p>
+                      <p className="text-sm font-medium text-foreground">Earned "First Week" badge</p>
+                      <p className="text-xs text-muted-foreground">Yesterday • +100 XP</p>
                     </div>
                   </div>
                   
-                  <div className="flex items-start gap-3 p-2 hover:bg-gray-50 dark:hover:bg-gray-800/50 rounded-lg transition-colors">
+                  <div className="flex items-start gap-3 p-2 hover:bg-muted/50 rounded-lg transition-colors">
                     <div className="w-2 h-2 bg-orange-500 rounded-full mt-1.5 flex-shrink-0"></div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-gray-900 dark:text-white">Applied to Data Center Technician job</p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">2 days ago</p>
+                      <p className="text-sm font-medium text-foreground">Applied to Data Center Technician job</p>
+                      <p className="text-xs text-muted-foreground">2 days ago</p>
                     </div>
                   </div>
                 </div>
 
                 {/* View All Button */}
-                <div className="pt-2 border-t border-gray-200 dark:border-gray-700">
-                  <Button variant="ghost" size="sm" className="w-full text-green-600 hover:text-green-700 hover:bg-green-50 dark:hover:bg-green-900/20">
+                <div className="pt-2 border-t border-border">
+                  <Button variant="ghost" size="sm" className="w-full text-success hover:text-success/90 hover:bg-success/10">
                     View All Activity
                     <ChevronRight className="h-4 w-4 ml-1" />
                   </Button>
@@ -843,7 +850,7 @@ export default function LearnerDashboard() {
 
 
           {/* My Submissions */}
-          <Card className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm shadow-xl border-2 border-orange-200/60 dark:border-orange-400/30 hover:border-orange-300/80 dark:hover:border-orange-300/50 transition-all duration-300 hover:shadow-2xl hover:shadow-orange-500/10 w-full min-w-0">
+          <Card className={`bg-card/90 backdrop-blur-sm shadow-xl border-2 ${isDark ? 'border-orange-400/30 hover:border-orange-300/50' : 'border-orange-200/60 hover:border-orange-300/80'} transition-all duration-300 hover:shadow-2xl hover:shadow-orange-500/10 w-full min-w-0`}>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <FileText className="h-5 w-5 text-orange-600" />
@@ -852,49 +859,49 @@ export default function LearnerDashboard() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-2 sm:gap-4 text-center">
-                <div className="p-2 sm:p-3 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
+                <div className={`p-2 sm:p-3 ${isDark ? 'bg-orange-900/20' : 'bg-orange-50'} rounded-lg`}>
                   <div className="text-lg sm:text-xl font-bold text-orange-600">5</div>
-                  <div className="text-xs text-gray-600 dark:text-gray-400">Active</div>
+                  <div className="text-xs text-muted-foreground">Active</div>
                 </div>
-                <div className="p-2 sm:p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
-                  <div className="text-lg sm:text-xl font-bold text-green-600">1</div>
-                  <div className="text-xs text-gray-600 dark:text-gray-400">Offer</div>
+                <div className="p-2 sm:p-3 bg-success/10 rounded-lg">
+                  <div className="text-lg sm:text-xl font-bold text-success">1</div>
+                  <div className="text-xs text-muted-foreground">Offer</div>
                 </div>
               </div>
               
               {/* Recent Submissions */}
               <div className="space-y-2">
-                <div className="flex items-center gap-3 p-2 hover:bg-gray-50 dark:hover:bg-gray-800/50 rounded-lg transition-colors">
-                  <div className="w-2 h-2 bg-green-500 rounded-full mt-1.5 flex-shrink-0"></div>
+                <div className="flex items-center gap-3 p-2 hover:bg-muted/50 rounded-lg transition-colors">
+                  <div className="w-2 h-2 bg-success rounded-full mt-1.5 flex-shrink-0"></div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-900 dark:text-white truncate">TSMC Process Engineer</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">Offer Extended • $95K</p>
+                    <p className="text-sm font-medium text-foreground truncate">TSMC Process Engineer</p>
+                    <p className="text-xs text-muted-foreground">Offer Extended • $95K</p>
                   </div>
                 </div>
                 
-                <div className="flex items-center gap-3 p-2 hover:bg-gray-50 dark:hover:bg-gray-800/50 rounded-lg transition-colors">
-                  <div className="w-2 h-2 bg-blue-500 rounded-full mt-1.5 flex-shrink-0"></div>
+                <div className="flex items-center gap-3 p-2 hover:bg-muted/50 rounded-lg transition-colors">
+                  <div className="w-2 h-2 bg-primary rounded-full mt-1.5 flex-shrink-0"></div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-900 dark:text-white truncate">Honeywell Avionics Tech</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">Interview Complete • Pending</p>
+                    <p className="text-sm font-medium text-foreground truncate">Honeywell Avionics Tech</p>
+                    <p className="text-xs text-muted-foreground">Interview Complete • Pending</p>
                   </div>
                 </div>
                 
-                <div className="flex items-center gap-3 p-2 hover:bg-gray-50 dark:hover:bg-gray-800/50 rounded-lg transition-colors">
-                  <div className="w-2 h-2 bg-yellow-500 rounded-full mt-1.5 flex-shrink-0"></div>
+                <div className="flex items-center gap-3 p-2 hover:bg-muted/50 rounded-lg transition-colors">
+                  <div className="w-2 h-2 bg-warning rounded-full mt-1.5 flex-shrink-0"></div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-900 dark:text-white truncate">Phoenix Data Center</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">Technical Assessment • Due Jan 30</p>
+                    <p className="text-sm font-medium text-foreground truncate">Phoenix Data Center</p>
+                    <p className="text-xs text-muted-foreground">Technical Assessment • Due Jan 30</p>
                   </div>
                 </div>
               </div>
 
               {/* View All Button */}
-              <div className="pt-2 border-t border-gray-200 dark:border-gray-700">
+              <div className="pt-2 border-t border-border">
                 <Button 
                   variant="ghost" 
                   size="sm" 
-                  className="w-full text-orange-600 hover:text-orange-700 hover:bg-orange-50 dark:hover:bg-orange-900/20"
+                  className={`w-full text-orange-600 hover:text-orange-700 ${isDark ? 'hover:bg-orange-900/20' : 'hover:bg-orange-50'}`}
                   onClick={() => window.location.href = '/employers/submissions'}
                 >
                   View All Submissions
@@ -909,7 +916,7 @@ export default function LearnerDashboard() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-4 md:gap-6 w-full min-w-0">
             
             {/* Badges */}
-            <Card className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm shadow-xl border-2 border-orange-200/60 dark:border-orange-400/30 hover:border-orange-300/80 dark:hover:border-orange-300/50 transition-all duration-300 hover:shadow-2xl hover:shadow-orange-500/10 w-full min-w-0">
+            <Card className={`bg-card/90 backdrop-blur-sm shadow-xl border-2 ${isDark ? 'border-orange-400/30 hover:border-orange-300/50' : 'border-orange-200/60 hover:border-orange-300/80'} transition-all duration-300 hover:shadow-2xl hover:shadow-orange-500/10 w-full min-w-0`}>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Award className="h-5 w-5 text-orange-600" />
@@ -918,25 +925,25 @@ export default function LearnerDashboard() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-3 gap-1 sm:gap-2 text-center">
-                  <div className="p-2 sm:p-3 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
+                  <div className={`p-2 sm:p-3 ${isDark ? 'bg-orange-900/20' : 'bg-orange-50'} rounded-lg`}>
                     <div className="text-lg sm:text-xl font-bold text-orange-600">{data.certifications.earned}</div>
-                    <div className="text-xs text-gray-600 dark:text-gray-400">Earned</div>
+                    <div className="text-xs text-muted-foreground">Earned</div>
                   </div>
-                  <div className="p-2 sm:p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                    <div className="text-lg sm:text-xl font-bold text-blue-600">{data.certifications.inProgress}</div>
-                    <div className="text-xs text-gray-600 dark:text-gray-400">In Progress</div>
+                  <div className="p-2 sm:p-3 bg-primary/10 rounded-lg">
+                    <div className="text-lg sm:text-xl font-bold text-primary">4</div>
+                    <div className="text-xs text-muted-foreground">In Progress</div>
                   </div>
-                  <div className="p-2 sm:p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                    <div className="text-lg sm:text-xl font-bold text-gray-600 dark:text-gray-400">{data.certifications.available}</div>
-                    <div className="text-xs text-gray-600 dark:text-gray-400">Available</div>
+                  <div className="p-2 sm:p-3 bg-muted/50 rounded-lg">
+                    <div className={`text-lg sm:text-xl font-bold ${isDark ? 'text-muted-foreground/40' : 'text-muted-foreground'}`}>{data.certifications.available}</div>
+                    <div className="text-xs text-muted-foreground">Available</div>
               </div>
                 </div>
                 
-                <div className="p-3 border border-orange-200 dark:border-orange-800 rounded-lg">
+                <div className={`p-3 border ${isDark ? 'border-orange-800' : 'border-orange-200'} rounded-lg`}>
                   <div className="text-center">
-                    <p className="text-sm font-medium text-gray-900 dark:text-white mb-2">Next: {data.certifications.nextCertification}</p>
+                    <p className="text-sm font-medium text-foreground mb-2">Next: {data.certifications.nextCertification}</p>
                     <div className="flex items-center justify-center gap-2">
-                      <div className="w-20 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                      <div className="w-20 bg-muted/50 rounded-full h-2">
                         <div 
                           className="bg-orange-500 h-2 rounded-full"
                           style={{ width: `${data.certifications.nextProgress}%` }}
@@ -950,10 +957,10 @@ export default function LearnerDashboard() {
           </Card>
 
             {/* Achievements */}
-            <Card className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm shadow-xl border-2 border-yellow-200/60 dark:border-yellow-400/30 hover:border-yellow-300/80 dark:hover:border-yellow-300/50 transition-all duration-300 hover:shadow-2xl hover:shadow-yellow-500/10 w-full min-w-0">
+            <Card className="bg-card/90 backdrop-blur-sm shadow-xl border-2 border-warning/20 hover:border-warning/40 transition-all duration-300 hover:shadow-2xl hover:shadow-warning/10 w-full min-w-0">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <Medal className="h-5 w-5 text-yellow-600" />
+                  <Medal className="h-5 w-5 text-warning" />
                   Achievements
                 </CardTitle>
             </CardHeader>
@@ -964,12 +971,18 @@ export default function LearnerDashboard() {
                       "p-3 rounded-lg transition-all duration-300",
                       achievement.completed 
                         ? `bg-gradient-to-r ${achievement.color} text-white shadow-md` 
-                        : "bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600"
+                        : isDark 
+                          ? "bg-muted-foreground/10 hover:bg-muted-foreground/20"
+                          : "bg-muted/50 hover:bg-muted/70"
                     )}>
                       <div className="flex items-center gap-2">
                         <div className={cn(
                           "p-1 rounded",
-                          achievement.completed ? "bg-white/20" : "bg-white dark:bg-gray-600"
+                          achievement.completed 
+                            ? "bg-white/20" 
+                            : isDark 
+                              ? "bg-muted-foreground" 
+                              : "bg-white"
                         )}>
                           {achievement.icon === 'flame' && <Flame className="h-3 w-3" />}
                           {achievement.icon === 'award' && <Award className="h-3 w-3" />}
@@ -1005,41 +1018,41 @@ export default function LearnerDashboard() {
           </Card>
 
             {/* Invite Friends (Referrals) */}
-            <Card className="bg-gradient-to-br from-green-100 to-emerald-100 dark:from-green-900/20 dark:to-emerald-900/20 shadow-lg border border-green-200/50">
+            <Card className="bg-card/90 backdrop-blur-sm shadow-xl border-2 border-success/20 hover:border-success/40 transition-all duration-300 hover:shadow-2xl hover:shadow-success/10 w-full min-w-0">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-green-800 dark:text-green-300">
-                  <Users className="h-5 w-5" />
+                <CardTitle className="flex items-center gap-2">
+                  <Users className="h-5 w-5 text-success" />
                   Referrals
                 </CardTitle>
-                <CardDescription className="text-green-700 dark:text-green-400 text-sm">
+                <CardDescription className="text-sm">
                   +{data.inviteRewards.xpPerInvite} XP per invite
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-2 gap-2 sm:gap-3 text-center">
-                  <div className="p-2 sm:p-3 bg-green-200/50 dark:bg-green-800/30 rounded-lg">
-                    <div className="text-lg sm:text-xl font-bold text-green-800 dark:text-green-300">{data.inviteRewards.successfulInvites}</div>
-                    <div className="text-xs text-green-700 dark:text-green-400">Friends</div>
+                  <div className="p-2 sm:p-3 bg-success/10 rounded-lg">
+                    <div className="text-lg sm:text-xl font-bold text-success">{data.inviteRewards.successfulInvites}</div>
+                    <div className="text-xs text-muted-foreground">Friends</div>
               </div>
-                  <div className="p-2 sm:p-3 bg-green-200/50 dark:bg-green-800/30 rounded-lg">
-                    <div className="text-lg sm:text-xl font-bold text-green-800 dark:text-green-300">{data.inviteRewards.totalXpEarned}</div>
-                    <div className="text-xs text-green-700 dark:text-green-400">XP Earned</div>
+                  <div className="p-2 sm:p-3 bg-success/10 rounded-lg">
+                    <div className="text-lg sm:text-xl font-bold text-success">{data.inviteRewards.totalXpEarned}</div>
+                    <div className="text-xs text-muted-foreground">XP Earned</div>
               </div>
                 </div>
                 
                 <div className="space-y-2">
-                  <label className="text-xs font-medium text-green-800 dark:text-green-300">Referral Code:</label>
+                  <label className="text-xs font-medium text-success">Referral Code:</label>
                   <div className="flex gap-1">
                     <input 
                       type="text" 
                       value={data.inviteRewards.referralCode}
                       readOnly
-                      className="flex-1 px-2 py-1 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded text-xs"
+                      className={`flex-1 px-2 py-1 ${isDark ? 'bg-muted-foreground' : 'bg-muted/50'} border border-muted-foreground rounded text-xs`}
                     />
                     <Button 
                       onClick={copyReferralCode}
                       size="sm"
-                      className="bg-green-600 hover:bg-green-700 text-white px-2"
+                      className="bg-success hover:bg-success/90 text-white px-2"
                     >
                       {copiedCode ? <CheckCircle className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
                     </Button>
@@ -1047,7 +1060,7 @@ export default function LearnerDashboard() {
                 </div>
                 
                 <Button 
-                  className="w-full bg-green-600 hover:bg-green-700 text-white text-sm py-2"
+                  className="w-full bg-success hover:bg-success/90 text-white text-sm py-2"
                   onClick={() => setShowInviteModal(true)}
                 >
                   <Share2 className="h-3 w-3 mr-1" />
@@ -1062,19 +1075,19 @@ export default function LearnerDashboard() {
       {/* Invite Modal */}
       {showInviteModal && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 max-w-md w-full shadow-2xl">
+          <div className={`${isDark ? 'bg-slate-800' : 'bg-white'} rounded-2xl p-6 max-w-md w-full shadow-2xl`}>
             <div className="text-center mb-6">
-              <div className="w-16 h-16 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 bg-gradient-to-br from-success to-emerald rounded-full flex items-center justify-center mx-auto mb-4">
                 <Users className="h-8 w-8 text-white" />
               </div>
-              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Invite Friends</h3>
-              <p className="text-gray-600 dark:text-gray-400">Share your referral code and earn XP when friends join!</p>
+              <h3 className="text-xl font-bold text-foreground mb-2">Invite Friends</h3>
+              <p className="text-muted-foreground">Share your referral code and earn XP when friends join!</p>
             </div>
             
             <div className="space-y-4">
-              <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg text-center">
-                <p className="text-2xl font-bold text-green-600 mb-1">+{data.inviteRewards.xpPerInvite} XP</p>
-                <p className="text-sm text-green-700 dark:text-green-400">per successful invite</p>
+              <div className="p-4 bg-success/10 rounded-lg text-center">
+                <p className="text-2xl font-bold text-success mb-1">+{data.inviteRewards.xpPerInvite} XP</p>
+                <p className="text-sm text-success/90">per successful invite</p>
               </div>
               
               <div className="flex gap-2">
@@ -1082,16 +1095,16 @@ export default function LearnerDashboard() {
                   type="text" 
                   value={`Join me on Upskill! Use code: ${data.inviteRewards.referralCode}`}
                   readOnly
-                  className="flex-1 px-3 py-2 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-sm"
+                  className={`flex-1 px-3 py-2 ${isDark ? 'bg-muted-foreground' : 'bg-muted/50'} border border-muted-foreground rounded-lg text-sm`}
                 />
-                <Button onClick={copyReferralCode} size="sm" className="bg-green-600 hover:bg-green-700 text-white">
+                <Button onClick={copyReferralCode} size="sm" className="bg-success hover:bg-success/90 text-white">
                   {copiedCode ? <CheckCircle className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
                 </Button>
               </div>
               
               <div className="flex gap-2">
                 <Button 
-                  className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+                  className="flex-1 bg-success hover:bg-success/90 text-white"
                   onClick={() => {
                     // Implement share functionality
                     if (navigator.share) {
