@@ -3,6 +3,18 @@ import Link from 'next/link'
 export default function DemoIndex() {
   const demos = [
     {
+      title: 'AI Course Creator',
+      description: 'AI-powered course creation with intelligent text suggestions for all fields',
+      href: '/demo/ai-course-creator',
+      status: 'NEW'
+    },
+    {
+      title: 'AI Auto-Generation',
+      description: 'See how AI transforms course context into complete course structures instantly',
+      href: '/demo/ai-auto-generation',
+      status: 'NEW'
+    },
+    {
       title: 'User Profile Management',
       description: 'Comprehensive profile system with skills inventory and management',
       href: '/task18-demo',
@@ -80,6 +92,8 @@ export default function DemoIndex() {
                     ? 'bg-green-100 text-green-800'
                     : demo.status === 'Basic'
                     ? 'bg-yellow-100 text-yellow-800'
+                    : demo.status === 'NEW'
+                    ? 'bg-purple-100 text-purple-800'
                     : 'bg-blue-100 text-blue-800'
                 }`}>
                   {demo.status}

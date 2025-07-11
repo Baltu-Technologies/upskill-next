@@ -164,13 +164,13 @@ export interface Course {
   id: string;
   title: string;
   description: string;
-  overview: string;
   duration: string; // e.g., "8 hours"
   lessons: Lesson[];
   prerequisites?: string[];
   learningOutcomes: string[];
   industry: string;
   skillLevel: 'entry' | 'intermediate' | 'advanced';
+  courseLevel?: 'Beginning' | 'Intermediate' | 'Advanced'; // Course difficulty level
   certification?: {
     available: boolean;
     provider?: string;

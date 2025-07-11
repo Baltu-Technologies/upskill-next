@@ -1,7 +1,8 @@
 import { Pool } from "pg";
 import { nextCookies } from "better-auth/next-js";
 import { betterAuth } from "better-auth";
-import { UserRolesService, initializeUserRolesService, type UserRole } from "./lib/db/user-roles-service";
+import { UserRolesService, initializeUserRolesService } from "./lib/db/user-roles-service";
+import type { UserRole } from "./lib/db/user-roles-service";
 
 // Get the correct base URL for the environment
 const getBaseURL = () => {

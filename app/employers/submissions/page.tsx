@@ -382,7 +382,7 @@ export default function MySubmissionsPage() {
   const [expandedCards, setExpandedCards] = useState<Set<string>>(new Set());
 
   const filteredSubmissions = useMemo(() => {
-    let filtered = mockSubmissions.filter(submission => {
+    const filtered = mockSubmissions.filter(submission => {
       const matchesSearch = !searchQuery || 
         submission.jobTitle.toLowerCase().includes(searchQuery.toLowerCase()) ||
         submission.company.toLowerCase().includes(searchQuery.toLowerCase()) ||

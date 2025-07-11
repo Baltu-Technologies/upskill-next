@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth0 } from './lib/auth0-client';
-import { extractTenantContext } from './lib/organizations';
+import { extractTenantContext, TenantContext } from './lib/organizations';
 
 // Define public routes that don't require authentication (for both learner and employer)
 const publicRoutes = [
@@ -21,6 +21,7 @@ const publicRoutes = [
   '/rbac-test',
   '/user-management-test',
   '/microlesson-context-menu-test',
+  '/course-creator', // TEMPORARY: Allow course creator for testing
 ];
 
 // Define learner platform routes (BetterAuth)
@@ -38,7 +39,7 @@ const learnerRoutes = [
   '/career-exploration',
   '/microlessons',
   '/guide-access',
-  '/course-creator',
+  // '/course-creator', // TEMPORARY: Moved to public routes for testing
 ];
 
 // Define admin routes that require admin role (BetterAuth)
@@ -74,7 +75,7 @@ export async function middleware(request: NextRequest) {
   }
 
   // Extract tenant context (subdomain-based routing)
-  const tenantContext = extractTenantContext(request);
+  const tenantContext: TenantContext = extractTenantContext(request);
   
   console.log(`Tenant context for ${pathname}:`, tenantContext);
 
@@ -160,14 +161,12 @@ export async function middleware(request: NextRequest) {
   // 3. It's an unknown route
   
   // Default routing based on tenant type
-  switch (tenantContext.type) {
-    case 'employer':
-      // Employer trying to access learner routes - redirect to employer home
-      return NextResponse.redirect(new URL('/employer-access', request.url));
-    case 'learner':
-    default:
-      // Learner trying to access employer routes or unknown route - redirect to learner home
-      return NextResponse.redirect(new URL('/', request.url));
+  if ((tenantContext as TenantContext).type === 'employer') {
+    // Employer trying to access learner routes - redirect to employer home
+    return NextResponse.redirect(new URL('/employer-access', request.url));
+  } else {
+    // Learner trying to access employer routes or unknown route - redirect to learner home
+    return NextResponse.redirect(new URL('/', request.url));
   }
 }
 

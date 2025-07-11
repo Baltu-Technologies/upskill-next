@@ -172,7 +172,7 @@ export default function SearchEmployersPage() {
 
   // Filter employers based on search and filters
   useEffect(() => {
-    let filtered = employers.filter(employer => {
+    const filtered = employers.filter(employer => {
       const matchesSearch = employer.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                            employer.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
                            employer.technologies.some(tech => tech.toLowerCase().includes(searchQuery.toLowerCase()));

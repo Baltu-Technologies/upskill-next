@@ -305,7 +305,7 @@ export default function LearnerDashboard() {
       </div>
 
       {/* Top Profile Bar - Completely flush with window top */}
-      <div className={`relative z-10 ${isDark ? 'bg-gradient-to-r from-slate-700/90 via-primary/90 to-slate-700/90' : 'bg-gradient-to-r from-slate-300/90 via-primary/90 to-slate-300/90'} shadow-2xl shadow-primary/20 -mx-0 xs:-mx-1 sm:-mx-2 md:-mx-4 lg:-mx-6 xl:-mx-0 -mt-0`}>
+      <div className={`relative z-10 ${isDark ? 'bg-gradient-to-r from-black/95 via-primary/90 to-black/95' : 'bg-gradient-to-r from-slate-300/90 via-primary/90 to-slate-300/90'} shadow-2xl shadow-primary/20 -mx-0 xs:-mx-1 sm:-mx-2 md:-mx-4 lg:-mx-6 xl:-mx-0 -mt-0`}>
         {/* Glow effect behind the bar */}
         <div className="absolute inset-0 bg-gradient-to-r from-primary/20 via-primary/30 to-primary/20 blur-xl"></div>
         <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background/20"></div>
@@ -470,7 +470,7 @@ export default function LearnerDashboard() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Target className="h-5 w-5 text-primary" />
-                Career Pathway
+                My Career Pathway
                 </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -625,7 +625,7 @@ export default function LearnerDashboard() {
             <div className="flex items-center justify-between mb-6">
               <div>
                 <h2 className="text-2xl font-bold text-foreground mb-2">
-                  Job Opportunities
+                  My Job Opportunities
                 </h2>
                 <p className="text-muted-foreground text-lg">
                   Discover career opportunities with our industry partners

@@ -296,7 +296,7 @@ export async function getMetricsByDate(
   
   let filterExpression: string | undefined;
   let expressionAttributeNames: Record<string, string> | undefined;
-  let expressionAttributeValues: Record<string, any> = { ':metricDate': date };
+  const expressionAttributeValues: Record<string, any> = { ':metricDate': date };
 
   const filters: string[] = [];
 
@@ -366,7 +366,7 @@ export async function getMetricsByType(
   
   let filterExpression: string | undefined;
   let expressionAttributeNames: Record<string, string> | undefined;
-  let expressionAttributeValues: Record<string, any> = { ':metricType': metricType };
+  const expressionAttributeValues: Record<string, any> = { ':metricType': metricType };
 
   const filters: string[] = [];
 

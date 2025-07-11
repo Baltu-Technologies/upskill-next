@@ -560,8 +560,7 @@ export const sampleLessons: Lesson[] = [
 export const sampleCourse: Course = {
   id: 'advanced-manufacturing-cert',
   title: 'Basics of Semiconductor',
-  description: 'Comprehensive training in modern manufacturing processes and automation',
-  overview: 'This course program provides hands-on training in advanced manufacturing technologies including semiconductor processing, industrial robotics, and quality control systems. Designed for technicians and engineers working in high-tech manufacturing environments.',
+  description: 'Comprehensive training in modern manufacturing processes and automation including semiconductor processing, industrial robotics, and quality control systems. Designed for technicians and engineers working in high-tech manufacturing environments.',
   duration: '8 hours',
   lessons: sampleLessons,
   prerequisites: [

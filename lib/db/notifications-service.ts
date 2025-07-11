@@ -197,7 +197,7 @@ export async function getNotificationsByType(
   
   let filterExpression: string | undefined;
   let expressionAttributeNames: Record<string, string> | undefined;
-  let expressionAttributeValues: Record<string, any> = { ':notificationType': notificationType };
+  const expressionAttributeValues: Record<string, any> = { ':notificationType': notificationType };
 
   // Apply date range filter
   if (options.dateFrom || options.dateTo) {

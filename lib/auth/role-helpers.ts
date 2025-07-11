@@ -2,6 +2,20 @@ import { auth } from "../../auth";
 import { UserRolesService, type UserRole } from "../db/user-roles-service";
 import { NextRequest, NextResponse } from "next/server";
 
+// Re-export the UserRole type for convenience
+export type { UserRole };
+
+/**
+ * Check if a user role has at least the minimum required role level
+ */
+export function hasMinimumRole(userRole: UserRole, minimumRole: UserRole): boolean {
+    const hierarchy = UserRolesService.getRoleHierarchy();
+    const userLevel = hierarchy[userRole];
+    const minLevel = hierarchy[minimumRole];
+    
+    return userLevel >= minLevel;
+}
+
 // Type for session with roles
 export interface SessionWithRoles {
     user: {

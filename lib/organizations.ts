@@ -54,11 +54,13 @@ export const ORGANIZATIONS: Record<string, OrganizationConfig> = {
 /**
  * Extract tenant context from request
  */
-export function extractTenantContext(request: NextRequest): {
+export type TenantContext = {
   type: 'learner' | 'employer';
   organization?: OrganizationConfig;
   subdomain?: string;
-} {
+};
+
+export function extractTenantContext(request: NextRequest): TenantContext {
   const host = request.headers.get('host') || '';
   
   // Development environment
@@ -69,12 +71,12 @@ export function extractTenantContext(request: NextRequest): {
       // For development, use the first organization as default
       const defaultOrg = Object.values(ORGANIZATIONS)[0];
       return {
-        type: 'employer',
+        type: 'employer' as const,
         organization: defaultOrg,
         subdomain: defaultOrg.subdomain
       };
     }
-    return { type: 'learner' };
+    return { type: 'learner' as const };
   }
   
   // Production environment - parse subdomain
@@ -82,7 +84,7 @@ export function extractTenantContext(request: NextRequest): {
   
   // Main domain (upskill.baltutech.com) - learner platform
   if (parts.length === 3 && parts[0] === 'upskill') {
-    return { type: 'learner' };
+    return { type: 'learner' as const };
   }
   
   // Subdomain (baltu.baltutech.com) - employer portal
@@ -92,7 +94,7 @@ export function extractTenantContext(request: NextRequest): {
     
     if (organization && organization.isActive) {
       return {
-        type: 'employer',
+        type: 'employer' as const,
         organization,
         subdomain
       };
@@ -100,7 +102,7 @@ export function extractTenantContext(request: NextRequest): {
   }
   
   // Default to learner for unknown domains
-  return { type: 'learner' };
+  return { type: 'learner' as const };
 }
 
 /**

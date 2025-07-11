@@ -241,7 +241,7 @@ export async function getUserActivityTimeline(
   
   let filterExpression: string | undefined;
   let expressionAttributeNames: Record<string, string> | undefined;
-  let expressionAttributeValues: Record<string, any> = { ':userId': userId };
+  const expressionAttributeValues: Record<string, any> = { ':userId': userId };
 
   const filters: string[] = [];
 
@@ -311,8 +311,8 @@ export async function getUserCourseActivities(
 ): Promise<{ activities: ActivityStreamItem[]; lastEvaluatedKey?: Record<string, any> }> {
   
   let filterExpression = '#courseId = :courseId';
-  let expressionAttributeNames: Record<string, string> = { '#courseId': 'courseId' };
-  let expressionAttributeValues: Record<string, any> = { 
+  const expressionAttributeNames: Record<string, string> = { '#courseId': 'courseId' };
+  const expressionAttributeValues: Record<string, any> = { 
     ':userId': userId,
     ':courseId': courseId 
   };
@@ -357,7 +357,7 @@ export async function getActivitiesByType(
   
   let filterExpression: string | undefined;
   let expressionAttributeNames: Record<string, string> | undefined;
-  let expressionAttributeValues: Record<string, any> = { ':activityType': activityType };
+  const expressionAttributeValues: Record<string, any> = { ':activityType': activityType };
 
   const filters: string[] = [];
 
