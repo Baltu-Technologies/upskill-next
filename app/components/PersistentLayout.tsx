@@ -42,6 +42,9 @@ export default function PersistentLayout({ children }: PersistentLayoutProps) {
 
   const [showStudyModal, setShowStudyModal] = useState(false);
 
+  // Check if we're in course creator mode
+  const isInCourseCreator = pathname?.startsWith('/course-creator');
+
   // Refs for click outside detection
   const notificationsRef = useRef<HTMLDivElement>(null);
   const messagesRef = useRef<HTMLDivElement>(null);
@@ -125,7 +128,7 @@ export default function PersistentLayout({ children }: PersistentLayoutProps) {
         )}
 
         {/* Floating Navigation Bar - Desktop/Tablet Only */}
-        {!isMobile && (
+        {!isMobile && !isInCourseCreator && (
           <div className="fixed top-6 right-4 xl:right-6 z-40" style={{ width: 'fit-content', maxWidth: '420px' }}>
             <nav className="bg-card/80 backdrop-blur-xl rounded-2xl border border-border hover:shadow-xl transition-all duration-300 hover:scale-[1.02] shadow-lg before:content-[''] before:absolute before:inset-0 before:bg-gradient-to-b before:from-background/20 before:via-transparent before:to-transparent before:backdrop-blur-[2px] before:z-[-1] before:rounded-2xl">
               <div className="flex items-center gap-4 px-4 py-3">

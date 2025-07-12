@@ -329,7 +329,7 @@ export default function LessonDetailPage() {
             {lesson.tags && lesson.tags.length > 0 && (
               <Card className="p-6">
                 <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">
-                  Topics Covered
+                  Course Tags
                 </h3>
                 <div className="flex flex-wrap gap-2">
                   {lesson.tags.map((tag, index) => (

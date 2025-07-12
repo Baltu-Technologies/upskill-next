@@ -114,13 +114,13 @@ export default function CoursePreview({ courseData, onSave }: CoursePreviewProps
         </CardContent>
       </Card>
 
-      {/* Learning Outcomes */}
+      {/* Learning Objectives */}
       {courseData.learningOutcomes && courseData.learningOutcomes.length > 0 && (
         <Card className="border-slate-700 bg-slate-800/50">
           <CardHeader>
             <CardTitle className="text-white flex items-center gap-2">
               <Target className="w-5 h-5 text-green-400" />
-              Learning Outcomes
+              Learning Objectives
             </CardTitle>
           </CardHeader>
           <CardContent>

@@ -359,19 +359,19 @@ export default function CourseTestPage() {
               </CardContent>
             </Card>
 
-            {/* Topics Covered */}
+            {/* Course Tags */}
             <Card className="group overflow-hidden border-slate-700 bg-slate-800/50 hover:bg-slate-800/70 transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/10">
               <CardHeader>
                 <CardTitle className="text-xl font-bold text-white flex items-center gap-3">
                   <Zap className="w-5 h-5 text-yellow-400" />
-                  Topics Covered
+                  Course Tags
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="flex flex-wrap gap-2">
-                  {['Wafer Processing', 'Photolithography', 'Etching', 'Deposition', 'Clean Room', 'Quality Control', 'Safety Protocols', 'Equipment Maintenance'].map((topic, index) => (
+                  {['Semiconductor Manufacturing', 'Clean Room Operations', 'Wafer Processing', 'Quality Control', 'Safety Protocols', 'Equipment Maintenance', 'Photolithography', 'Industrial Operations'].map((tag, index) => (
                     <Badge key={index} variant="outline" className="border-blue-400/50 text-blue-400 bg-blue-400/5 hover:bg-blue-400/10 transition-colors">
-                      {topic}
+                      {tag}
                     </Badge>
                   ))}
                 </div>

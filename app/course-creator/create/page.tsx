@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { 
@@ -13,7 +13,8 @@ import {
   Loader2,
   AlertCircle,
   CheckCircle,
-  CheckCircle2
+  CheckCircle2,
+  ChevronRight
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -23,6 +24,30 @@ import { toast } from 'sonner';
 import CourseInfoForm from './CourseInfoForm';
 import CourseContextForm from './CourseContextForm';
 import LessonBuilder from './LessonBuilder';
+
+const STEPS = [
+  {
+    id: 'info',
+    title: 'Course Information',
+    description: 'Define basic course details',
+    icon: BookOpen,
+    color: 'orange'
+  },
+  {
+    id: 'context',
+    title: 'Course Context',
+    description: 'Provide job description and structure',
+    icon: Target,
+    color: 'blue'
+  },
+  {
+    id: 'lessons',
+    title: 'Lesson Outline',
+    description: 'Generate and organize lessons',
+    icon: Sparkles,
+    color: 'purple'
+  }
+];
 
 
 
@@ -98,7 +123,7 @@ interface CourseData {
   courseLevel?: string;
 }
 
-const STEPS = [
+const SECTIONS = [
   {
     id: 'info',
     title: 'Course Information',
@@ -124,13 +149,23 @@ const STEPS = [
 
 export default function CreateCoursePage() {
   const router = useRouter();
-  const [currentStep, setCurrentStep] = useState(0);
-  const [selectedLessonId, setSelectedLessonId] = useState<string | null>(null);
+  const [activeSection, setActiveSection] = useState('info');
   const [isGenerating, setIsGenerating] = useState(false);
   const [generationStatus, setGenerationStatus] = useState<string | null>(null);
   const [generationError, setGenerationError] = useState<string | null>(null);
   const [isGeneratingMicrolessons, setIsGeneratingMicrolessons] = useState(false);
   const [microlessonProgress, setMicrolessonProgress] = useState<{[key: number]: number}>({});
+  
+  // Refs for scrolling to sections
+  const sectionRefs = useRef<{[key: string]: HTMLDivElement | null}>({});
+
+  const scrollToSection = (sectionId: string) => {
+    setActiveSection(sectionId);
+    sectionRefs.current[sectionId]?.scrollIntoView({ 
+      behavior: 'smooth',
+      block: 'start'
+    });
+  };
 
   const [courseData, setCourseData] = useState<CourseData>({
     title: '',
@@ -183,39 +218,7 @@ export default function CreateCoursePage() {
     setGenerationError(null);
     
     try {
-      // Step 1: Generate enhanced course info
-      setGenerationStatus('Analyzing course requirements...');
-      const courseInfoResponse = await fetch('/api/ai-course-generation', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          generationType: 'courseInfo',
-          courseContext: courseData.context,
-          courseData: courseData
-        })
-      });
-
-      if (!courseInfoResponse.ok) {
-        throw new Error('Failed to generate course information');
-      }
-
-      const enhancedCourseInfoResponse = await courseInfoResponse.json();
-      const enhancedCourseInfo = enhancedCourseInfoResponse.data || enhancedCourseInfoResponse;
-      
-      // Update course data with enhanced information
-      const updatedCourseData = {
-        ...courseData,
-        ...enhancedCourseInfo,
-        // Keep user's original title and description if they exist
-        title: courseData.title || enhancedCourseInfo.title,
-        description: courseData.description || enhancedCourseInfo.description
-      };
-      
-      setCourseData(updatedCourseData);
-
-      // Step 2: Generate lessons only (no microlessons yet)
+      // Generate lessons directly using existing course information
       setGenerationStatus('Creating lesson structure...');
       const lessonsResponse = await fetch('/api/ai-course-generation', {
         method: 'POST',
@@ -225,7 +228,7 @@ export default function CreateCoursePage() {
         body: JSON.stringify({
           generationType: 'lessons',
           courseContext: courseData.context,
-          courseData: updatedCourseData
+          courseData: courseData
         })
       });
 
@@ -236,10 +239,9 @@ export default function CreateCoursePage() {
       const lessonsDataResponse = await lessonsResponse.json();
       const lessonsData = lessonsDataResponse.data || lessonsDataResponse;
       
-      // Final update with generated lessons (microlessons will be empty initially)
+      // Update with generated lessons (microlessons will be empty initially)
       setCourseData(prev => ({
         ...prev,
-        ...updatedCourseData,
         lessons: lessonsData.lessons || [],
         microlessons: [], // No microlessons generated yet
         assessments: [] // No assessments generated yet
@@ -335,172 +337,31 @@ export default function CreateCoursePage() {
 
 
 
-  const canProceedToStep = (stepIndex: number) => {
-    switch (stepIndex) {
-      case 0: return true; // Info step is always accessible
-      case 1: return courseData.title && courseData.description; // Need basic info
-      case 2: return courseData.title && courseData.description; // Need basic info for generation
-      default: return false;
-    }
-  };
-
-  const getStepStatus = (stepIndex: number) => {
-    if (stepIndex < currentStep) return 'completed';
-    if (stepIndex === currentStep) return 'current';
-    if (canProceedToStep(stepIndex)) return 'available';
-    return 'locked';
-  };
-
-  const nextStep = () => {
-    if (currentStep < STEPS.length - 1 && canProceedToStep(currentStep + 1)) {
-      setCurrentStep(currentStep + 1);
-    }
-  };
-
-  const prevStep = () => {
-    if (currentStep > 0) {
-      setCurrentStep(currentStep - 1);
-    }
-  };
-
-  const goToStep = (stepIndex: number) => {
-    if (canProceedToStep(stepIndex)) {
-      setCurrentStep(stepIndex);
-    }
-  };
-
-  const renderStepContent = () => {
-    switch (currentStep) {
-      case 0:
-        return (
-          <CourseInfoForm
-            courseData={courseData}
-            updateCourseData={updateCourseData}
-            isGenerating={isGenerating}
-            generationStatus={generationStatus}
-          />
-        );
-      case 1:
-        return (
-          <CourseContextForm
-            courseData={courseData}
-            updateCourseData={updateCourseData}
-          />
-        );
-      case 2:
-        return (
-          <div className="space-y-6">
-            {/* AI Generation Section */}
-            <Card className="border-purple-500/50 bg-purple-500/5">
-              <CardHeader>
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center">
-                    <Sparkles className="w-5 h-5 text-white" />
-                  </div>
-                  <div>
-                    <CardTitle className="text-xl font-bold bg-gradient-to-r from-purple-300 to-pink-300 bg-clip-text text-transparent">
-                      Generate Lesson Outline
-                    </CardTitle>
-                    <CardDescription className="text-slate-400">
-                      Generate comprehensive lesson structure using AI
-                    </CardDescription>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                {!isGenerating && !courseData.lessons.length && (
-                  <>
-                    <div className="bg-slate-800/50 p-6 rounded-lg border border-slate-700/50">
-                      <h3 className="text-lg font-semibold text-white mb-4">Ready to Generate!</h3>
-                      <p className="text-slate-300 mb-4">
-                        Based on your course information and context, AI will generate:
-                      </p>
-                      <ul className="space-y-2 text-sm text-slate-400 mb-6">
-                        <li className="flex items-center gap-2">
-                          <CheckCircle className="w-4 h-4 text-green-400" />
-                          Enhanced course details and learning outcomes
-                        </li>
-                        <li className="flex items-center gap-2">
-                          <CheckCircle className="w-4 h-4 text-green-400" />
-                          Structured lesson plan with clear objectives
-                        </li>
-                        <li className="flex items-center gap-2">
-                          <CheckCircle className="w-4 h-4 text-green-400" />
-                          Lesson titles, descriptions, and learning objectives
-                        </li>
-                        <li className="flex items-center gap-2">
-                          <CheckCircle className="w-4 h-4 text-green-400" />
-                          Editable lesson structure ready for customization
-                        </li>
-                      </ul>
-                      <Button
-                        onClick={generateCourseContent}
-                        className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
-                        size="lg"
-                      >
-                        <Sparkles className="w-4 h-4 mr-2" />
-                        Generate Lesson Outline
-                      </Button>
-                    </div>
-                  </>
-                )}
-
-                {isGenerating && (
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className="text-center py-12"
-                  >
-                    <Loader2 className="w-12 h-12 text-purple-400 animate-spin mx-auto mb-4" />
-                    <h3 className="text-xl font-semibold text-white mb-2">Generating Your Course</h3>
-                    <p className="text-slate-400 mb-4">
-                      This may take a few moments as we create comprehensive content...
-                    </p>
-                    {generationStatus && (
-                      <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4 max-w-md mx-auto">
-                        <p className="text-sm text-blue-400 font-medium">{generationStatus}</p>
-                      </div>
-                    )}
-                  </motion.div>
-                )}
-
-                {generationError && (
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className="bg-red-500/10 border border-red-500/20 rounded-lg p-4"
-                  >
-                    <div className="flex items-center gap-2 mb-2">
-                      <AlertCircle className="w-5 h-5 text-red-400" />
-                      <h3 className="text-red-400 font-medium">Generation Failed</h3>
-                    </div>
-                    <p className="text-sm text-red-300 mb-4">{generationError}</p>
-                    <Button
-                      onClick={generateCourseContent}
-                      variant="outline"
-                      className="border-red-500/50 text-red-400 hover:bg-red-500/10"
-                    >
-                      Try Again
-                    </Button>
-                  </motion.div>
-                )}
-              </CardContent>
-            </Card>
-
-            {/* Lesson Structure Section - Only show after generation */}
-            {courseData.lessons.length > 0 && (
-              <LessonBuilder
-                lessons={courseData.lessons}
-                onLessonsUpdate={(lessons) => updateCourseData({ lessons })}
-                isGenerating={isGenerating}
-                generationStatus={generationStatus || undefined}
-                onGenerateCourse={handleGenerateCourse}
-              />
-            )}
-          </div>
-        );
+  const getSectionStatus = (sectionId: string) => {
+    switch (sectionId) {
+      case 'info':
+        return courseData.title && courseData.description ? 'completed' : 'active';
+      case 'context':
+        return courseData.context?.jobDescription?.text && courseData.context?.courseStructure?.text ? 'completed' : 
+               courseData.title && courseData.description ? 'active' : 'pending';
+      case 'lessons':
+        return courseData.lessons.length > 0 ? 'completed' :
+               courseData.title && courseData.description ? 'active' : 'pending';
       default:
-        return null;
+        return 'pending';
+    }
+  };
+
+  const canAccessSection = (sectionId: string) => {
+    switch (sectionId) {
+      case 'info':
+        return true; // Always accessible
+      case 'context':
+        return courseData.title && courseData.description; // Requires basic info
+      case 'lessons':
+        return courseData.title && courseData.description; // Only requires Course Information to be complete
+      default:
+        return false;
     }
   };
 
@@ -523,7 +384,7 @@ export default function CreateCoursePage() {
               <div className="h-6 w-px bg-slate-600" />
               <div>
                 <h1 className="text-xl font-bold text-white">Create New Course</h1>
-                <p className="text-sm text-slate-400">Step {currentStep + 1} of {STEPS.length}</p>
+                <p className="text-sm text-slate-400">Complete each section below</p>
               </div>
             </div>
             
@@ -537,88 +398,247 @@ export default function CreateCoursePage() {
         </div>
       </div>
 
-      {/* Step Navigation */}
-      <div className="border-b border-slate-700 bg-slate-900/50">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-1">
-              {STEPS.map((step, index) => {
-                const status = getStepStatus(index);
-                const Icon = step.icon;
+      {/* Main Content Area */}
+      <div className="flex min-h-screen">
+        {/* Sidebar Navigation */}
+        <div className="w-64 border-r border-slate-700 bg-slate-900/50 sticky top-[72px] h-screen overflow-y-auto">
+          <div className="p-4">
+            <h2 className="text-sm font-semibold text-slate-400 mb-4">Course Creation</h2>
+            <nav className="space-y-2">
+                             {STEPS.map((step: any) => {
+                 const status = getSectionStatus(step.id);
+                 const Icon = step.icon;
+                 const isAccessible = canAccessSection(step.id);
                 
                 return (
-                  <React.Fragment key={step.id}>
-                    <button
-                      onClick={() => goToStep(index)}
-                      disabled={status === 'locked'}
-                      className={`
-                        flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all
-                        ${status === 'current' 
-                          ? 'bg-blue-600 text-white' 
-                          : status === 'completed'
-                          ? 'bg-green-600/20 text-green-400 hover:bg-green-600/30'
-                          : status === 'available'
-                          ? 'text-slate-400 hover:text-white hover:bg-slate-700'
-                          : 'text-slate-600 cursor-not-allowed'
-                        }
-                      `}
-                    >
+                  <button
+                    key={step.id}
+                    onClick={() => isAccessible && scrollToSection(step.id)}
+                    className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-colors ${
+                      isAccessible 
+                        ? 'hover:bg-slate-800/50 cursor-pointer' 
+                        : 'cursor-not-allowed opacity-50'
+                    }`}
+                  >
+                    <div className={`
+                      w-6 h-6 rounded-full flex items-center justify-center border-2 transition-all duration-300
+                      ${status === 'completed' ? 'bg-green-500 border-green-500' : 
+                        status === 'active' ? 'bg-blue-500 border-blue-500' : 
+                        status === 'pending' ? 'border-slate-600' : 
+                        'border-slate-600'}
+                    `}>
                       {status === 'completed' ? (
-                        <Check className="w-4 h-4" />
+                        <CheckCircle2 className="w-4 h-4 text-white" />
                       ) : (
-                        <Icon className="w-4 h-4" />
+                        <Icon className={`w-3 h-3 ${
+                          status === 'active' ? 'text-white' : 
+                          status === 'pending' ? 'text-slate-600' : 
+                          'text-slate-600'
+                        }`} />
                       )}
-                      <span className="hidden sm:inline">{step.title}</span>
-                    </button>
-                    {index < STEPS.length - 1 && (
-                      <div className="w-8 h-px bg-slate-600 mx-1" />
-                    )}
-                  </React.Fragment>
+                    </div>
+                    
+                    <div className="flex-1">
+                      <div className={`text-sm font-medium ${
+                        status === 'completed' ? 'text-green-400' : 
+                        status === 'active' ? 'text-blue-400' : 
+                        status === 'pending' ? 'text-slate-600' : 
+                        'text-slate-600'
+                      }`}>
+                        {step.title}
+                      </div>
+                      <div className="text-xs text-slate-600">
+                        {step.description}
+                      </div>
+                    </div>
+                  </button>
                 );
               })}
-            </div>
+            </nav>
           </div>
         </div>
-      </div>
 
-      {/* Main Content */}
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-4xl mx-auto">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={currentStep}
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.3 }}
-            >
-              {renderStepContent()}
-            </motion.div>
-          </AnimatePresence>
+        {/* Main Content */}
+        <div className="flex-1 overflow-y-auto">
+          <div className="container mx-auto px-6 py-8">
+            <div className="max-w-4xl mx-auto space-y-12">
+              {/* Course Information Section */}
+              <section id="info" ref={(el: HTMLDivElement | null) => { if (el) sectionRefs.current['info'] = el; }}>
+                <div className="mb-6">
+                  <h2 className="text-2xl font-bold text-white mb-2">Course Information</h2>
+                  <p className="text-slate-400">Define the basic details of your course</p>
+                </div>
+                <CourseInfoForm
+                  courseData={courseData}
+                  updateCourseData={updateCourseData}
+                  isGenerating={isGenerating}
+                  generationStatus={generationStatus}
+                />
+              </section>
 
-          {/* Navigation Buttons */}
-          <div className="flex justify-between mt-8">
-            <Button
-              variant="outline"
-              onClick={prevStep}
-              disabled={currentStep === 0}
-              className="border-slate-600 text-slate-300 hover:text-white"
-            >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Previous
-            </Button>
-            
-            <div className="flex gap-2">
-              {currentStep < STEPS.length - 1 && (
-                <Button
-                  onClick={nextStep}
-                  disabled={!canProceedToStep(currentStep + 1)}
-                  className="bg-blue-600 hover:bg-blue-700"
-                >
-                  Next
-                  <ArrowRight className="w-4 h-4 ml-2" />
-                </Button>
-              )}
+              {/* Course Context Section */}
+              <section id="context" ref={(el: HTMLDivElement | null) => { if (el) sectionRefs.current['context'] = el; }}>
+                <div className="mb-6">
+                  <h2 className="text-2xl font-bold text-white mb-2">Course Context</h2>
+                  <p className="text-slate-400">Provide job description and structure for AI generation</p>
+                </div>
+                <CourseContextForm
+                  courseData={courseData}
+                  updateCourseData={updateCourseData}
+                />
+              </section>
+
+              {/* Lesson Outline Section */}
+              <section id="lessons" ref={(el: HTMLDivElement | null) => { if (el) sectionRefs.current['lessons'] = el; }}>
+                <div className="mb-6">
+                  <h2 className="text-2xl font-bold text-white mb-2">Lesson Outline</h2>
+                  <p className="text-slate-400">Generate and organize your course lessons</p>
+                </div>
+                
+                {/* AI Generation Section */}
+                {canAccessSection('lessons') && (
+                  <div className="space-y-6">
+                    <Card className="border-purple-500/50 bg-purple-500/5">
+                      <CardHeader>
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center">
+                            <Sparkles className="w-5 h-5 text-white" />
+                          </div>
+                          <div>
+                            <CardTitle className="text-xl font-bold bg-gradient-to-r from-purple-300 to-pink-300 bg-clip-text text-transparent">
+                              Generate Lesson Outline
+                            </CardTitle>
+                            <CardDescription className="text-slate-400">
+                              Generate comprehensive lesson structure using AI
+                            </CardDescription>
+                          </div>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="space-y-6">
+                        {!isGenerating && !courseData.lessons.length && (
+                          <>
+                            <div className="bg-slate-800/50 p-6 rounded-lg border border-slate-700/50">
+                              <h3 className="text-lg font-semibold text-white mb-4">Ready to Generate!</h3>
+                              <p className="text-slate-300 mb-4">
+                                Based on your course information and context, AI will generate:
+                              </p>
+                              <ul className="space-y-2 text-sm text-slate-400 mb-6">
+                                <li className="flex items-center gap-2">
+                                  <CheckCircle className="w-4 h-4 text-green-400" />
+                                  Enhanced course details and learning objectives
+                                </li>
+                                <li className="flex items-center gap-2">
+                                  <CheckCircle className="w-4 h-4 text-green-400" />
+                                  Structured lesson plan with clear objectives
+                                </li>
+                                <li className="flex items-center gap-2">
+                                  <CheckCircle className="w-4 h-4 text-green-400" />
+                                  Lesson titles, descriptions, and learning objectives
+                                </li>
+                                <li className="flex items-center gap-2">
+                                  <CheckCircle className="w-4 h-4 text-green-400" />
+                                  Editable lesson structure ready for customization
+                                </li>
+                              </ul>
+                              <Button
+                                onClick={generateCourseContent}
+                                className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+                                size="lg"
+                              >
+                                <Sparkles className="w-4 h-4 mr-2" />
+                                Generate Lesson Outline
+                              </Button>
+                            </div>
+                          </>
+                        )}
+
+                        {isGenerating && (
+                          <motion.div
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            className="text-center py-12"
+                          >
+                            <Loader2 className="w-12 h-12 text-purple-400 animate-spin mx-auto mb-4" />
+                            <h3 className="text-xl font-semibold text-white mb-2">Generating Your Course</h3>
+                            <p className="text-slate-400 mb-4">
+                              This may take a few moments as we create comprehensive content...
+                            </p>
+                            {generationStatus && (
+                              <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4 max-w-md mx-auto">
+                                <p className="text-sm text-blue-400 font-medium">{generationStatus}</p>
+                              </div>
+                            )}
+                          </motion.div>
+                        )}
+
+                        {generationError && (
+                          <motion.div
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            className="bg-red-500/10 border border-red-500/20 rounded-lg p-4"
+                          >
+                            <div className="flex items-center gap-2 mb-2">
+                              <AlertCircle className="w-5 h-5 text-red-400" />
+                              <h3 className="text-red-400 font-medium">Generation Failed</h3>
+                            </div>
+                            <p className="text-sm text-red-300 mb-4">{generationError}</p>
+                            <Button
+                              onClick={generateCourseContent}
+                              variant="outline"
+                              className="border-red-500/50 text-red-400 hover:bg-red-500/10"
+                            >
+                              Try Again
+                            </Button>
+                          </motion.div>
+                        )}
+                      </CardContent>
+                    </Card>
+
+                    {/* Generated Lessons - Edit and organize your lesson structure */}
+                    {courseData.lessons.length > 0 && (
+                      <div className="space-y-6">
+                        <div className="border-t border-slate-700/50 pt-6">
+                          <div className="flex items-center gap-3 mb-6">
+                            <div className="w-8 h-8 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center">
+                              <BookOpen className="w-4 h-4 text-white" />
+                            </div>
+                            <div>
+                              <h3 className="text-lg font-semibold text-white">Generated Lessons</h3>
+                              <p className="text-sm text-slate-400">
+                                {courseData.lessons.length} lesson{courseData.lessons.length !== 1 ? 's' : ''} created • Click to edit titles, descriptions, and objectives
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <LessonBuilder
+                          lessons={courseData.lessons}
+                          onLessonsUpdate={(lessons) => updateCourseData({ lessons })}
+                          isGenerating={isGenerating}
+                          generationStatus={generationStatus || undefined}
+                          onGenerateCourse={handleGenerateCourse}
+                          courseInfo={{
+                            title: courseData.title,
+                            description: courseData.description,
+                            industry: courseData.industry,
+                            skillLevel: courseData.skillLevel
+                          }}
+                        />
+                      </div>
+                    )}
+                  </div>
+                )}
+                
+                {!canAccessSection('lessons') && (
+                  <div className="bg-slate-800/30 border border-slate-700 rounded-lg p-6 text-center">
+                    <AlertCircle className="w-8 h-8 text-amber-400 mx-auto mb-3" />
+                    <h3 className="text-lg font-semibold text-white mb-2">Complete Previous Sections</h3>
+                    <p className="text-slate-400">
+                      You need to complete the Course Information and Course Context sections before proceeding to lesson generation.
+                    </p>
+                  </div>
+                )}
+              </section>
             </div>
           </div>
         </div>

@@ -15,13 +15,15 @@ import {
   BookOpen,
   Loader2,
   CheckCircle,
-  Sparkles
+  Sparkles,
+  Check
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { toast } from 'sonner';
 
 interface SimpleLesson {
   id: string;
@@ -42,6 +44,37 @@ interface SimpleMicrolesson {
   microlessonIndex: number;
 }
 
+interface CourseContext {
+  jobDescription?: {
+    text: string;
+    source: string;
+    files: any[];
+  };
+  courseStructure?: {
+    text: string;
+    source: string;
+    files: any[];
+  };
+}
+
+interface CourseData {
+  title: string;
+  description: string;
+  industry: string;
+  duration: string;
+  skillLevel: 'entry' | 'intermediate' | 'advanced';
+  prerequisites: string[];
+  learningOutcomes: string[];
+  context?: CourseContext;
+}
+
+interface CourseInfo {
+  title: string;
+  description: string;
+  industry: string;
+  skillLevel: string;
+}
+
 interface LessonBuilderProps {
   lessons?: SimpleLesson[];
   microlessons?: SimpleMicrolesson[];
@@ -49,6 +82,7 @@ interface LessonBuilderProps {
   isGenerating?: boolean;
   generationStatus?: string;
   onGenerateCourse?: () => void;
+  courseInfo?: CourseInfo;
 }
 
 export default function LessonBuilder({ 
@@ -57,11 +91,24 @@ export default function LessonBuilder({
   onLessonsUpdate, 
   isGenerating = false,
   generationStatus,
-  onGenerateCourse
+  onGenerateCourse,
+  courseInfo
 }: LessonBuilderProps) {
   const [editingLessonId, setEditingLessonId] = useState<string | null>(null);
   const [editingObjectiveIndex, setEditingObjectiveIndex] = useState<number | null>(null);
   const [newObjective, setNewObjective] = useState('');
+  const [generatingObjectivesForLesson, setGeneratingObjectivesForLesson] = useState<string | null>(null);
+  const [generatingTitleForLesson, setGeneratingTitleForLesson] = useState<string | null>(null);
+  const [generatingDescriptionForLesson, setGeneratingDescriptionForLesson] = useState<string | null>(null);
+
+  // AI Suggestion Preview states
+  const [aiSuggestions, setAiSuggestions] = useState<{
+    [lessonId: string]: {
+      title?: string;
+      description?: string;
+      objectives?: string[];
+    }
+  }>({});
 
   // Group microlessons by lesson index
   const microlessonsByLesson = (microlessons || []).reduce((acc, microlesson) => {
@@ -121,6 +168,66 @@ export default function LessonBuilder({
     }
   };
 
+  const addNewLesson = () => {
+    const newLesson: SimpleLesson = {
+      id: `lesson-${Date.now()}`,
+      title: `New Lesson ${(lessons || []).length + 1}`,
+      description: 'Click edit to add a description for this lesson',
+      duration: '15 minutes',
+      objectives: [],
+      microlessons: []
+    };
+    
+    const updatedLessons = [...(lessons || []), newLesson];
+    onLessonsUpdate(updatedLessons);
+    
+    // Automatically enter edit mode for the new lesson
+    setEditingLessonId(newLesson.id);
+    
+    toast.success("New Lesson Added!", {
+      description: "Click edit to customize the lesson details"
+    });
+  };
+
+  // AI Suggestion functions
+  const acceptSuggestion = (lessonId: string, type: 'title' | 'description' | 'objectives') => {
+    const suggestion = aiSuggestions[lessonId]?.[type];
+    if (!suggestion) return;
+
+    if (type === 'objectives' && Array.isArray(suggestion)) {
+      updateLesson(lessonId, { objectives: suggestion });
+    } else if ((type === 'title' || type === 'description') && typeof suggestion === 'string') {
+      updateLesson(lessonId, { [type]: suggestion });
+    }
+
+    // Clear the suggestion after accepting
+    setAiSuggestions(prev => ({
+      ...prev,
+      [lessonId]: {
+        ...prev[lessonId],
+        [type]: undefined
+      }
+    }));
+
+    toast.success("Suggestion Applied!", {
+      description: `Updated lesson ${type} with AI suggestion`
+    });
+  };
+
+  const declineSuggestion = (lessonId: string, type: 'title' | 'description' | 'objectives') => {
+    setAiSuggestions(prev => ({
+      ...prev,
+      [lessonId]: {
+        ...prev[lessonId],
+        [type]: undefined
+      }
+    }));
+
+    toast.info("Suggestion Declined", {
+      description: "You can generate a new suggestion anytime"
+    });
+  };
+
   const getMicrolessonIcon = (type: string) => {
     switch (type) {
       case 'video': return <Play className="h-4 w-4" />;
@@ -139,19 +246,195 @@ export default function LessonBuilder({
     }
   };
 
+  const generateLearningObjectives = async (lessonId: string) => {
+    if (!courseInfo || !lessons) return;
+    
+    const lesson = lessons.find(l => l.id === lessonId);
+    if (!lesson || !lesson.title || !lesson.description) {
+      toast.error("Missing Information", {
+        description: "Please complete the lesson title and description before generating objectives."
+      });
+      return;
+    }
+
+    setGeneratingObjectivesForLesson(lessonId);
+    
+    try {
+      const response = await fetch('/api/ai-course-generation', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          generationType: 'learningObjectives',
+          courseData: courseInfo,
+          lessonData: {
+            title: lesson.title,
+            description: lesson.description,
+            currentObjectives: lesson.objectives
+          }
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to generate learning objectives');
+      }
+
+      const result = await response.json();
+      
+      if (result.success && result.objectives) {
+        // Store suggestion for preview instead of directly updating
+        setAiSuggestions(prev => ({
+          ...prev,
+          [lessonId]: {
+            ...prev[lessonId],
+            objectives: result.objectives
+          }
+        }));
+        
+        toast.success("Learning Objectives Generated!", {
+          description: `Generated ${result.objectives.length} learning objectives for "${lesson.title}". Review and accept below.`
+        });
+      } else {
+        throw new Error(result.error || 'Failed to generate objectives');
+      }
+    } catch (error) {
+      console.error('Error generating learning objectives:', error);
+      toast.error("Generation Failed", {
+        description: "There was an error generating learning objectives. Please try again."
+      });
+    } finally {
+      setGeneratingObjectivesForLesson(null);
+    }
+  };
+
+  const generateLessonTitle = async (lessonId: string) => {
+    if (!courseInfo) return;
+    
+    const lesson = lessons?.find(l => l.id === lessonId);
+    if (!lesson) return;
+
+    setGeneratingTitleForLesson(lessonId);
+    
+    try {
+      const response = await fetch('/api/ai-suggestions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          type: 'lesson_title',
+          context: {
+            courseTitle: courseInfo.title,
+            courseDescription: courseInfo.description,
+            industry: courseInfo.industry,
+            skillLevel: courseInfo.skillLevel,
+            currentTitle: lesson.title,
+            currentDescription: lesson.description,
+            allLessons: lessons?.map(l => ({ title: l.title, description: l.description })) || []
+          }
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to generate title suggestions');
+      }
+
+      const result = await response.json();
+      
+      if (result.success && result.suggestions && result.suggestions.length > 0) {
+        // Store suggestion for preview instead of directly updating
+        setAiSuggestions(prev => ({
+          ...prev,
+          [lessonId]: {
+            ...prev[lessonId],
+            title: result.suggestions[0]
+          }
+        }));
+        
+        toast.success("Title Generated!", {
+          description: `Generated new title suggestion for the lesson. Review and accept below.`
+        });
+      } else {
+        throw new Error(result.error || 'Failed to generate title');
+      }
+    } catch (error) {
+      console.error('Error generating lesson title:', error);
+      toast.error("Generation Failed", {
+        description: "There was an error generating the title. Please try again."
+      });
+    } finally {
+      setGeneratingTitleForLesson(null);
+    }
+  };
+
+  const generateLessonDescription = async (lessonId: string) => {
+    if (!courseInfo) return;
+    
+    const lesson = lessons?.find(l => l.id === lessonId);
+    if (!lesson || !lesson.title) {
+      toast.error("Missing Information", {
+        description: "Please add a lesson title before generating the description."
+      });
+      return;
+    }
+
+    setGeneratingDescriptionForLesson(lessonId);
+    
+    try {
+      const response = await fetch('/api/ai-suggestions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          type: 'lesson_description',
+          context: {
+            courseTitle: courseInfo.title,
+            courseDescription: courseInfo.description,
+            industry: courseInfo.industry,
+            skillLevel: courseInfo.skillLevel,
+            lessonTitle: lesson.title,
+            currentDescription: lesson.description,
+            allLessons: lessons?.map(l => ({ title: l.title, description: l.description })) || []
+          }
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to generate description suggestions');
+      }
+
+      const result = await response.json();
+      
+      if (result.success && result.suggestions && result.suggestions.length > 0) {
+        // Store suggestion for preview instead of directly updating
+        setAiSuggestions(prev => ({
+          ...prev,
+          [lessonId]: {
+            ...prev[lessonId],
+            description: result.suggestions[0]
+          }
+        }));
+        
+        toast.success("Description Generated!", {
+          description: `Generated new description for "${lesson.title}". Review and accept below.`
+        });
+      } else {
+        throw new Error(result.error || 'Failed to generate description');
+      }
+    } catch (error) {
+      console.error('Error generating lesson description:', error);
+      toast.error("Generation Failed", {
+        description: "There was an error generating the description. Please try again."
+      });
+    } finally {
+      setGeneratingDescriptionForLesson(null);
+    }
+  };
+
   return (
     <div className="max-w-4xl mx-auto space-y-6">
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h2 className="text-2xl font-bold text-white">Lesson Outline</h2>
-          <p className="text-slate-400">
-            Generate and organize your course lessons with detailed objectives
-          </p>
-        </div>
-        <div className="text-sm text-slate-400">
-          {(lessons || []).length} lesson{(lessons || []).length !== 1 ? 's' : ''} • {(microlessons || []).length} microlesson{(microlessons || []).length !== 1 ? 's' : ''}
-        </div>
-      </div>
 
       {/* Real-time Generation Display */}
       {isGenerating && (
@@ -207,7 +490,7 @@ export default function LessonBuilder({
             </h3>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="text-center">
               <div className="text-2xl font-bold text-green-200">{(lessons || []).length}</div>
               <div className="text-sm text-green-300">Lessons Created</div>
@@ -219,24 +502,6 @@ export default function LessonBuilder({
               <div className="text-sm text-green-300">Learning Objectives</div>
             </div>
           </div>
-          
-          <p className="text-sm text-green-300 text-center mb-4">
-            Your lesson outline is ready! You can edit titles, descriptions, and objectives below, then proceed to generate your full course outline.
-          </p>
-          
-          {/* Generate Course Button */}
-          {onGenerateCourse && (
-            <div className="text-center">
-              <Button
-                onClick={onGenerateCourse}
-                size="lg"
-                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium px-8 py-3"
-              >
-                <Sparkles className="w-5 h-5 mr-2" />
-                Generate Course Outline
-              </Button>
-            </div>
-          )}
         </motion.div>
       )}
 
@@ -266,39 +531,160 @@ export default function LessonBuilder({
                   <div className="flex-1 space-y-3">
                     {/* Lesson Title */}
                     {isEditing ? (
-                      <Input
-                        value={lesson.title}
-                        onChange={(e) => updateLesson(lesson.id, { title: e.target.value })}
-                        className="text-lg font-semibold bg-slate-700/50 border-slate-600/50 text-white placeholder-slate-400"
-                        placeholder="Lesson title..."
-                        onKeyDown={(e) => e.key === 'Enter' && setEditingLessonId(null)}
-                      />
+                      <div className="relative">
+                        <Input
+                          value={lesson.title}
+                          onChange={(e) => updateLesson(lesson.id, { title: e.target.value })}
+                          className="text-lg font-semibold bg-slate-700/50 border-slate-600/50 text-white placeholder-slate-400 pr-10"
+                          placeholder="Lesson title..."
+                          onKeyDown={(e) => e.key === 'Enter' && setEditingLessonId(null)}
+                        />
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => generateLessonTitle(lesson.id)}
+                          disabled={generatingTitleForLesson === lesson.id}
+                          className="absolute right-1 top-1/2 transform -translate-y-1/2 h-7 w-7 p-0 text-slate-400 hover:text-purple-400 hover:bg-purple-500/10 disabled:opacity-50"
+                          title="Generate AI title suggestion"
+                        >
+                          {generatingTitleForLesson === lesson.id ? (
+                            <Loader2 className="h-3 w-3 animate-spin" />
+                          ) : (
+                            <Sparkles className="h-3 w-3" />
+                          )}
+                        </Button>
+                      </div>
                     ) : (
                       <h3 className="text-lg font-semibold text-white">
                         {lesson.title}
                       </h3>
                     )}
 
+                    {/* AI Title Suggestion Preview */}
+                    {aiSuggestions[lesson.id]?.title && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="bg-purple-900/20 border border-purple-500/30 rounded-lg p-3 mt-2"
+                      >
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="flex-1">
+                            <p className="text-xs text-purple-300 font-medium mb-1">AI Suggested Title:</p>
+                            <p className="text-sm text-white font-medium">{aiSuggestions[lesson.id].title}</p>
+                          </div>
+                          <div className="flex gap-1">
+                            <Button
+                              size="sm"
+                              onClick={() => acceptSuggestion(lesson.id, 'title')}
+                              className="h-7 px-2 bg-green-600 hover:bg-green-700 text-white text-xs"
+                            >
+                              Accept
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => declineSuggestion(lesson.id, 'title')}
+                              className="h-7 px-2 border-slate-600 text-slate-400 hover:text-white hover:bg-slate-700 text-xs"
+                            >
+                              Decline
+                            </Button>
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+
                     {/* Lesson Description */}
                     {isEditing ? (
-                      <Textarea
-                        value={lesson.description}
-                        onChange={(e) => updateLesson(lesson.id, { description: e.target.value })}
-                        placeholder="Lesson description..."
-                        rows={2}
-                        className="bg-slate-700/50 border-slate-600/50 text-white placeholder-slate-400"
-                      />
+                      <div className="relative">
+                        <Textarea
+                          value={lesson.description}
+                          onChange={(e) => updateLesson(lesson.id, { description: e.target.value })}
+                          placeholder="Lesson description..."
+                          rows={2}
+                          className="bg-slate-700/50 border-slate-600/50 text-white placeholder-slate-400 pr-10"
+                        />
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => generateLessonDescription(lesson.id)}
+                          disabled={generatingDescriptionForLesson === lesson.id || !lesson.title}
+                          className="absolute right-1 top-1 h-7 w-7 p-0 text-slate-400 hover:text-purple-400 hover:bg-purple-500/10 disabled:opacity-50"
+                          title="Generate AI description suggestion"
+                        >
+                          {generatingDescriptionForLesson === lesson.id ? (
+                            <Loader2 className="h-3 w-3 animate-spin" />
+                          ) : (
+                            <Sparkles className="h-3 w-3" />
+                          )}
+                        </Button>
+                      </div>
                     ) : (
                       <p className="text-slate-300">
                         {lesson.description}
                       </p>
                     )}
 
+                    {/* AI Description Suggestion Preview */}
+                    {aiSuggestions[lesson.id]?.description && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="bg-purple-900/20 border border-purple-500/30 rounded-lg p-3 mt-2"
+                      >
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="flex-1">
+                            <p className="text-xs text-purple-300 font-medium mb-1">AI Suggested Description:</p>
+                            <p className="text-sm text-slate-200">{aiSuggestions[lesson.id].description}</p>
+                          </div>
+                          <div className="flex gap-1">
+                            <Button
+                              size="sm"
+                              onClick={() => acceptSuggestion(lesson.id, 'description')}
+                              className="h-7 px-2 bg-green-600 hover:bg-green-700 text-white text-xs"
+                            >
+                              Accept
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => declineSuggestion(lesson.id, 'description')}
+                              className="h-7 px-2 border-slate-600 text-slate-400 hover:text-white hover:bg-slate-700 text-xs"
+                            >
+                              Decline
+                            </Button>
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+
                     {/* Learning Objectives */}
                     <div className="space-y-2">
-                      <h4 className="font-medium text-sm text-slate-200">
-                        Learning Objectives ({lesson.objectives.length})
-                      </h4>
+                      <div className="flex items-center justify-between">
+                        <h4 className="font-medium text-sm text-slate-200">
+                          Learning Objectives ({lesson.objectives.length})
+                        </h4>
+                        {lesson.title && lesson.description && (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => generateLearningObjectives(lesson.id)}
+                            disabled={generatingObjectivesForLesson === lesson.id}
+                            className="text-xs border-purple-500/50 text-purple-400 hover:text-purple-300 hover:bg-purple-500/10 disabled:opacity-50"
+                          >
+                            {generatingObjectivesForLesson === lesson.id ? (
+                              <>
+                                <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                                Generating...
+                              </>
+                            ) : (
+                              <>
+                                <Sparkles className="h-3 w-3 mr-1" />
+                                Generate Learning Objectives
+                              </>
+                            )}
+                          </Button>
+                        )}
+                      </div>
                       <div className="space-y-1">
                         {lesson.objectives.map((objective, objIndex) => (
                           <div key={objIndex} className="flex items-center gap-2">
@@ -377,6 +763,46 @@ export default function LessonBuilder({
                         )}
                       </div>
                     </div>
+
+                    {/* AI Learning Objectives Suggestion Preview */}
+                    {aiSuggestions[lesson.id]?.objectives && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="bg-purple-900/20 border border-purple-500/30 rounded-lg p-3 mt-2"
+                      >
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="flex-1">
+                            <p className="text-xs text-purple-300 font-medium mb-2">AI Suggested Learning Objectives:</p>
+                            <div className="space-y-1">
+                              {aiSuggestions[lesson.id]?.objectives?.map((objective: string, index: number) => (
+                                <div key={index} className="flex items-center gap-2">
+                                  <div className="w-1 h-1 bg-purple-400 rounded-full"></div>
+                                  <span className="text-sm text-slate-200">{objective}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                          <div className="flex gap-1">
+                            <Button
+                              size="sm"
+                              onClick={() => acceptSuggestion(lesson.id, 'objectives')}
+                              className="h-7 px-2 bg-green-600 hover:bg-green-700 text-white text-xs"
+                            >
+                              Accept
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => declineSuggestion(lesson.id, 'objectives')}
+                              className="h-7 px-2 border-slate-600 text-slate-400 hover:text-white hover:bg-slate-700 text-xs"
+                            >
+                              Decline
+                            </Button>
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
                   </div>
 
                   {/* Lesson Controls */}
@@ -456,7 +882,57 @@ export default function LessonBuilder({
             </motion.div>
           );
         })}
+        
+        {/* Add New Lesson Button */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex justify-center"
+        >
+          <Button
+            onClick={addNewLesson}
+            size="lg"
+            variant="outline"
+            className="border-slate-600/50 text-slate-300 hover:text-white hover:bg-slate-700/50 border-dashed py-6"
+          >
+            <Plus className="w-5 h-5 mr-2" />
+            Add New Lesson
+          </Button>
+        </motion.div>
       </div>
+
+      {/* Completion Block - Ready to Generate Course */}
+      {!isGenerating && (lessons || []).length > 0 && onGenerateCourse && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mt-8 bg-gradient-to-r from-blue-900/30 to-purple-900/30 border border-blue-500/30 rounded-xl p-8 backdrop-blur-sm"
+        >
+          <div className="text-center space-y-4">
+            <div className="flex items-center justify-center gap-3 mb-4">
+              <CheckCircle className="w-7 h-7 text-blue-400" />
+              <h3 className="text-xl font-semibold text-blue-200">
+                Ready to Generate Your Course!
+              </h3>
+            </div>
+            
+            <p className="text-blue-300 max-w-2xl mx-auto">
+              Your lesson outline is ready! You can edit titles, descriptions, and objectives above, then proceed to generate your full course outline.
+            </p>
+            
+            <div className="pt-4">
+              <Button
+                onClick={onGenerateCourse}
+                size="lg"
+                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold px-10 py-4 text-lg shadow-lg hover:shadow-xl transition-all duration-200"
+              >
+                <Sparkles className="w-6 h-6 mr-3" />
+                Generate Full Course Outline
+              </Button>
+            </div>
+          </div>
+        </motion.div>
+      )}
     </div>
   );
 } 

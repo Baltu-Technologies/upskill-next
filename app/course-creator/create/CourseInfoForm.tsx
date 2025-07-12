@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { BookOpen, Sparkles, Loader2, Zap, CheckCircle } from 'lucide-react';
+import { BookOpen, Sparkles, Loader2, Zap, CheckCircle, X, Edit3, Check } from 'lucide-react';
 
 interface FileInfo {
   name: string;
@@ -85,6 +85,12 @@ export default function CourseInfoForm({
   const [newPrerequisite, setNewPrerequisite] = useState('');
   const [newLearningOutcome, setNewLearningOutcome] = useState('');
   
+  // Editing state for inline editing
+  const [editingPrerequisiteIndex, setEditingPrerequisiteIndex] = useState<number | null>(null);
+  const [editingLearningObjectiveIndex, setEditingLearningObjectiveIndex] = useState<number | null>(null);
+  const [editingPrerequisiteValue, setEditingPrerequisiteValue] = useState('');
+  const [editingLearningObjectiveValue, setEditingLearningObjectiveValue] = useState('');
+  
   // AI Quick Start state
   const [quickStartInput, setQuickStartInput] = useState('');
   const [isGeneratingInfo, setIsGeneratingInfo] = useState(false);
@@ -118,6 +124,48 @@ export default function CourseInfoForm({
     updateCourseData({
       learningOutcomes: courseData.learningOutcomes.filter((_, i) => i !== index)
     });
+  };
+
+  // Inline editing functions for prerequisites
+  const startEditingPrerequisite = (index: number, value: string) => {
+    setEditingPrerequisiteIndex(index);
+    setEditingPrerequisiteValue(value);
+  };
+
+  const savePrerequisiteEdit = () => {
+    if (editingPrerequisiteIndex !== null && editingPrerequisiteValue.trim()) {
+      const updatedPrerequisites = [...courseData.prerequisites];
+      updatedPrerequisites[editingPrerequisiteIndex] = editingPrerequisiteValue.trim();
+      updateCourseData({ prerequisites: updatedPrerequisites });
+    }
+    setEditingPrerequisiteIndex(null);
+    setEditingPrerequisiteValue('');
+  };
+
+  const cancelPrerequisiteEdit = () => {
+    setEditingPrerequisiteIndex(null);
+    setEditingPrerequisiteValue('');
+  };
+
+  // Inline editing functions for learning objectives
+  const startEditingLearningObjective = (index: number, value: string) => {
+    setEditingLearningObjectiveIndex(index);
+    setEditingLearningObjectiveValue(value);
+  };
+
+  const saveLearningObjectiveEdit = () => {
+    if (editingLearningObjectiveIndex !== null && editingLearningObjectiveValue.trim()) {
+      const updatedOutcomes = [...courseData.learningOutcomes];
+      updatedOutcomes[editingLearningObjectiveIndex] = editingLearningObjectiveValue.trim();
+      updateCourseData({ learningOutcomes: updatedOutcomes });
+    }
+    setEditingLearningObjectiveIndex(null);
+    setEditingLearningObjectiveValue('');
+  };
+
+  const cancelLearningObjectiveEdit = () => {
+    setEditingLearningObjectiveIndex(null);
+    setEditingLearningObjectiveValue('');
   };
 
   const handleQuickStartGenerate = async () => {
@@ -399,34 +447,78 @@ export default function CourseInfoForm({
                 </Button>
               </div>
               {courseData.prerequisites.length > 0 && (
-                <div className="flex flex-wrap gap-2">
+                <div className="space-y-2">
                   {courseData.prerequisites.map((prerequisite, index) => (
-                    <Badge
-                      key={index}
-                      variant="secondary"
-                      className="bg-gradient-to-r from-blue-600/20 to-cyan-600/20 border border-blue-500/30 text-blue-200 hover:from-blue-600/30 hover:to-cyan-600/30 hover:border-blue-400/50 cursor-pointer transition-all duration-200"
-                      onClick={() => handleRemovePrerequisite(index)}
-                    >
-                      {prerequisite} ×
-                    </Badge>
+                    <div key={index} className="flex items-center gap-3 p-3 bg-slate-700/30 rounded-lg border border-slate-600/30">
+                      <div className="w-2 h-2 rounded-full bg-blue-400 flex-shrink-0" />
+                      {editingPrerequisiteIndex === index ? (
+                        <div className="flex-1 flex items-center gap-2">
+                          <Input
+                            value={editingPrerequisiteValue}
+                            onChange={(e) => setEditingPrerequisiteValue(e.target.value)}
+                            className="flex-1 bg-slate-600/50 border-slate-500/50 text-slate-200"
+                            onKeyPress={(e) => {
+                              if (e.key === 'Enter') savePrerequisiteEdit();
+                              if (e.key === 'Escape') cancelPrerequisiteEdit();
+                            }}
+                            autoFocus
+                          />
+                          <Button
+                            size="sm"
+                            onClick={savePrerequisiteEdit}
+                            className="w-8 h-8 p-0 bg-green-600 hover:bg-green-700"
+                          >
+                            <Check className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={cancelPrerequisiteEdit}
+                            className="w-8 h-8 p-0 border-slate-500"
+                          >
+                            <X className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      ) : (
+                        <>
+                          <span className="flex-1 text-slate-300">{prerequisite}</span>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => startEditingPrerequisite(index, prerequisite)}
+                            className="w-8 h-8 p-0 text-slate-400 hover:text-blue-400"
+                          >
+                            <Edit3 className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => handleRemovePrerequisite(index)}
+                            className="w-8 h-8 p-0 text-slate-400 hover:text-red-400"
+                          >
+                            <X className="w-4 h-4" />
+                          </Button>
+                        </>
+                      )}
+                    </div>
                   ))}
                 </div>
               )}
             </div>
 
-            {/* Learning Outcomes */}
+            {/* Learning Objectives */}
             <div className="space-y-3">
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500"></div>
                 <label className="text-sm font-medium bg-gradient-to-r from-emerald-300 to-teal-300 bg-clip-text text-transparent">
-                  Learning Outcomes
+                  Learning Objectives
                 </label>
               </div>
               <div className="flex gap-2">
                 <Input
                   value={newLearningOutcome}
                   onChange={(e) => setNewLearningOutcome(e.target.value)}
-                  placeholder="Add a learning outcome..."
+                  placeholder="Add a learning objective..."
                   className="flex-1 bg-slate-700/50 border-slate-600/50 text-slate-200 placeholder-slate-500 focus:border-emerald-500/50 focus:ring-emerald-500/20"
                   onKeyPress={(e) => e.key === 'Enter' && handleAddLearningOutcome()}
                 />
@@ -440,16 +532,60 @@ export default function CourseInfoForm({
                 </Button>
               </div>
               {courseData.learningOutcomes.length > 0 && (
-                <div className="flex flex-wrap gap-2">
+                <div className="space-y-2">
                   {courseData.learningOutcomes.map((outcome, index) => (
-                    <Badge
-                      key={index}
-                      variant="secondary"
-                      className="bg-gradient-to-r from-emerald-600/20 to-teal-600/20 border border-emerald-500/30 text-emerald-200 hover:from-emerald-600/30 hover:to-teal-600/30 hover:border-emerald-400/50 cursor-pointer transition-all duration-200"
-                      onClick={() => handleRemoveLearningOutcome(index)}
-                    >
-                      {outcome} ×
-                    </Badge>
+                    <div key={index} className="flex items-center gap-3 p-3 bg-slate-700/30 rounded-lg border border-slate-600/30">
+                      <div className="w-2 h-2 rounded-full bg-emerald-400 flex-shrink-0" />
+                      {editingLearningObjectiveIndex === index ? (
+                        <div className="flex-1 flex items-center gap-2">
+                          <Input
+                            value={editingLearningObjectiveValue}
+                            onChange={(e) => setEditingLearningObjectiveValue(e.target.value)}
+                            className="flex-1 bg-slate-600/50 border-slate-500/50 text-slate-200"
+                            onKeyPress={(e) => {
+                              if (e.key === 'Enter') saveLearningObjectiveEdit();
+                              if (e.key === 'Escape') cancelLearningObjectiveEdit();
+                            }}
+                            autoFocus
+                          />
+                          <Button
+                            size="sm"
+                            onClick={saveLearningObjectiveEdit}
+                            className="w-8 h-8 p-0 bg-green-600 hover:bg-green-700"
+                          >
+                            <Check className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={cancelLearningObjectiveEdit}
+                            className="w-8 h-8 p-0 border-slate-500"
+                          >
+                            <X className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      ) : (
+                        <>
+                          <span className="flex-1 text-slate-300">{outcome}</span>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => startEditingLearningObjective(index, outcome)}
+                            className="w-8 h-8 p-0 text-slate-400 hover:text-emerald-400"
+                          >
+                            <Edit3 className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => handleRemoveLearningOutcome(index)}
+                            className="w-8 h-8 p-0 text-slate-400 hover:text-red-400"
+                          >
+                            <X className="w-4 h-4" />
+                          </Button>
+                        </>
+                      )}
+                    </div>
                   ))}
                 </div>
               )}

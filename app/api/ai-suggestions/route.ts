@@ -194,6 +194,154 @@ Please generate job description context and course structure guidelines for this
       }
     }
 
+    // Handle lesson title generation
+    if (type === 'lesson_title') {
+      const systemPrompt = `You are an expert instructional designer specializing in skilled trades and industrial training.
+
+Your task is to generate lesson titles that will be part of a comprehensive course outline. Create titles that are:
+
+- **Clear and descriptive** - learners should immediately understand what the lesson covers
+- **Keyword-based and topical** - use keywords that clearly summarize the lesson content
+- **Professional and industry-appropriate** - suitable for workplace training
+- **Concise but informative** - typically 4-8 words
+- **Specific and focused** - each lesson should cover a distinct skill or knowledge area
+- **Logically progressive** - consider how this lesson fits in the overall learning sequence
+
+Examples of good lesson titles:
+- "Introduction to Data Centers"
+- "Key Components of Data Centers"
+- "Networking and Security in Data Centers"
+- "Power Distribution Systems"
+- "Cooling and HVAC Systems"
+- "Server Hardware and Configuration"
+- "Safety Protocols and Procedures"
+
+Avoid generic or vague titles like:
+- "Basic Equipment Overview"
+- "Understanding Important Topics"
+- "General Safety Information"`;
+
+      const userPrompt = `Course: "${context.courseTitle}"
+Industry: ${context.industry}
+Skill Level: ${context.skillLevel}
+Current Lesson Title: "${context.currentTitle}"
+Current Lesson Description: "${context.currentDescription}"
+
+Other lessons in this course:
+${context.allLessons?.map((l: any, i: number) => `${i + 1}. ${l.title}`).join('\n') || 'None'}
+
+Please suggest 3 alternative lesson titles that would be appropriate for this lesson within the course context. Each title should be clear, action-oriented, and specific to what learners will accomplish.`;
+
+      const completion = await openai.chat.completions.create({
+        model: "gpt-4o",
+        messages: [
+          {
+            role: "system",
+            content: systemPrompt
+          },
+          {
+            role: "user", 
+            content: userPrompt
+          }
+        ],
+        max_tokens: 300,
+        temperature: 0.7,
+      });
+
+      const response = completion.choices[0]?.message?.content?.trim();
+      
+      if (!response) {
+        return NextResponse.json(
+          { error: 'No title suggestions generated' },
+          { status: 500 }
+        );
+      }
+
+      const suggestions = response.split('\n')
+        .map(s => s.trim())
+        .filter(s => s.length > 0)
+        .map(s => s.replace(/^\d+\.\s*/, '')) // Remove numbering
+        .slice(0, 3);
+
+      return NextResponse.json({
+        success: true,
+        suggestions,
+        type: 'lesson_title'
+      });
+    }
+
+    // Handle lesson description generation
+    if (type === 'lesson_description') {
+      const systemPrompt = `You are an expert instructional designer specializing in skilled trades and industrial training. 
+
+Your task is to generate lesson descriptions that are CONCISE, CLEAR, and ACTION-ORIENTED, matching the style of professional course outlines.
+
+Create descriptions that are:
+- **Exactly 1-2 sentences** - be concise and direct
+- **Action-focused** - describe what learners will DO, not just learn about
+- **Specific and practical** - mention concrete skills, tasks, or knowledge
+- **Professional but simple** - avoid flowery or overly complex language
+- **Industry-appropriate** - use relevant terminology but keep it accessible
+
+**Examples of GOOD concise descriptions:**
+- "Explore the critical role of data center operations in ensuring business continuity and disaster recovery."
+- "Learn proper safety lockout/tagout procedures for electrical equipment maintenance."
+- "Install and test fiber optic connectors using industry-standard splicing techniques."
+
+**Avoid verbose or wordy descriptions like:**
+- "Learners will explore the essential safety protocols and security measures required to protect personnel and infrastructure in data centers, focusing on best practices for risk mitigation and emergency response."
+
+Keep it simple, direct, and focused on the core learning activity.`;
+
+      const userPrompt = `Course: "${context.courseTitle}"
+Industry: ${context.industry}
+Skill Level: ${context.skillLevel}
+Lesson Title: "${context.lessonTitle}"
+Current Description: "${context.currentDescription}"
+
+Other lessons in this course:
+${context.allLessons?.map((l: any, i: number) => `${i + 1}. ${l.title}: ${l.description}`).join('\n') || 'None'}
+
+Please suggest 3 alternative descriptions for this lesson that explain what learners will do and achieve.`;
+
+      const completion = await openai.chat.completions.create({
+        model: "gpt-4o",
+        messages: [
+          {
+            role: "system",
+            content: systemPrompt
+          },
+          {
+            role: "user", 
+            content: userPrompt
+          }
+        ],
+        max_tokens: 500,
+        temperature: 0.7,
+      });
+
+      const response = completion.choices[0]?.message?.content?.trim();
+      
+      if (!response) {
+        return NextResponse.json(
+          { error: 'No description suggestions generated' },
+          { status: 500 }
+        );
+      }
+
+      const suggestions = response.split('\n\n')
+        .map(s => s.trim())
+        .filter(s => s.length > 0)
+        .map(s => s.replace(/^\d+\.\s*/, '')) // Remove numbering
+        .slice(0, 3);
+
+      return NextResponse.json({
+        success: true,
+        suggestions,
+        type: 'lesson_description'
+      });
+    }
+
     // Check if this is a Quick Start request (legacy)
     const isQuickStartRequest = context?.purpose === 'quick_start_elaboration' || context?.purpose === 'quick_start_structure';
 
@@ -246,11 +394,77 @@ Please generate job description context and course structure guidelines for this
       
       prerequisite: `Suggest 3 realistic prerequisites for a ${context.skillLevel || 'intermediate'} level course in ${context.industry || 'industrial'} sector titled "${context.title || 'Professional Development Course'}". Be specific about skills or certifications. Use CLEAR, PLAIN language that is easy to understand. Current prerequisite: "${currentValue}". Return only the suggestions, one per line.`,
       
-      lessonTitle: `Suggest 3 engaging lesson titles for a training module within a ${context.industry || 'industrial'} course titled "${context.courseTitle || 'Professional Development Course'}". Keep them concise and action-oriented. Use CLEAR, SIMPLE language. Current title: "${currentValue}". Return only the suggestions, one per line.`,
+      lessonTitle: `Generate 3 CLEAR, CONCISE lesson titles that improve and refine the current text while maintaining its core meaning and focus.
+
+**CRITICAL REQUIREMENTS:**
+- **Base on current text**: Use "${currentValue}" as the foundation - improve clarity and conciseness without changing the core topic
+- **No forced prefixes**: DO NOT automatically add "Implement", "Learn", "Understand" or similar prefixes unless they were in the original
+- **Keep it natural**: Maintain the natural style and intent of the current title
+- **Simple & clear**: Use plain, professional language that is easy to understand
+- **Industry appropriate**: Suitable for ${context.industry || 'industrial'} training
+
+**Examples of good improvements:**
+- Current: "data center stuff" → Improved: "Data Center Infrastructure Basics"
+- Current: "safety things" → Improved: "Workplace Safety Protocols"
+- Current: "how to do wiring" → Improved: "Electrical Wiring Techniques"
+
+**Avoid:**
+- Adding unnecessary prefixes like "Implement..." when not in original
+- Making titles overly complex or verbose
+- Changing the core subject matter
+
+Current title: "${currentValue}". Return only the suggestions, one per line.`,
       
-      lessonDescription: `Write 3 brief lesson descriptions (1-2 sentences each) for a lesson titled "${context.lessonTitle || 'Training Module'}" within a ${context.industry || 'industrial'} course. Focus on what learners will do in this lesson. Use CLEAR, CONCISE language that is easy to understand. Current description: "${currentValue}". Return only the suggestions, separated by "---".`,
+      lessonDescription: `Generate 3 CLEAR, CONCISE lesson descriptions (1-2 sentences each) that describe what this lesson covers, using the lesson title as context.
+
+**CRITICAL REQUIREMENTS:**
+- **Use lesson title as context**: Base the description on the lesson title "${context.lessonTitle || currentValue}"
+- **Describe what's covered**: Focus on what topics, skills, or concepts the lesson teaches
+- **Be concise**: Keep each description to 1-2 sentences maximum
+- **Clear & simple**: Use plain, professional language that is easy to understand
+- **No "learners will" language**: Write direct descriptions of lesson content
+
+**Examples of good descriptions:**
+- For "Electrical Safety Basics": "Cover fundamental electrical safety principles and hazard identification procedures."
+- For "Data Center Infrastructure": "Explore the key components of data center infrastructure including power, cooling, and networking systems."
+- For "Welding Techniques": "Demonstrate proper welding techniques for steel joints using MIG and TIG welding methods."
+
+**Avoid:**
+- Starting with "Students will..." or "Learners will..."
+- Overly complex or verbose explanations
+- Vague descriptions that don't specify what's actually covered
+
+Current description: "${currentValue}". Return only the suggestions, separated by "---".`,
       
-      lessonObjective: `Suggest 3 specific learning objectives for a lesson titled "${context.lessonTitle || 'Training Module'}" in a ${context.industry || 'industrial'} course. Use measurable action verbs and CLEAR, SIMPLE language. Current objective: "${currentValue}". Return only the suggestions, one per line.`,
+      lessonObjective: `Generate 3 SPECIFIC, CONCISE learning objectives for a lesson titled "${context.lessonTitle || 'Training Module'}" in a ${context.industry || 'industrial'} course. 
+
+**CRITICAL REQUIREMENTS:**
+
+**FORMAT:** Start directly with action verbs - DO NOT use "Students will", "Learners will", "Participants will" or similar prefixes.
+
+**NEVER use generic verbs:** recognize, understand, be familiar with, know about, appreciate, be aware of, get acquainted with, comprehend, learn about
+
+**ALWAYS use specific action verbs:** identify, explain, demonstrate, calculate, install, troubleshoot, operate, maintain, inspect, test, calibrate, configure, assemble, disassemble, measure, analyze, compare, evaluate, apply, implement, perform, execute, follow, create, design, modify, repair, replace, adjust, monitor, control
+
+**Each objective must be:**
+- **Start directly with action verb** - NO "Students will" prefix
+- **Concise and direct** - one clear sentence each
+- **Specific and measurable** - exactly what learners will DO
+- **Professional but simple** - avoid verbose explanations
+
+**PERFECT examples (correct format):**
+- "Explain how data center operations contribute to business continuity"
+- "Identify risks associated with data center downtime and their business impacts" 
+- "Demonstrate proper safety procedures for equipment maintenance"
+
+**WRONG examples (avoid these formats):**
+- "Students will be able to identify and explain the function of fire suppression systems"
+- "Learners will recognize major components within a data center"
+- "Participants will understand safety procedures"
+
+**Remember:** Start each objective immediately with the action verb. No introductory phrases.
+
+Current objective: "${currentValue}". Return only the suggestions, one per line.`,
     };
 
     const prompt_text = prompts[fieldType as keyof typeof prompts] || 
