@@ -430,7 +430,7 @@ Create comprehensive assessments that effectively measure learner competency in 
     }
 
     const completion = await openai.chat.completions.create({
-      model: "gpt-4o", // Using gpt-4o as requested in the memories
+      model: "gpt-4.1-mini", // Updated to GPT-4.1 Mini (released April 14, 2025)
       messages: [
         {
           role: "system",

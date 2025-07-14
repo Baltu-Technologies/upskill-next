@@ -82,7 +82,7 @@ Return your response as a JSON object with exactly these fields:
 Please generate comprehensive course information for this training course idea.`;
 
       const completion = await openai.chat.completions.create({
-        model: "gpt-4o",
+        model: "gpt-4.1-mini",
         messages: [
           {
             role: "system",
@@ -152,7 +152,7 @@ Return your response as a JSON object with exactly these fields:
 Please generate job description context and course structure guidelines for this training course idea.`;
 
       const completion = await openai.chat.completions.create({
-        model: "gpt-4o",
+        model: "gpt-4.1-mini",
         messages: [
           {
             role: "system",
@@ -233,7 +233,7 @@ ${context.allLessons?.map((l: any, i: number) => `${i + 1}. ${l.title}`).join('\
 Please suggest 3 alternative lesson titles that would be appropriate for this lesson within the course context. Each title should be clear, action-oriented, and specific to what learners will accomplish.`;
 
       const completion = await openai.chat.completions.create({
-        model: "gpt-4o",
+        model: "gpt-4.1-mini",
         messages: [
           {
             role: "system",
@@ -305,7 +305,7 @@ ${context.allLessons?.map((l: any, i: number) => `${i + 1}. ${l.title}: ${l.desc
 Please suggest 3 alternative descriptions for this lesson that explain what learners will do and achieve.`;
 
       const completion = await openai.chat.completions.create({
-        model: "gpt-4o",
+        model: "gpt-4.1-mini",
         messages: [
           {
             role: "system",
@@ -350,7 +350,7 @@ Please suggest 3 alternative descriptions for this lesson that explain what lear
       const systemPrompt = "You are an expert instructional designer specializing in skilled trades and industrial training. You provide CLEAR, CONCISE, and practical content that is industry-appropriate and professionally written. Use simple, direct language that is easy to understand.";
       
       const completion = await openai.chat.completions.create({
-        model: "gpt-4o",
+        model: "gpt-4.1-mini",
         messages: [
           {
             role: "system",
@@ -488,7 +488,7 @@ Current objective: "${currentValue}". Return only the suggestions, one per line.
     }
 
     const completion = await openai.chat.completions.create({
-      model: "gpt-4o",
+      model: "gpt-4.1-mini",
       messages: [
         {
           role: "system",

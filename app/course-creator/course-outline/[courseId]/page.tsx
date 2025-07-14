@@ -11,6 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useRouter } from 'next/navigation';
+import { useUserPermissions } from '@/app/hooks/useUserPermissions';
 
 interface CourseData {
   title: string;
@@ -66,6 +67,7 @@ interface SimpleAssessment {
 
 export default function CourseOutlinePage({ params }: { params: { courseId: string } }) {
   const router = useRouter();
+  const { permissions } = useUserPermissions();
   const [courseData, setCourseData] = useState<CourseData | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [editingLessonId, setEditingLessonId] = useState<string | null>(null);
@@ -85,6 +87,17 @@ export default function CourseOutlinePage({ params }: { params: { courseId: stri
   const [currentGeneratingLesson, setCurrentGeneratingLesson] = useState<string | null>(null);
   const [generatedMicrolessons, setGeneratedMicrolessons] = useState<Set<string>>(new Set());
   const [generationComplete, setGenerationComplete] = useState(false);
+
+  // Function to handle slide creation navigation
+  const handleCreateSlides = (lessonId: string, microlessonId: string) => {
+    if (!permissions.canAccessCourseCreator) {
+      alert('You do not have permission to create slides. Please contact your administrator.');
+      return;
+    }
+    
+    // Navigate to slide creation page
+    router.push(`/course-creator/microlesson-slides/${microlessonId}?courseId=${params.courseId}&lessonId=${lessonId}`);
+  };
 
   useEffect(() => {
     // Load course data from localStorage
@@ -315,6 +328,45 @@ export default function CourseOutlinePage({ params }: { params: { courseId: stri
             const updatedObjectives = microlesson.objectives?.map((obj, idx) => 
               idx === objectiveIndex ? newObjective : obj
             ) || [];
+            return { ...microlesson, objectives: updatedObjectives };
+          }
+          return microlesson;
+        });
+        return { ...lesson, microlessons: updatedMicrolessons };
+      }
+      return lesson;
+    });
+    updateCourseData({ lessons: updatedLessons });
+  };
+
+  const addMicrolessonObjective = (lessonId: string, microlessonId: string) => {
+    const updatedLessons = courseData.lessons.map(lesson => {
+      if (lesson.id === lessonId) {
+        const updatedMicrolessons = lesson.microlessons.map(microlesson => {
+          if (microlesson.id === microlessonId) {
+            const currentObjectives = microlesson.objectives || [];
+            // Only add if we have less than 2 objectives
+            if (currentObjectives.length < 2) {
+              const newObjectives = [...currentObjectives, 'New learning objective'];
+              return { ...microlesson, objectives: newObjectives };
+            }
+            return microlesson;
+          }
+          return microlesson;
+        });
+        return { ...lesson, microlessons: updatedMicrolessons };
+      }
+      return lesson;
+    });
+    updateCourseData({ lessons: updatedLessons });
+  };
+
+  const removeMicrolessonObjective = (lessonId: string, microlessonId: string, objectiveIndex: number) => {
+    const updatedLessons = courseData.lessons.map(lesson => {
+      if (lesson.id === lessonId) {
+        const updatedMicrolessons = lesson.microlessons.map(microlesson => {
+          if (microlesson.id === microlessonId) {
+            const updatedObjectives = microlesson.objectives?.filter((_, idx) => idx !== objectiveIndex) || [];
             return { ...microlesson, objectives: updatedObjectives };
           }
           return microlesson;
@@ -1069,7 +1121,7 @@ export default function CourseOutlinePage({ params }: { params: { courseId: stri
                                   <div className="flex items-center gap-3 flex-1 min-w-0">
                                     {/* Status Icon */}
                                     <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 bg-gray-600">
-                                      <BookOpen className="w-4 h-4 text-white" />
+                                      <Target className="w-4 h-4 text-white" />
                                     </div>
 
                                     {/* Title & Learning Objective */}
@@ -1078,6 +1130,11 @@ export default function CourseOutlinePage({ params }: { params: { courseId: stri
                                       <div className="mb-2">
                                         {editingMicrolessonId === microlesson.id ? (
                                           <div className="space-y-2">
+                                            <div className="flex items-center gap-2 mb-1">
+                                              <div className="w-1.5 h-1.5 rounded-full bg-blue-400"></div>
+                                              <BookOpen className="w-3 h-3 text-blue-400" />
+                                              <label className="text-xs font-medium text-blue-300">Title</label>
+                                            </div>
                                             <div className="flex items-center gap-2">
                                               <Input
                                                 value={microlesson.title}
@@ -1141,117 +1198,176 @@ export default function CourseOutlinePage({ params }: { params: { courseId: stri
                                             )}
                                           </div>
                                         ) : (
-                                          <h4 
-                                            className="text-sm font-semibold text-white mb-1 truncate cursor-pointer hover:text-blue-300 transition-colors"
-                                            onClick={() => setEditingMicrolessonId(microlesson.id)}
-                                            title="Click to edit title"
-                                          >
-                                            {microlesson.title}
-                                          </h4>
+                                          <div className="flex items-center gap-2">
+                                            <BookOpen className="w-3 h-3 text-blue-400" />
+                                            <h4 
+                                              className="text-sm font-semibold text-white mb-1 truncate cursor-pointer hover:text-blue-300 transition-colors"
+                                              onClick={() => setEditingMicrolessonId(microlesson.id)}
+                                              title="Click to edit title"
+                                            >
+                                              {microlesson.title}
+                                            </h4>
+                                          </div>
                                         )}
                                       </div>
 
                                       {/* Learning Objectives Section */}
-                                      {microlesson.objectives && microlesson.objectives.length > 0 && (
-                                        <div className="space-y-1 mb-3">
-                                          {microlesson.objectives.slice(0, 2).map((objective, idx) => {
-                                            const objectiveId = `${microlesson.id}-objective-${idx}`;
-                                            const isEditingObjective = editingObjectiveId === objectiveId;
-                                            
-                                            return (
-                                              <div key={idx} className="flex items-center gap-2">
-                                                {isEditingObjective ? (
-                                                  <div className="flex-1 space-y-2">
-                                                    <div className="flex items-center gap-2">
-                                                      <Input
-                                                        value={objective}
-                                                        onChange={(e) => updateMicrolessonObjective(lesson.id, microlesson.id, idx, e.target.value)}
-                                                        className="text-xs bg-slate-600/50 border-slate-500/50 text-blue-300 flex-1"
-                                                        placeholder="Learning objective"
-                                                      />
+                                      <div className="space-y-1 mb-3">
+                                        {/* Learning Objectives Header */}
+                                        <div className="flex items-center justify-between">
+                                          <div className="flex items-center gap-2">
+                                            <label className="text-xs font-medium text-green-300">
+                                              Learning Objectives
+                                            </label>
+                                          </div>
+                                          {(!microlesson.objectives || microlesson.objectives.length < 2) && (
+                                            <Button
+                                              variant="ghost"
+                                              size="sm"
+                                              onClick={() => {
+                                                const currentObjectives = microlesson.objectives || [];
+                                                addMicrolessonObjective(lesson.id, microlesson.id);
+                                                // Auto-edit the new objective
+                                                setTimeout(() => {
+                                                  const newIndex = currentObjectives.length;
+                                                  const newObjectiveId = `${microlesson.id}-objective-${newIndex}`;
+                                                  setEditingObjectiveId(newObjectiveId);
+                                                }, 100);
+                                              }}
+                                              className="px-1.5 py-0.5 text-green-400 hover:text-green-300 hover:bg-green-500/10"
+                                              title="Add learning objective"
+                                            >
+                                              <Plus className="w-2.5 h-2.5" />
+                                            </Button>
+                                          )}
+                                        </div>
+                                        
+                                        {/* Existing Objectives */}
+                                        {microlesson.objectives && microlesson.objectives.length > 0 && (
+                                          <div className="space-y-1">
+                                            {microlesson.objectives.slice(0, 2).map((objective, idx) => {
+                                              const objectiveId = `${microlesson.id}-objective-${idx}`;
+                                              const isEditingObjective = editingObjectiveId === objectiveId;
+                                              
+                                              return (
+                                                <div key={idx} className="flex items-center gap-2">
+                                                  {isEditingObjective ? (
+                                                    <div className="flex-1 space-y-2">
+                                                      <div className="flex items-center gap-2">
+                                                        <Input
+                                                          value={objective}
+                                                          onChange={(e) => updateMicrolessonObjective(lesson.id, microlesson.id, idx, e.target.value)}
+                                                          className="text-xs bg-slate-600/50 border-slate-500/50 text-blue-300 flex-1"
+                                                          placeholder="Learning objective"
+                                                        />
+                                                        <Button
+                                                          variant="ghost"
+                                                          size="sm"
+                                                          onClick={() => {
+                                                            const suggestionId = `objective-${microlesson.id}-${idx}`;
+                                                            generateAiSuggestion('objective', objective, suggestionId);
+                                                          }}
+                                                          disabled={loadingAiSuggestions.has(`objective-${microlesson.id}-${idx}`)}
+                                                          className="px-1.5 py-0.5 text-purple-400 hover:text-purple-300 hover:bg-purple-500/10"
+                                                          title="Get AI suggestion"
+                                                        >
+                                                          {loadingAiSuggestions.has(`objective-${microlesson.id}-${idx}`) ? (
+                                                            <Loader2 className="w-2.5 h-2.5 animate-spin" />
+                                                          ) : (
+                                                            <Sparkles className="w-2.5 h-2.5" />
+                                                          )}
+                                                        </Button>
+                                                        <Button
+                                                          variant="ghost"
+                                                          size="sm"
+                                                          onClick={() => removeMicrolessonObjective(lesson.id, microlesson.id, idx)}
+                                                          className="px-1.5 py-0.5 text-red-400 hover:text-red-300 hover:bg-red-500/10"
+                                                          title="Remove objective"
+                                                        >
+                                                          <X className="w-2.5 h-2.5" />
+                                                        </Button>
+                                                        <Button
+                                                          variant="ghost"
+                                                          size="sm"
+                                                          onClick={() => setEditingObjectiveId(null)}
+                                                          className="px-1.5 py-0.5 text-green-400 hover:text-green-300 hover:bg-green-500/10"
+                                                        >
+                                                          <Save className="w-2.5 h-2.5" />
+                                                        </Button>
+                                                      </div>
+                                                      {/* AI Suggestion for Objective */}
+                                                      {aiSuggestions[`objective-${microlesson.id}-${idx}`] && (
+                                                        <div className="bg-purple-900/30 border border-purple-500/30 rounded-lg p-2">
+                                                          <div className="flex items-start gap-1 mb-1">
+                                                            <Sparkles className="w-2.5 h-2.5 text-purple-400 mt-0.5 flex-shrink-0" />
+                                                            <span className="text-xs text-purple-300 font-medium">AI Suggestion:</span>
+                                                          </div>
+                                                          <p className="text-xs text-white mb-2">{aiSuggestions[`objective-${microlesson.id}-${idx}`]}</p>
+                                                          <div className="flex items-center gap-1">
+                                                            <Button
+                                                              variant="default"
+                                                              size="sm"
+                                                              onClick={() => acceptAiSuggestion(`objective-${microlesson.id}-${idx}`, lesson.id, microlesson.id, 'objective', idx)}
+                                                              className="bg-green-600 hover:bg-green-700 text-white text-xs px-2 py-1"
+                                                            >
+                                                              Accept
+                                                            </Button>
+                                                            <Button
+                                                              variant="outline"
+                                                              size="sm"
+                                                              onClick={() => rejectAiSuggestion(`objective-${microlesson.id}-${idx}`)}
+                                                              className="border-slate-600 text-slate-300 hover:bg-slate-700 text-xs px-2 py-1"
+                                                            >
+                                                              Reject
+                                                            </Button>
+                                                          </div>
+                                                        </div>
+                                                      )}
+                                                    </div>
+                                                  ) : (
+                                                    <div className="flex items-center gap-2 flex-1">
+                                                      <div className="w-1.5 h-1.5 rounded-full bg-blue-400 flex-shrink-0"></div>
+                                                      <p 
+                                                        className="text-xs text-blue-300 leading-relaxed cursor-pointer hover:text-blue-200 transition-colors flex-1"
+                                                        onClick={() => setEditingObjectiveId(objectiveId)}
+                                                        title="Click to edit objective"
+                                                      >
+                                                        {objective}
+                                                      </p>
                                                       <Button
                                                         variant="ghost"
                                                         size="sm"
-                                                        onClick={() => {
-                                                          const suggestionId = `objective-${microlesson.id}-${idx}`;
-                                                          generateAiSuggestion('objective', objective, suggestionId);
-                                                        }}
-                                                        disabled={loadingAiSuggestions.has(`objective-${microlesson.id}-${idx}`)}
-                                                        className="px-1.5 py-0.5 text-purple-400 hover:text-purple-300 hover:bg-purple-500/10"
-                                                        title="Get AI suggestion"
+                                                        onClick={() => removeMicrolessonObjective(lesson.id, microlesson.id, idx)}
+                                                        className="px-1.5 py-0.5 text-red-400 hover:text-red-300 hover:bg-red-500/10 opacity-0 group-hover:opacity-100 transition-opacity"
+                                                        title="Remove objective"
                                                       >
-                                                        {loadingAiSuggestions.has(`objective-${microlesson.id}-${idx}`) ? (
-                                                          <Loader2 className="w-2.5 h-2.5 animate-spin" />
-                                                        ) : (
-                                                          <Sparkles className="w-2.5 h-2.5" />
-                                                        )}
-                                                      </Button>
-                                                      <Button
-                                                        variant="ghost"
-                                                        size="sm"
-                                                        onClick={() => setEditingObjectiveId(null)}
-                                                        className="px-1.5 py-0.5 text-green-400 hover:text-green-300 hover:bg-green-500/10"
-                                                      >
-                                                        <Save className="w-2.5 h-2.5" />
+                                                        <X className="w-2.5 h-2.5" />
                                                       </Button>
                                                     </div>
-                                                    {/* AI Suggestion for Objective */}
-                                                    {aiSuggestions[`objective-${microlesson.id}-${idx}`] && (
-                                                      <div className="bg-purple-900/30 border border-purple-500/30 rounded-lg p-2">
-                                                        <div className="flex items-start gap-1 mb-1">
-                                                          <Sparkles className="w-2.5 h-2.5 text-purple-400 mt-0.5 flex-shrink-0" />
-                                                          <span className="text-xs text-purple-300 font-medium">AI Suggestion:</span>
-                                                        </div>
-                                                        <p className="text-xs text-white mb-2">{aiSuggestions[`objective-${microlesson.id}-${idx}`]}</p>
-                                                        <div className="flex items-center gap-1">
-                                                          <Button
-                                                            variant="default"
-                                                            size="sm"
-                                                            onClick={() => acceptAiSuggestion(`objective-${microlesson.id}-${idx}`, lesson.id, microlesson.id, 'objective', idx)}
-                                                            className="bg-green-600 hover:bg-green-700 text-white text-xs px-2 py-1"
-                                                          >
-                                                            Accept
-                                                          </Button>
-                                                          <Button
-                                                            variant="outline"
-                                                            size="sm"
-                                                            onClick={() => rejectAiSuggestion(`objective-${microlesson.id}-${idx}`)}
-                                                            className="border-slate-600 text-slate-300 hover:bg-slate-700 text-xs px-2 py-1"
-                                                          >
-                                                            Reject
-                                                          </Button>
-                                                        </div>
-                                                      </div>
-                                                    )}
-                                                  </div>
-                                                ) : (
-                                                  <p 
-                                                    className="text-xs text-blue-300 leading-relaxed cursor-pointer hover:text-blue-200 transition-colors flex-1"
-                                                    onClick={() => setEditingObjectiveId(objectiveId)}
-                                                    title="Click to edit objective"
-                                                  >
-                                                    {objective}
-                                                  </p>
-                                                )}
-                                              </div>
-                                            );
-                                          })}
-                                        </div>
-                                      )}
+                                                  )}
+                                                </div>
+                                              );
+                                            })}
+                                          </div>
+                                        )}
+                                        
+                                        {/* Empty state when no objectives */}
+                                        {(!microlesson.objectives || microlesson.objectives.length === 0) && (
+                                          <div className="text-xs text-slate-500 italic py-2">
+                                            No learning objectives yet. Click + to add one.
+                                          </div>
+                                        )}
+                                      </div>
 
                                       {/* Microlesson Description - Right under learning objectives */}
                                       <div className="mb-3">
                                         {editingDescriptionId === microlesson.id ? (
                                           <div className="space-y-3">
-                                            <Textarea
-                                              value={microlesson.content}
-                                              onChange={(e) => updateMicrolesson(lesson.id, microlesson.id, { content: e.target.value })}
-                                              className="bg-slate-700/70 border-slate-600/50 text-white text-sm leading-relaxed resize-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50"
-                                              placeholder="Click to edit microlesson description - This will be used to generate slides. Provide detailed description of what this microlesson will cover..."
-                                              rows={6}
-                                              autoFocus
-                                            />
-                                            <div className="flex items-center gap-2">
+                                            <div className="flex items-center justify-between mb-2">
+                                              <div className="flex items-center gap-2">
+                                                <div className="w-1.5 h-1.5 rounded-full bg-purple-400"></div>
+                                                <label className="text-xs font-medium text-purple-300">Description</label>
+                                              </div>
                                               <Button
                                                 variant="ghost"
                                                 size="sm"
@@ -1264,12 +1380,21 @@ export default function CourseOutlinePage({ params }: { params: { courseId: stri
                                                 title="Get AI suggestion"
                                               >
                                                 {loadingAiSuggestions.has(`description-${microlesson.id}`) ? (
-                                                  <Loader2 className="w-3 h-3 animate-spin mr-1" />
+                                                  <Loader2 className="w-3 h-3 animate-spin" />
                                                 ) : (
-                                                  <Sparkles className="w-3 h-3 mr-1" />
+                                                  <Sparkles className="w-3 h-3" />
                                                 )}
-                                                AI Improve
                                               </Button>
+                                            </div>
+                                            <Textarea
+                                              value={microlesson.content}
+                                              onChange={(e) => updateMicrolesson(lesson.id, microlesson.id, { content: e.target.value })}
+                                              className="bg-slate-700/70 border-slate-600/50 text-white text-sm leading-relaxed resize-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50"
+                                              placeholder="Click to edit microlesson description - This will be used to generate slides. Provide detailed description of what this microlesson will cover..."
+                                              rows={6}
+                                              autoFocus
+                                            />
+                                            <div className="flex items-center gap-2">
                                               <Button
                                                 variant="default"
                                                 size="sm"
@@ -1288,7 +1413,7 @@ export default function CourseOutlinePage({ params }: { params: { courseId: stri
                                                 Cancel
                                               </Button>
                                             </div>
-                                            {/* AI Suggestion for Description */}
+                                            {/* AI Suggestion Display - Now below the field */}
                                             {aiSuggestions[`description-${microlesson.id}`] && (
                                               <div className="bg-purple-900/30 border border-purple-500/30 rounded-lg p-3">
                                                 <div className="flex items-start gap-2 mb-2">
@@ -1344,7 +1469,7 @@ export default function CourseOutlinePage({ params }: { params: { courseId: stri
                                       <Button
                                         variant="outline"
                                         size="sm"
-                                        onClick={() => {/* TODO: Implement add slides */}}
+                                        onClick={() => handleCreateSlides(lesson.id, microlesson.id)}
                                         disabled={isGenerating}
                                         className="px-2 py-1.5 text-blue-400 border-blue-500/30 hover:bg-blue-500/10 hover:text-blue-300 transition-all duration-300 rounded-lg text-xs disabled:opacity-50 disabled:cursor-not-allowed"
                                       >
