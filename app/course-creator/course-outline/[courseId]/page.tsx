@@ -1471,10 +1471,23 @@ export default function CourseOutlinePage({ params }: { params: { courseId: stri
                                         size="sm"
                                         onClick={() => handleCreateSlides(lesson.id, microlesson.id)}
                                         disabled={isGenerating}
-                                        className="px-2 py-1.5 text-blue-400 border-blue-500/30 hover:bg-blue-500/10 hover:text-blue-300 transition-all duration-300 rounded-lg text-xs disabled:opacity-50 disabled:cursor-not-allowed"
+                                        className={`px-2 py-1.5 transition-all duration-300 rounded-lg text-xs disabled:opacity-50 disabled:cursor-not-allowed ${
+                                          (microlesson as any).hasSlides 
+                                            ? 'text-green-400 border-green-500/30 hover:bg-green-500/10 hover:text-green-300' 
+                                            : 'text-blue-400 border-blue-500/30 hover:bg-blue-500/10 hover:text-blue-300'
+                                        }`}
                                       >
-                                        <BookOpen className="w-3 h-3 mr-1" />
-                                        Add Slides
+                                        {(microlesson as any).hasSlides ? (
+                                          <>
+                                            <CheckCircle2 className="w-3 h-3 mr-1" />
+                                            Edit Slides {(microlesson as any).slideCount ? `(${(microlesson as any).slideCount})` : ''}
+                                          </>
+                                        ) : (
+                                          <>
+                                            <BookOpen className="w-3 h-3 mr-1" />
+                                            Add Slides
+                                          </>
+                                        )}
                                       </Button>
                                       
                                       <Button

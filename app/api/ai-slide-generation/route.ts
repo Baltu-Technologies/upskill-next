@@ -38,8 +38,26 @@ export async function POST(request: NextRequest) {
   try {
     const { microlesson, courseContext, additionalContext }: SlideGenerationRequest = await request.json();
 
+    console.log('🔍 Slide Generation API - Received request:', {
+      microlesson: microlesson ? {
+        id: microlesson.id,
+        title: microlesson.title,
+        objectives: microlesson.objectives,
+        duration: microlesson.duration,
+        type: microlesson.type
+      } : 'undefined',
+      courseContext: courseContext ? {
+        id: courseContext.id,
+        title: courseContext.title,
+        industry: courseContext.industry,
+        skillLevel: courseContext.skillLevel
+      } : 'undefined',
+      additionalContext: additionalContext || 'none'
+    });
+
     // Validate required fields
     if (!microlesson || !courseContext) {
+      console.error('❌ Missing required fields:', { microlesson: !!microlesson, courseContext: !!courseContext });
       return NextResponse.json(
         { error: 'Missing required fields: microlesson and courseContext' },
         { status: 400 }
@@ -88,9 +106,25 @@ AVAILABLE SLIDE TYPES:
 - MarkdownSlide: Rich text content with formatting
 - HotspotActivitySlide: Interactive image with clickable hotspots
 
+IMAGE LAYOUT OPTIONS:
+For slides that include images, you can specify an imageLayout field with one of these values:
+- "none": No image (text only)
+- "top": Image positioned above the text content
+- "left": Image positioned on the left side with text on the right
+- "right": Image positioned on the right side with text on the left
+- "bottom": Image positioned below the text content
+- "background": Image used as a background with text overlay
+
+When including images, also provide:
+- imageUrl: A descriptive placeholder URL or description for the image needed
+- imageCaption: Optional caption for the image
+
 Return a JSON array of slide objects. Each slide must have:
 - id: unique identifier
 - type: one of the available slide types
+- imageLayout: (optional) one of the layout options above
+- imageUrl: (optional) description of needed image
+- imageCaption: (optional) caption for the image
 - appropriate fields for that slide type
 
 Example structure:
@@ -100,14 +134,19 @@ Example structure:
     "type": "TitleSlide",
     "title": "Introduction to ${microlesson.title}",
     "subtitle": "Key concepts for ${courseContext.industry}",
-    "backgroundColor": "#1E293B"
+    "imageLayout": "background",
+    "imageUrl": "Industrial facility showing ${courseContext.industry} operations",
+    "backgroundColor": "#1E40AF"
   },
   {
-    "id": "slide-2", 
+    "id": "slide-2",
     "type": "TitleWithSubtext",
-    "title": "Learning Objectives",
-    "bullets": ["Objective 1", "Objective 2"],
-    "accentColor": "#3B82F6"
+    "title": "Key Learning Objectives",
+    "content": "What you'll learn in this lesson",
+    "imageLayout": "right",
+    "imageUrl": "Diagram showing ${microlesson.title} process",
+    "imageCaption": "Process overview diagram",
+    "bullets": ["Objective 1", "Objective 2", "Objective 3"]
   }
 ]
 
@@ -115,11 +154,11 @@ Focus on creating practical, industry-relevant content that directly addresses t
 `;
 
     const completion = await openai.chat.completions.create({
-      model: "gpt-4.1-mini",
+      model: "gpt-4o",
       messages: [
         {
           role: "system",
-          content: "You are an expert instructional designer specializing in industrial training programs. Create engaging, practical slides that effectively teach the specified learning objectives. Always respond with valid JSON."
+          content: "You are an expert instructional designer specializing in industrial training programs. Create engaging, practical slides that effectively teach the specified learning objectives. IMPORTANT: Always respond with ONLY valid JSON - no markdown code blocks, no explanations, just the raw JSON array."
         },
         {
           role: "user",
@@ -138,10 +177,22 @@ Focus on creating practical, industry-relevant content that directly addresses t
     // Parse the JSON response
     let slides;
     try {
-      slides = JSON.parse(responseText);
+      // Clean up the response text by removing markdown code blocks if present
+      let cleanedResponse = responseText.trim();
+      
+      // Remove markdown code blocks if they exist
+      if (cleanedResponse.startsWith('```json')) {
+        cleanedResponse = cleanedResponse.replace(/^```json\s*/, '').replace(/\s*```$/, '');
+      } else if (cleanedResponse.startsWith('```')) {
+        cleanedResponse = cleanedResponse.replace(/^```\s*/, '').replace(/\s*```$/, '');
+      }
+      
+      console.log('🔧 Cleaned response text:', cleanedResponse.substring(0, 200) + '...');
+      
+      slides = JSON.parse(cleanedResponse);
     } catch (parseError) {
-      console.error('JSON parsing error:', parseError);
-      console.error('Response text:', responseText);
+      console.error('❌ JSON parsing error:', parseError);
+      console.error('📝 Original response text:', responseText);
       throw new Error('Invalid JSON response from AI');
     }
 
@@ -167,14 +218,22 @@ Focus on creating practical, industry-relevant content that directly addresses t
       return slide;
     });
 
-    return NextResponse.json({
+    console.log('✅ Successfully generated slides:', {
+      microlessonTitle: microlesson.title,
+      courseTitle: courseContext.title,
+      slideCount: processedSlides.length,
+      slideTypes: processedSlides.map(s => s.type)
+    });
+
+    // Return the generated slides
+    return NextResponse.json({ 
       success: true,
       slides: processedSlides,
       metadata: {
         microlessonId: microlesson.id,
         courseId: courseContext.id,
         generatedAt: new Date().toISOString(),
-        totalSlides: processedSlides.length
+        slideCount: processedSlides.length
       }
     });
 

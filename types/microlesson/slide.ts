@@ -1,8 +1,13 @@
+export type ImageLayout = 'none' | 'top' | 'left' | 'right' | 'bottom' | 'background';
+
 export interface BaseSlide {
   id: string;
   type: string;
   duration?: number; // Duration in seconds
   backgroundColor?: string;
+  imageLayout?: ImageLayout;
+  imageUrl?: string;
+  imageCaption?: string;
 }
 
 export interface TitleSlide extends BaseSlide {
@@ -26,7 +31,7 @@ export interface TitleWithImage extends BaseSlide {
   title: string;
   subtitle?: string;
   imageUrl: string;
-  imagePosition: 'left' | 'right';
+  imagePosition: 'left' | 'right'; // Keep for backward compatibility
   caption?: string;
 }
 

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { UserRole, hasMinimumRole } from '../auth/role-helpers';
+import { UserRole, hasMinimumRole } from '../auth/roles';
 
 // Types
 export interface CurrentUser {

@@ -17,6 +17,7 @@ import { Progress } from '@/components/ui/progress';
 import { useUserPermissions } from '@/app/hooks/useUserPermissions';
 import { SlidePlayer } from '@/components/microlesson/SlidePlayer';
 import EditableSlideRenderer from '@/components/microlesson/EditableSlideRenderer';
+import VerticalSlideEditor from '@/components/microlesson/VerticalSlideEditor';
 import { SlideType, LessonConfig } from '@/types/microlesson/slide';
 
 interface MicrolessonContext {
@@ -62,6 +63,8 @@ export default function MicrolessonSlideCreator({ params }: { params: { microles
   
   // Editing state
   const [editingMode, setEditingMode] = useState(false);
+  type ViewMode = 'single' | 'vertical';
+  const [viewMode, setViewMode] = useState<ViewMode>('single');
   const [selectedSlideIndex, setSelectedSlideIndex] = useState<number | null>(null);
   const [leftPanelOpen, setLeftPanelOpen] = useState(true);
   const [rightPanelOpen, setRightPanelOpen] = useState(true);
@@ -485,6 +488,80 @@ export default function MicrolessonSlideCreator({ params }: { params: { microles
             >
               Back to Generator
             </Button>
+          </div>
+        </div>
+      );
+    }
+    
+    // Use vertical editor mode if selected
+    if (viewMode === 'vertical') {
+      return (
+        <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+          {/* Header with view mode toggle */}
+          <div className="absolute top-0 left-0 right-0 z-50 bg-slate-800/90 backdrop-blur-md border-b border-slate-700/50 p-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setEditingMode(false)}
+                  className="text-slate-300 hover:text-white"
+                >
+                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  Back to Generator
+                </Button>
+                <div>
+                  <h1 className="text-lg font-semibold text-white">Edit Slides</h1>
+                  <p className="text-sm text-slate-400">{currentMicrolesson.title}</p>
+                </div>
+              </div>
+              
+              <div className="flex items-center gap-4">
+                {/* View Mode Toggle */}
+                <div className="flex items-center gap-2 bg-slate-700/50 rounded-lg p-1">
+                  <Button
+                    variant={viewMode === 'single' ? 'default' : 'ghost'}
+                    size="sm"
+                    onClick={() => setViewMode('single')}
+                    className="h-8 px-3"
+                  >
+                    <Layout className="w-4 h-4 mr-1" />
+                    Single
+                  </Button>
+                  <Button
+                    variant={viewMode === 'vertical' ? 'default' : 'ghost'}
+                    size="sm"
+                    onClick={() => setViewMode('vertical')}
+                    className="h-8 px-3"
+                  >
+                    <Layers className="w-4 h-4 mr-1" />
+                    Vertical
+                  </Button>
+                </div>
+                
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={saveSlides}
+                  className="bg-green-600 hover:bg-green-700 text-white border-green-600"
+                >
+                  <Save className="w-4 h-4 mr-2" />
+                  Save Slides
+                </Button>
+              </div>
+            </div>
+          </div>
+
+          {/* Vertical Slide Editor */}
+          <div className="pt-20">
+            <VerticalSlideEditor
+              slides={generatedSlides}
+              onSlideChange={updateSlide}
+              onAddSlide={addNewSlide}
+              onDeleteSlide={deleteSlide}
+              onDuplicateSlide={duplicateSlide}
+              onMoveSlide={moveSlide}
+            />
           </div>
         </div>
       );

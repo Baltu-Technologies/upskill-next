@@ -3,6 +3,18 @@ import Link from 'next/link'
 export default function DemoIndex() {
   const demos = [
     {
+      title: 'Slide Layout Selector',
+      description: 'Interactive image layout system for course slide creation with 6 positioning options',
+      href: '/demo/slide-layout-selector',
+      status: 'NEW'
+    },
+    {
+      title: 'Vertical Slide Editor',
+      description: 'Document-style editing experience where you can see multiple slides vertically and edit them inline',
+      href: '/demo/vertical-slide-editor',
+      status: 'NEW'
+    },
+    {
       title: 'AI Course Creator',
       description: 'AI-powered course creation with intelligent text suggestions for all fields',
       href: '/demo/ai-course-creator',
