@@ -21,6 +21,12 @@ export default function DemoIndex() {
       status: 'NEW'
     },
     {
+      title: 'Single Slide Editor',
+      description: 'Focused testing environment for perfecting text editing behavior on individual slides',
+      href: '/demo/single-slide-editor',
+      status: 'TEST'
+    },
+    {
       title: 'Enhanced Vertical Slide Editor',
       description: 'Document-style editing with smart block text editing - Enter key creates new blocks, smart placeholders, and drag & drop',
       href: '/demo/vertical-slide-editor',
@@ -124,6 +130,8 @@ export default function DemoIndex() {
                     ? 'bg-yellow-100 text-yellow-800'
                     : demo.status === 'NEW'
                     ? 'bg-purple-100 text-purple-800'
+                    : demo.status === 'TEST'
+                    ? 'bg-orange-100 text-orange-800'
                     : 'bg-blue-100 text-blue-800'
                 }`}>
                   {demo.status}

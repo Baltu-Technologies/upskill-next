@@ -57,7 +57,7 @@
 
 /* Placeholder styling */
 .enhanced-block-placeholder {
-  color: #9ca3af !important; /* gray-400 */
+  color: rgba(255, 255, 255, 0.5) !important; /* Light gray with 50% opacity for dark backgrounds */
   font-style: italic;
   font-weight: inherit; /* Inherit weight from parent (e.g., bold for headings) */
   font-size: inherit; /* Inherit size from parent */
@@ -67,12 +67,12 @@
 
 /* Placeholder-like content styling */
 .placeholder-content {
-  color: #9ca3af !important; /* gray-400 */
+  color: rgba(255, 255, 255, 0.5) !important; /* Light gray with 50% opacity for dark backgrounds */
   transition: all 0.2s ease;
 }
 
 .placeholder-content:hover {
-  color: #6b7280 !important; /* gray-500 on hover */
+  color: rgba(255, 255, 255, 0.7) !important; /* Lighter on hover */
 }
 
 .placeholder-content:focus-within {
@@ -81,8 +81,21 @@
   font-style: normal !important;
 }
 
+/* Title placeholder overlay styling - consolidated */
+.enhanced-inline-editor .title-placeholder {
+  color: rgba(255, 255, 255, 0.4); /* Light gray with 40% opacity for dark backgrounds */
+  font-style: italic;
+  pointer-events: none;
+  user-select: none;
+  transition: opacity 0.2s ease;
+}
+
+.dark .enhanced-inline-editor .title-placeholder {
+  color: rgba(255, 255, 255, 0.4); /* Light gray with 40% opacity for dark backgrounds */
+}
+
 .dark .enhanced-block-placeholder {
-  color: #6b7280 !important; /* gray-500 in dark mode */
+  color: rgba(255, 255, 255, 0.5) !important; /* Light gray with 50% opacity for dark backgrounds */
 }
 
 /* Make placeholder more visible when it's in a heading */
@@ -489,4 +502,60 @@
   .enhanced-editor h3 {
     font-size: 1.25rem;
   }
+} 
+
+/* Title placeholder styling */
+.title-placeholder {
+  color: rgba(255, 255, 255, 0.4); /* Light gray with 40% opacity for dark backgrounds */
+  font-style: italic;
+  pointer-events: none;
+  user-select: none;
+  z-index: 10;
+  position: relative;
+}
+
+/* Content placeholder styling */
+.content-placeholder {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: rgba(255, 255, 255, 0.4); /* Light gray with 40% opacity for dark backgrounds */
+  font-style: italic;
+  z-index: 10;
+  position: relative;
+}
+
+.ghost-text {
+  color: rgba(255, 255, 255, 0.4); /* Light gray with 40% opacity for dark backgrounds */
+  font-style: italic;
+  user-select: none;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 0.25rem;
+  align-items: center;
+}
+
+.action-button {
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.action-button:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.3);
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.action-button:active {
+  background-color: rgba(255, 255, 255, 0.2);
+  transform: scale(0.98);
 } 

@@ -26,8 +26,12 @@ export const SlashCommandMenu: React.FC<SlashCommandMenuProps> = ({
   // Close menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-        onClose();
+      try {
+        if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+          onClose();
+        }
+      } catch (error) {
+        console.error('Error in handleClickOutside:', error);
       }
     };
     
@@ -37,18 +41,22 @@ export const SlashCommandMenu: React.FC<SlashCommandMenuProps> = ({
   
   // Auto-scroll to selected item
   useEffect(() => {
-    if (menuRef.current) {
-      const selectedElement = menuRef.current.querySelector(`[data-index="${selectedIndex}"]`);
-      if (selectedElement) {
-        selectedElement.scrollIntoView({ block: 'nearest' });
+    try {
+      if (menuRef.current && selectedIndex >= 0 && selectedIndex < items.length) {
+        const selectedElement = menuRef.current.querySelector(`[data-index="${selectedIndex}"]`);
+        if (selectedElement) {
+          selectedElement.scrollIntoView({ block: 'nearest' });
+        }
       }
+    } catch (error) {
+      console.error('Error in auto-scroll:', error);
     }
-  }, [selectedIndex]);
+  }, [selectedIndex, items.length]);
   
-  if (items.length === 0) {
+    if (!items || items.length === 0) {
     return null;
   }
-  
+
   return (
     <div
       ref={menuRef}
