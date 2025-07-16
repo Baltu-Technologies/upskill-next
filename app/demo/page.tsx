@@ -3,15 +3,33 @@ import Link from 'next/link'
 export default function DemoIndex() {
   const demos = [
     {
+      title: 'Table-Based Columns',
+      description: 'TipTap v3 native table extension styled as columns with rich editing capabilities',
+      href: '/demo/table-based-columns',
+      status: 'NEW'
+    },
+    {
+      title: 'Column Layout Editor',
+      description: 'Multi-column layout system with 2, 3, and 4 column support and flexible width ratios',
+      href: '/demo/column-layout-editor',
+      status: 'NEW'
+    },
+    {
       title: 'Slide Layout Selector',
       description: 'Interactive image layout system for course slide creation with 6 positioning options',
       href: '/demo/slide-layout-selector',
       status: 'NEW'
     },
     {
-      title: 'Vertical Slide Editor',
-      description: 'Document-style editing experience where you can see multiple slides vertically and edit them inline',
+      title: 'Enhanced Vertical Slide Editor',
+      description: 'Document-style editing with smart block text editing - Enter key creates new blocks, smart placeholders, and drag & drop',
       href: '/demo/vertical-slide-editor',
+      status: 'NEW'
+    },
+    {
+      title: 'Enhanced Block Editor',
+      description: 'Advanced block-based editor with drag & drop, smart text wrapping, and keyboard shortcuts',
+      href: '/demo/enhanced-block-editor',
       status: 'NEW'
     },
     {

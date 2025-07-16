@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { useEditor, EditorContent, Editor } from '@tiptap/react';
+import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Underline from '@tiptap/extension-underline';
 import TextAlign from '@tiptap/extension-text-align';
@@ -12,15 +12,16 @@ import { FontSize } from './FontSizeExtension';
 import { SlashCommandExtension, SlashCommandPlugin } from './SlashCommandExtension';
 import { ALL_EXTENSIONS } from './TipTapExtensions';
 import SlashCommandMenu from './SlashCommandMenu';
+import { EnhancedDragDropContainer } from './EnhancedDragDropContainer';
 import { 
   Bold, Italic, Underline as UnderlineIcon, Strikethrough, 
   AlignLeft, AlignCenter, AlignRight, 
   List, ListOrdered, Quote, Code, Link as LinkIcon,
   Type, Palette, Heading1, Heading2, Heading3, ChevronDown
 } from 'lucide-react';
-import './tiptap-styles.css';
+import './enhanced-tiptap-styles.css';
 
-interface TipTapSlideEditorProps {
+interface EnhancedTipTapSlideEditorProps {
   content: string;
   onChange: (content: string) => void;
   onSave: () => void;
@@ -88,42 +89,9 @@ const TEXT_SIZE_OPTIONS = [
     action: (editor: any) => editor.chain().focus().toggleHeading({ level: 3 }).run(),
     isActive: (editor: any) => editor.isActive('heading', { level: 3 })
   },
-  { 
-    label: 'Heading 4', 
-    value: 'h4', 
-    className: 'text-xl font-bold',
-    action: (editor: any) => editor.chain().focus().toggleHeading({ level: 4 }).run(),
-    isActive: (editor: any) => editor.isActive('heading', { level: 4 })
-  },
-  { 
-    label: 'Title !', 
-    value: 'title', 
-    className: 'text-5xl font-bold',
-    action: (editor: any) => editor.chain().focus().toggleHeading({ level: 5 }).run(),
-    isActive: (editor: any) => editor.isActive('heading', { level: 5 })
-  },
-  { 
-    label: 'Display !!', 
-    value: 'display', 
-    className: 'text-6xl font-bold',
-    action: (editor: any) => editor.chain().focus().toggleHeading({ level: 6 }).run(),
-    isActive: (editor: any) => editor.isActive('heading', { level: 6 })
-  },
-  { 
-    label: 'Monster (!!!)', 
-    value: 'monster', 
-    className: 'text-8xl font-bold',
-    action: (editor: any) => {
-      editor.chain().focus().setParagraph().run();
-      editor.chain().focus().setFontSize('96px').run();
-    },
-    isActive: (editor: any) => {
-      return !editor.isActive('heading') && editor.isActive('textStyle', { fontSize: '96px' });
-    }
-  }
 ];
 
-const TipTapSlideEditor: React.FC<TipTapSlideEditorProps> = ({
+const EnhancedTipTapSlideEditor: React.FC<EnhancedTipTapSlideEditorProps> = ({
   content,
   onChange,
   onSave,
@@ -154,6 +122,12 @@ const TipTapSlideEditor: React.FC<TipTapSlideEditorProps> = ({
         heading: {
           levels: [1, 2, 3, 4, 5, 6],
         },
+        // Keep paragraph enabled but let enhanced blocks handle structure
+        paragraph: {
+          HTMLAttributes: {
+            class: 'my-2',
+          },
+        },
       }),
       Underline,
       TextAlign.configure({
@@ -170,11 +144,11 @@ const TipTapSlideEditor: React.FC<TipTapSlideEditorProps> = ({
       SlashCommandExtension,
       ...ALL_EXTENSIONS,
     ],
-    content: content,
+    content: content || '',
     immediatelyRender: false,
     editorProps: {
       attributes: {
-        class: 'prose prose-lg prose-invert max-w-none focus:outline-none min-h-[120px] p-4',
+        class: 'enhanced-editor prose prose-lg prose-invert max-w-none focus:outline-none min-h-[120px] p-4',
       },
     },
     onUpdate: ({ editor }) => {
@@ -192,6 +166,51 @@ const TipTapSlideEditor: React.FC<TipTapSlideEditorProps> = ({
       } else {
         setSlashCommandState(null);
         setMenuPosition(null);
+      }
+    },
+    onCreate: ({ editor }) => {
+      // If the editor is empty or has no content, create initial blocks
+      if (editor.isEmpty || !content) {
+        setTimeout(() => {
+          // Create initial heading block with "Untitled Card" placeholder
+          const titleBlockId = `block-title-${Date.now()}`;
+          const contentBlockId = `block-content-${Date.now() + 1}`;
+          
+          editor.commands.setContent([
+            {
+              type: 'enhancedBlock',
+              attrs: {
+                id: titleBlockId,
+                type: 'title',
+                placeholder: 'Untitled Card'
+              },
+              content: [
+                {
+                  type: 'heading',
+                  attrs: { level: 1 },
+                  content: []
+                }
+              ]
+            },
+            {
+              type: 'enhancedBlock',
+              attrs: {
+                id: contentBlockId,
+                type: 'content',
+                placeholder: 'Type / to add blocks...'
+              },
+              content: [
+                {
+                  type: 'paragraph',
+                  content: []
+                }
+              ]
+            }
+          ]);
+          
+          // Focus on the first block (title)
+          editor.commands.focus(1);
+        }, 0);
       }
     },
   });
@@ -306,7 +325,7 @@ const TipTapSlideEditor: React.FC<TipTapSlideEditorProps> = ({
       {/* Floating Toolbar */}
       <div 
         ref={toolbarRef}
-                  className="sticky top-0 z-[9999] bg-gray-900 border border-gray-700 rounded-lg shadow-lg p-2 mb-4 flex items-center space-x-1 overflow-x-auto"
+        className="sticky top-0 z-[9999] bg-gray-900 border border-gray-700 rounded-lg shadow-lg p-2 mb-4 flex items-center space-x-1 overflow-x-auto"
       >
         {/* Text Size Dropdown */}
         <div className="relative">
@@ -321,7 +340,7 @@ const TipTapSlideEditor: React.FC<TipTapSlideEditorProps> = ({
           </button>
 
           {showTextSizeDropdown && (
-                          <div className="absolute top-full left-0 mt-1 bg-gray-900 border border-gray-700 rounded-lg shadow-lg p-1 z-[10000] min-w-[160px]">
+            <div className="absolute top-full left-0 mt-1 bg-gray-900 border border-gray-700 rounded-lg shadow-lg p-1 z-[10000] min-w-[160px]">
               {TEXT_SIZE_OPTIONS.map((option) => (
                 <button
                   key={option.value}
@@ -533,15 +552,20 @@ const TipTapSlideEditor: React.FC<TipTapSlideEditorProps> = ({
         </div>
       </div>
 
-      {/* Editor Content */}
+      {/* Editor Content wrapped in DragDropContainer */}
       <div 
         ref={editorRef}
         className="border border-gray-300 rounded-lg focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500 focus-within:ring-opacity-50 transition-all bg-white"
       >
-        <EditorContent 
-          editor={editor} 
-          className="min-h-[120px]"
-        />
+        <EnhancedDragDropContainer 
+          editor={editor}
+          className="min-h-[120px] px-4 py-2"
+        >
+          <EditorContent 
+            editor={editor} 
+            className="min-h-[120px]"
+          />
+        </EnhancedDragDropContainer>
       </div>
 
       {/* Action Buttons */}
@@ -562,7 +586,7 @@ const TipTapSlideEditor: React.FC<TipTapSlideEditorProps> = ({
 
       {/* Keyboard Shortcuts Help */}
       <div className="text-xs text-gray-600 mt-2">
-        Press <kbd className="px-1 py-0.5 bg-gray-100 rounded border">Cmd+Enter</kbd> to save • Press <kbd className="px-1 py-0.5 bg-gray-100 rounded border">Escape</kbd> to cancel • Type <kbd className="px-1 py-0.5 bg-gray-100 rounded border">/</kbd> for commands
+        Press <kbd className="px-1 py-0.5 bg-gray-100 rounded border">Cmd+Enter</kbd> to save • Press <kbd className="px-1 py-0.5 bg-gray-100 rounded border">Escape</kbd> to cancel • Type <kbd className="px-1 py-0.5 bg-gray-100 rounded border">/</kbd> for commands • Drag <kbd className="px-1 py-0.5 bg-gray-100 rounded border">⋮⋮</kbd> to reorder blocks
       </div>
 
       {/* Slash Command Menu */}
@@ -580,4 +604,4 @@ const TipTapSlideEditor: React.FC<TipTapSlideEditorProps> = ({
   );
 };
 
-export default TipTapSlideEditor;
+export default EnhancedTipTapSlideEditor; 

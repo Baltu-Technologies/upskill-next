@@ -33,6 +33,8 @@ import {
   Layers,
   X
 } from 'lucide-react';
+import EditableSlideRenderer from './EditableSlideRenderer';
+import TableAsColumns from './TableAsColumnsExtension';
 
 // New imports for enhanced components
 import {
@@ -69,26 +71,53 @@ const SLIDE_TYPES = [
   { type: 'CustomHTMLSlide', label: 'Custom', icon: <Layers className="w-4 h-4" /> },
 ];
 
-// Image layout options with custom SVG icons
-const IMAGE_LAYOUT_OPTIONS = [
-  { value: 'none', label: 'None', icon: <div className="w-5 h-5 border border-slate-400 rounded"></div> },
-  { value: 'background', label: 'Background', icon: <div className="w-5 h-5 bg-slate-400 rounded"></div> },
-  { value: 'left', label: 'Left', icon: <div className="w-5 h-5 border border-slate-400 rounded flex"><div className="w-2 h-full bg-slate-400"></div></div> },
-  { value: 'right', label: 'Right', icon: <div className="w-5 h-5 border border-slate-400 rounded flex"><div className="w-3 h-full"></div><div className="w-2 h-full bg-slate-400"></div></div> },
-  { value: 'bottom', label: 'Bottom', icon: <div className="w-5 h-5 border border-slate-400 rounded flex flex-col"><div className="w-full h-3"></div><div className="w-full h-2 bg-slate-400"></div></div> },
-  { value: 'top', label: 'Top', icon: <div className="w-5 h-5 border border-slate-400 rounded flex flex-col"><div className="w-full h-2 bg-slate-400"></div></div> },
+// Card layout options - updated to match requirements
+const CARD_LAYOUT_OPTIONS = [
+  { value: 'none', label: 'No Layout', icon: <div className="w-5 h-5 border border-slate-400 rounded bg-slate-100"></div> },
+  { value: 'top', label: 'Image Top', icon: <div className="w-5 h-5 border border-slate-400 rounded flex flex-col"><div className="w-full h-2 bg-slate-400"></div><div className="w-full h-3 bg-slate-100"></div></div> },
+  { value: 'left', label: 'Image Left', icon: <div className="w-5 h-5 border border-slate-400 rounded flex"><div className="w-2 h-full bg-slate-400"></div><div className="w-3 h-full bg-slate-100"></div></div> },
+  { value: 'right', label: 'Image Right', icon: <div className="w-5 h-5 border border-slate-400 rounded flex"><div className="w-3 h-full bg-slate-100"></div><div className="w-2 h-full bg-slate-400"></div></div> },
+  { value: 'background', label: 'Full Image', icon: <div className="w-5 h-5 bg-slate-400 rounded border border-slate-400"></div> },
 ];
 
-// Color options for slide backgrounds
+// Color options for slide backgrounds - both solid and gradient
 const COLOR_OPTIONS = [
-  { value: 'bg-white', label: 'White', preview: '#ffffff' },
-  { value: 'bg-gray-100', label: 'Light Gray', preview: '#f3f4f6' },
-  { value: 'bg-gray-800', label: 'Dark', preview: '#1f2937' },
-  { value: 'bg-gray-900', label: 'Very Dark', preview: '#111827' },
-  { value: 'bg-blue-500', label: 'Blue', preview: '#3b82f6' },
-  { value: 'bg-purple-500', label: 'Purple', preview: '#8b5cf6' },
-  { value: 'bg-green-500', label: 'Green', preview: '#10b981' },
-  { value: 'bg-red-500', label: 'Red', preview: '#ef4444' },
+  // Solid colors
+  { value: '#0F172A', label: 'Default Dark', preview: '#0F172A', type: 'solid' },
+  { value: '#ffffff', label: 'White', preview: '#ffffff', type: 'solid' },
+  { value: '#f3f4f6', label: 'Light Gray', preview: '#f3f4f6', type: 'solid' },
+  { value: '#1f2937', label: 'Dark Gray', preview: '#1f2937', type: 'solid' },
+  { value: '#111827', label: 'Very Dark', preview: '#111827', type: 'solid' },
+  { value: '#3b82f6', label: 'Blue', preview: '#3b82f6', type: 'solid' },
+  { value: '#8b5cf6', label: 'Purple', preview: '#8b5cf6', type: 'solid' },
+  { value: '#10b981', label: 'Green', preview: '#10b981', type: 'solid' },
+  { value: '#ef4444', label: 'Red', preview: '#ef4444', type: 'solid' },
+  { value: '#f59e0b', label: 'Orange', preview: '#f59e0b', type: 'solid' },
+  { value: '#06b6d4', label: 'Cyan', preview: '#06b6d4', type: 'solid' },
+  { value: '#84cc16', label: 'Lime', preview: '#84cc16', type: 'solid' },
+  { value: '#ec4899', label: 'Pink', preview: '#ec4899', type: 'solid' },
+  
+  // Gradient colors - including more darker options
+  { value: 'linear-gradient(135deg, #1e3c72 0%, #2a5298 100%)', label: 'Deep Blue', preview: 'linear-gradient(135deg, #1e3c72 0%, #2a5298 100%)', type: 'gradient' },
+  { value: 'linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%)', label: 'Dark Purple', preview: 'linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%)', type: 'gradient' },
+  { value: 'linear-gradient(135deg, #232526 0%, #414345 100%)', label: 'Dark Gray', preview: 'linear-gradient(135deg, #232526 0%, #414345 100%)', type: 'gradient' },
+  { value: 'linear-gradient(135deg, #0c0c0c 0%, #1a1a1a 100%)', label: 'Pure Black', preview: 'linear-gradient(135deg, #0c0c0c 0%, #1a1a1a 100%)', type: 'gradient' },
+  { value: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)', label: 'Midnight', preview: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)', type: 'gradient' },
+  { value: 'linear-gradient(135deg, #2c1810 0%, #3e2723 100%)', label: 'Dark Brown', preview: 'linear-gradient(135deg, #2c1810 0%, #3e2723 100%)', type: 'gradient' },
+  { value: 'linear-gradient(135deg, #141e30 0%, #243b55 100%)', label: 'Steel Blue', preview: 'linear-gradient(135deg, #141e30 0%, #243b55 100%)', type: 'gradient' },
+  { value: 'linear-gradient(135deg, #2d1b69 0%, #11998e 100%)', label: 'Dark Teal', preview: 'linear-gradient(135deg, #2d1b69 0%, #11998e 100%)', type: 'gradient' },
+  { value: 'linear-gradient(135deg, #1f4037 0%, #99f2cc 100%)', label: 'Forest Green', preview: 'linear-gradient(135deg, #1f4037 0%, #99f2cc 100%)', type: 'gradient' },
+  { value: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', label: 'Blue Purple', preview: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', type: 'gradient' },
+  { value: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)', label: 'Pink Red', preview: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)', type: 'gradient' },
+  { value: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)', label: 'Blue Cyan', preview: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)', type: 'gradient' },
+  { value: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)', label: 'Green Cyan', preview: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)', type: 'gradient' },
+  { value: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)', label: 'Pink Yellow', preview: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)', type: 'gradient' },
+  { value: 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)', label: 'Mint Pink', preview: 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)', type: 'gradient' },
+  { value: 'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)', label: 'Peach', preview: 'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)', type: 'gradient' },
+  { value: 'linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)', label: 'Purple Pink', preview: 'linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)', type: 'gradient' },
+  { value: 'linear-gradient(135deg, #fad0c4 0%, #ffd1ff 100%)', label: 'Sunset', preview: 'linear-gradient(135deg, #fad0c4 0%, #ffd1ff 100%)', type: 'gradient' },
+  { value: 'linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%)', label: 'Ocean', preview: 'linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%)', type: 'gradient' },
+  { value: 'linear-gradient(135deg, #f6d365 0%, #fda085 100%)', label: 'Warm', preview: 'linear-gradient(135deg, #f6d365 0%, #fda085 100%)', type: 'gradient' },
 ];
 
 interface VerticalSlideEditorProps {
@@ -126,69 +155,31 @@ function getSlideDisplayInfo(slide: SlideType) {
   };
 }
 
-// Custom color picker modal component
-function ColorPickerModal({ 
-  isOpen, 
-  onClose, 
-  color, 
-  onColorChange 
-}: { 
-  isOpen: boolean; 
-  onClose: () => void; 
-  color: string; 
-  onColorChange: (color: string) => void; 
-}) {
-  if (!isOpen) return null;
-
-  return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={onClose}>
-      <div className="bg-slate-800 rounded-lg p-6 max-w-sm w-full mx-4" onClick={(e) => e.stopPropagation()}>
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-slate-200">Pick a Color</h3>
-          <Button variant="ghost" size="sm" onClick={onClose}>
-            <X className="h-4 w-4" />
-          </Button>
-        </div>
-        
-        <div className="space-y-4">
-          <HexColorPicker color={color} onChange={onColorChange} />
-          
-          <div className="flex items-center gap-2">
-            <div 
-              className="w-8 h-8 rounded border border-slate-600" 
-              style={{ backgroundColor: color }}
-            />
-            <input
-              type="text"
-              value={color}
-              onChange={(e) => onColorChange(e.target.value)}
-              className="flex-1 bg-slate-700 text-slate-200 px-3 py-2 rounded border border-slate-600 focus:border-blue-500 focus:outline-none"
-              placeholder="#000000"
-            />
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// Slide settings modal component
-function SlideSettingsModal({ 
-  isOpen, 
-  onClose, 
+// Slide settings dropdown component
+function SlideSettingsDropdown({ 
   slide, 
   onSlideChange 
 }: { 
-  isOpen: boolean; 
-  onClose: () => void; 
   slide: SlideType; 
   onSlideChange: (slide: SlideType) => void; 
 }) {
+  const [isUploading, setIsUploading] = useState(false);
   const [showColorPicker, setShowColorPicker] = useState(false);
+  const [showSlideTypePicker, setShowSlideTypePicker] = useState(false);
+  const [showLayoutPicker, setShowLayoutPicker] = useState(false);
+  const [showColumnLayoutPicker, setShowColumnLayoutPicker] = useState(false);
+  
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  if (!isOpen) return null;
+
 
   const handleTypeChange = (newType: string) => {
+    // Close all pickers when changing slide type
+    setShowColorPicker(false);
+    setShowSlideTypePicker(false);
+    setShowLayoutPicker(false);
+    setShowColumnLayoutPicker(false);
+    
     // Create a new slide with the minimum required properties for the new type
     const baseSlide = {
       id: slide.id,
@@ -256,120 +247,419 @@ function SlideSettingsModal({
     onSlideChange(newSlide);
   };
 
+  const handleLayoutChange = (layout: string) => {
+    // Close all pickers when changing layout
+    setShowColorPicker(false);
+    setShowSlideTypePicker(false);
+    setShowLayoutPicker(false);
+    setShowColumnLayoutPicker(false);
+    
+    // If we're setting a layout other than 'none' on a non-image slide, convert it
+    let newSlide = { ...slide };
+    
+    if (layout !== 'none' && slide.type !== 'TitleWithImage') {
+      // Convert to TitleWithImage to support image layouts
+      const title = ('title' in slide) ? slide.title : 'Slide Title';
+      newSlide = {
+        ...slide,
+        type: 'TitleWithImage',
+        imageLayout: layout as 'none' | 'top' | 'left' | 'right' | 'bottom' | 'background',
+        imageUrl: (slide as any).imageUrl || '', // Use existing image or empty string
+        title: title
+      } as any;
+    } else {
+      // Just update the layout
+      newSlide = { 
+        ...slide, 
+        imageLayout: layout as 'none' | 'top' | 'left' | 'right' | 'bottom' | 'background'
+      };
+    }
+    
+    onSlideChange(newSlide);
+  };
+
   const handleBackgroundColorChange = (color: string) => {
+    // Close all pickers when changing background color
+    setShowColorPicker(false);
+    setShowSlideTypePicker(false);
+    setShowLayoutPicker(false);
+    setShowColumnLayoutPicker(false);
+    
     const newSlide = { ...slide, backgroundColor: color };
     onSlideChange(newSlide);
   };
 
-  const handleLayoutChange = (layout: string) => {
-    if ('imageLayout' in slide) {
-      const newSlide = { 
-        ...slide, 
-        imageLayout: layout as 'none' | 'top' | 'left' | 'right' | 'bottom' | 'background'
-      };
+  const handleColumnLayoutChange = (layout: string) => {
+    // Close all pickers when changing column layout
+    setShowColorPicker(false);
+    setShowSlideTypePicker(false);
+    setShowLayoutPicker(false);
+    setShowColumnLayoutPicker(false);
+    
+    // Check if it's a table-based column layout
+    if (layout.startsWith('table-')) {
+      // Enable table-based columns
+      const newSlide = { ...slide, tableContent: '' };
+      onSlideChange(newSlide);
+    } else {
+      // Handle other layouts or disable table mode
+      const newSlide = { ...slide };
+      delete (newSlide as any).tableContent;
       onSlideChange(newSlide);
     }
   };
 
-  const currentLayout = ('imageLayout' in slide) ? slide.imageLayout : 'none';
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const response = await fetch('/api/upload-image', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error('Upload failed');
+      }
+
+      const data = await response.json();
+      
+      // Update slide with new image URL
+      if ('imageUrl' in slide) {
+        const newSlide = { ...slide, imageUrl: data.imageUrl };
+        onSlideChange(newSlide);
+      }
+    } catch (error) {
+      console.error('Image upload error:', error);
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const currentLayout = slide.imageLayout || 'none';
+  const hasImage = 'imageUrl' in slide && slide.imageUrl;
 
   return (
-    <>
-      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={onClose}>
-        <div className="bg-slate-800 rounded-lg p-6 max-w-md w-full mx-4" onClick={(e) => e.stopPropagation()}>
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-lg font-semibold text-slate-200">Slide Settings</h3>
-            <Button variant="ghost" size="sm" onClick={onClose}>
-              <X className="h-4 w-4" />
-            </Button>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="text-slate-400 hover:text-slate-200"
+        >
+          <Settings className="h-4 w-4" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent 
+        align="end" 
+        className="w-96 bg-slate-800 border-slate-600 p-4 space-y-4"
+      >
+        <DropdownMenuLabel className="text-slate-200 font-medium px-0 pb-2">
+          Slide Settings
+        </DropdownMenuLabel>
+        
+                 {/* Slide Type Section */}
+         <div className="space-y-2">
+           <Label className="text-sm font-medium text-slate-300">Slide Type</Label>
+           
+           {/* Slide Type Picker Button */}
+           <Button
+             variant="outline"
+             size="sm"
+             onClick={() => setShowSlideTypePicker(!showSlideTypePicker)}
+             className="w-full justify-between h-10 text-slate-300 border-slate-600 hover:bg-slate-700"
+           >
+             <div className="flex items-center gap-2">
+               {SLIDE_TYPES.find(st => st.type === slide.type)?.icon}
+               <span className="text-xs">
+                 {SLIDE_TYPES.find(st => st.type === slide.type)?.label || 'Unknown'}
+               </span>
+             </div>
+             <ChevronDown className={`h-4 w-4 transition-transform ${showSlideTypePicker ? 'rotate-180' : ''}`} />
+           </Button>
+
+           {/* Expandable Slide Type Options */}
+           {showSlideTypePicker && (
+             <div className="space-y-2 border border-slate-600 rounded-lg p-3 bg-slate-700/30">
+               <div className="grid grid-cols-2 gap-2">
+                 {SLIDE_TYPES.map((slideType) => (
+                   <Button
+                     key={slideType.type}
+                     variant={slide.type === slideType.type ? "default" : "outline"}
+                     size="sm"
+                     onClick={() => handleTypeChange(slideType.type)}
+                     className="justify-start h-8 text-xs"
+                   >
+                     {slideType.icon}
+                     <span className="ml-2">{slideType.label}</span>
+                   </Button>
+                 ))}
+               </div>
+             </div>
+           )}
+         </div>
+
+                 {/* Card Layout Section */}
+         <div className="space-y-2">
+           <Label className="text-sm font-medium text-slate-300">Card Layout</Label>
+           
+           {/* Layout Picker Button */}
+           <Button
+             variant="outline"
+             size="sm"
+             onClick={() => setShowLayoutPicker(!showLayoutPicker)}
+             className="w-full justify-between h-10 text-slate-300 border-slate-600 hover:bg-slate-700"
+           >
+             <div className="flex items-center gap-2">
+               {CARD_LAYOUT_OPTIONS.find(lo => lo.value === currentLayout)?.icon}
+               <span className="text-xs">
+                 {CARD_LAYOUT_OPTIONS.find(lo => lo.value === currentLayout)?.label || 'Unknown'}
+               </span>
+             </div>
+             <ChevronDown className={`h-4 w-4 transition-transform ${showLayoutPicker ? 'rotate-180' : ''}`} />
+           </Button>
+
+           {/* Expandable Layout Options */}
+           {showLayoutPicker && (
+             <div className="space-y-2 border border-slate-600 rounded-lg p-3 bg-slate-700/30">
+               <div className="flex gap-2 justify-center">
+                 {CARD_LAYOUT_OPTIONS.map((layout) => (
+                   <button
+                     key={layout.value}
+                     onClick={() => handleLayoutChange(layout.value)}
+                     className={`p-2 rounded border-2 transition-all hover:scale-110 ${
+                       currentLayout === layout.value 
+                         ? 'border-blue-400 bg-blue-500/20' 
+                         : 'border-slate-600 hover:border-slate-400'
+                     }`}
+                     title={layout.label}
+                   >
+                     {layout.icon}
+                   </button>
+                 ))}
+               </div>
+             </div>
+           )}
+         </div>
+
+         {/* Column Layout Section */}
+         <div className="space-y-2">
+           <Label className="text-sm font-medium text-slate-300">Column Layout</Label>
+           
+           {/* Column Layout Picker Button */}
+           <Button
+             variant="outline"
+             size="sm"
+             onClick={() => setShowColumnLayoutPicker(!showColumnLayoutPicker)}
+             className="w-full justify-between h-10 text-slate-300 border-slate-600 hover:bg-slate-700"
+           >
+             <div className="flex items-center gap-2">
+               <span className="text-xs">Table-based Columns</span>
+             </div>
+             <ChevronDown className={`h-4 w-4 transition-transform ${showColumnLayoutPicker ? 'rotate-180' : ''}`} />
+           </Button>
+
+           {/* Expandable Column Layout Options */}
+           {showColumnLayoutPicker && (
+             <div className="space-y-2 border border-slate-600 rounded-lg p-3 bg-slate-700/30">
+               <TableAsColumns
+                 onLayoutChange={handleColumnLayoutChange}
+                 className="text-slate-300"
+               />
+             </div>
+           )}
+         </div>
+
+         {/* Card Color Section */}
+         <div className="space-y-2">
+           <Label className="text-sm font-medium text-slate-300">Card Color</Label>
+           
+           {/* Color Picker Button */}
+           <Button
+             variant="outline"
+             size="sm"
+             onClick={() => setShowColorPicker(!showColorPicker)}
+             className="w-full justify-between h-10 text-slate-300 border-slate-600 hover:bg-slate-700"
+           >
+                           <div className="flex items-center gap-2">
+                <div 
+                  className="w-6 h-6 rounded border border-slate-500"
+                  style={{ 
+                    background: slide.backgroundColor || '#0F172A'
+                  }}
+                />
+                <span className="text-xs">
+                  {COLOR_OPTIONS.find(c => c.value === slide.backgroundColor)?.label || 'Custom'}
+                </span>
+              </div>
+             <ChevronDown className={`h-4 w-4 transition-transform ${showColorPicker ? 'rotate-180' : ''}`} />
+           </Button>
+
+           {/* Expandable Color Options */}
+           {showColorPicker && (
+             <div className="max-h-80 overflow-y-auto border border-slate-600 rounded-lg p-3 bg-slate-700/30 scrollbar-thin scrollbar-thumb-slate-600 scrollbar-track-slate-800">
+               <div className="space-y-3">
+                 {/* Solid Colors */}
+                 <div className="space-y-2">
+                   <Label className="text-xs text-slate-400">Solid Colors</Label>
+                   <div className="grid grid-cols-6 gap-2">
+                     {COLOR_OPTIONS.filter(color => color.type === 'solid').map((colorOption) => (
+                       <button
+                         key={colorOption.value}
+                         className={`w-8 h-8 rounded border-2 transition-all hover:scale-110 ${
+                           slide.backgroundColor === colorOption.value 
+                             ? 'border-blue-400 ring-2 ring-blue-400/50' 
+                             : 'border-slate-600 hover:border-slate-400'
+                         }`}
+                         style={{ backgroundColor: colorOption.preview }}
+                         onClick={() => handleBackgroundColorChange(colorOption.value)}
+                         title={colorOption.label}
+                       />
+                     ))}
+                   </div>
+                 </div>
+
+                 {/* Gradient Colors */}
+                 <div className="space-y-2">
+                   <Label className="text-xs text-slate-400">Gradient Colors</Label>
+                   <div className="grid grid-cols-4 gap-2">
+                     {COLOR_OPTIONS.filter(color => color.type === 'gradient').map((colorOption) => (
+                       <button
+                         key={colorOption.value}
+                         className={`w-full h-8 rounded border-2 transition-all hover:scale-105 ${
+                           slide.backgroundColor === colorOption.value 
+                             ? 'border-blue-400 ring-2 ring-blue-400/50' 
+                             : 'border-slate-600 hover:border-slate-400'
+                         }`}
+                         style={{ background: colorOption.preview }}
+                         onClick={() => handleBackgroundColorChange(colorOption.value)}
+                         title={colorOption.label}
+                       />
+                     ))}
+                   </div>
+                 </div>
+               </div>
+             </div>
+           )}
+         </div>
+
+         {/* Image Upload Section */}
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <Label className="text-sm font-medium text-slate-300">Highlight Image</Label>
+            {hasImage && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  if ('imageUrl' in slide) {
+                    const newSlide = { ...slide, imageUrl: '' };
+                    onSlideChange(newSlide);
+                  }
+                }}
+                className="h-6 px-2 text-xs text-slate-400 hover:text-slate-200"
+              >
+                Remove
+              </Button>
+            )}
           </div>
           
-          <div className="space-y-6">
-            {/* Slide Type */}
-            <div>
-              <label className="block text-sm font-medium text-slate-300 mb-2">Slide Type</label>
-              <div className="grid grid-cols-2 gap-2">
-                {SLIDE_TYPES.map((slideType) => (
-                  <Button
-                    key={slideType.type}
-                    variant={slide.type === slideType.type ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => handleTypeChange(slideType.type)}
-                    className="justify-start"
-                  >
-                    {slideType.icon}
-                    <span className="ml-2 text-xs">{slideType.label}</span>
-                  </Button>
-                ))}
-              </div>
-            </div>
-
-            {/* Background Color */}
-            <div>
-              <label className="block text-sm font-medium text-slate-300 mb-2">Background Color</label>
-              <div className="flex items-center gap-2">
-                <div 
-                  className="w-8 h-8 rounded border border-slate-600 cursor-pointer"
-                  style={{ backgroundColor: slide.backgroundColor || '#1e293b' }}
-                  onClick={() => setShowColorPicker(true)}
-                />
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setShowColorPicker(true)}
-                  className="flex-1"
-                >
-                  <Palette className="h-4 w-4 mr-2" />
-                  Pick Color
-                </Button>
-              </div>
-              
-              {/* Preset Colors */}
-              <div className="grid grid-cols-8 gap-1 mt-2">
-                {COLOR_OPTIONS.slice(0, 16).map((colorOption) => (
-                  <button
-                    key={colorOption.value}
-                    className="w-6 h-6 rounded border border-slate-600 hover:scale-110 transition-transform"
-                    style={{ backgroundColor: colorOption.preview }}
-                    onClick={() => handleBackgroundColorChange(colorOption.preview)}
-                    title={colorOption.label}
-                  />
-                ))}
-              </div>
-            </div>
-
-            {/* Image Layout (only for slides with images) */}
-            {('imageLayout' in slide) && (
-              <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">Image Layout</label>
-                <div className="grid grid-cols-3 gap-2">
-                  {IMAGE_LAYOUT_OPTIONS.map((layout) => (
-                    <Button
-                      key={layout.value}
-                      variant={currentLayout === layout.value ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => handleLayoutChange(layout.value)}
-                      className="justify-start"
-                    >
-                      {layout.icon}
-                      <span className="ml-2 text-xs">{layout.label}</span>
-                    </Button>
-                  ))}
-                </div>
+          <div className="relative">
+            <Input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleImageUpload}
+              disabled={isUploading}
+              className="bg-slate-700 border-slate-600 text-slate-200 file:bg-slate-600 file:text-slate-200 file:border-slate-500"
+            />
+            {isUploading && (
+              <div className="absolute inset-0 bg-slate-700/50 flex items-center justify-center rounded">
+                <div className="text-xs text-slate-300">Uploading...</div>
               </div>
             )}
           </div>
+          
+          {hasImage && (
+            <div className="mt-2">
+              <img 
+                src={slide.imageUrl} 
+                alt="Slide preview" 
+                className="w-full h-20 object-cover rounded border border-slate-600"
+              />
+            </div>
+          )}
+        </div>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
+
+// Custom color picker modal component
+function ColorPickerModal({ 
+  isOpen, 
+  onClose, 
+  color, 
+  onColorChange 
+}: { 
+  isOpen: boolean; 
+  onClose: () => void; 
+  color: string; 
+  onColorChange: (color: string) => void; 
+}) {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={onClose}>
+      <div className="bg-slate-800 rounded-lg p-6 max-w-sm w-full mx-4" onClick={(e) => e.stopPropagation()}>
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-semibold text-slate-200">Pick a Color</h3>
+          <Button variant="ghost" size="sm" onClick={onClose}>
+            <X className="h-4 w-4" />
+          </Button>
+        </div>
+        
+        <div className="space-y-4">
+          <HexColorPicker color={color} onChange={onColorChange} />
+          
+          <div className="flex items-center gap-2">
+            <div 
+              className="w-8 h-8 rounded border border-slate-600" 
+              style={{ backgroundColor: color }}
+            />
+            <input
+              type="text"
+              value={color}
+              onChange={(e) => onColorChange(e.target.value)}
+              className="flex-1 bg-slate-700 text-slate-200 px-3 py-2 rounded border border-slate-600 focus:border-blue-500 focus:outline-none"
+              placeholder="#000000"
+            />
+          </div>
         </div>
       </div>
-
-      <ColorPickerModal
-        isOpen={showColorPicker}
-        onClose={() => setShowColorPicker(false)}
-        color={slide.backgroundColor || '#1e293b'}
-        onColorChange={handleBackgroundColorChange}
-      />
-    </>
+    </div>
   );
+}
+
+// Slide settings modal component - REMOVED (keeping for now for comparison)
+function SlideSettingsModal({ 
+  isOpen, 
+  onClose, 
+  slide, 
+  onSlideChange 
+}: { 
+  isOpen: boolean; 
+  onClose: () => void; 
+  slide: SlideType; 
+  onSlideChange: (slide: SlideType) => void; 
+}) {
+  // This component is now replaced by SlideSettingsDropdown
+  return null;
 }
 
 // Sortable slide item component
@@ -598,7 +888,6 @@ export default function VerticalSlideEditor({
   onMoveSlide 
 }: VerticalSlideEditorProps) {
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
-  const [settingsSlideIndex, setSettingsSlideIndex] = useState<number | null>(null);
   const slideRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   // Prevent body scrolling to avoid double scrollbar
@@ -644,23 +933,15 @@ export default function VerticalSlideEditor({
     }
   }, [slides.length]);
 
+
+
   const handleSlideSelect = (index: number) => {
     setCurrentSlideIndex(index);
     slideRefs.current[index]?.scrollIntoView({ behavior: 'smooth', block: 'center' });
   };
 
-  const handleSlideSettingsOpen = (index: number) => {
-    setSettingsSlideIndex(index);
-  };
-
-  const handleSlideSettingsClose = () => {
-    setSettingsSlideIndex(null);
-  };
-
-  const handleSlideSettingsChange = (slide: SlideType) => {
-    if (settingsSlideIndex !== null) {
-      onSlideChange(settingsSlideIndex, slide);
-    }
+  const handleSlideSettingsChange = (index: number) => (slide: SlideType) => {
+    onSlideChange(index, slide);
   };
 
   const handleSlideChange = useCallback((field: string, value: any) => {
@@ -712,14 +993,10 @@ export default function VerticalSlideEditor({
                   </div>
                   
                   {/* Settings button */}
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleSlideSettingsOpen(index)}
-                    className="text-slate-400 hover:text-slate-200"
-                  >
-                    <Settings className="h-4 w-4" />
-                  </Button>
+                  <SlideSettingsDropdown
+                    slide={slide}
+                    onSlideChange={handleSlideSettingsChange(index)}
+                  />
                 </div>
 
                 {/* Slide Content */}
@@ -729,89 +1006,13 @@ export default function VerticalSlideEditor({
                       className="relative overflow-hidden w-full"
                       style={{
                         aspectRatio: '16/9',
-                        backgroundColor: slide.backgroundColor || '#1e293b'
                       }}
                     >
-                      {/* Slide content based on type */}
-                      {slide.type === 'TitleSlide' && (
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <h1 className="text-4xl font-bold text-white text-center px-8">
-                            {slide.title || 'Slide Title'}
-                          </h1>
-                        </div>
-                      )}
-
-                      {slide.type === 'TitleWithSubtext' && (
-                        <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-8">
-                          <h1 className="text-4xl font-bold text-white mb-4">
-                            {slide.title || 'Slide Title'}
-                          </h1>
-                          <p className="text-xl text-slate-300">
-                            {slide.subtext || 'Slide subtext'}
-                          </p>
-                        </div>
-                      )}
-
-                      {slide.type === 'TitleWithImage' && (
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <div className="text-center">
-                            <h1 className="text-3xl font-bold text-white mb-4">
-                              {slide.title || 'Slide Title'}
-                            </h1>
-                            {slide.imageUrl && (
-                              <img 
-                                src={slide.imageUrl} 
-                                alt="Slide" 
-                                className="max-h-64 mx-auto rounded-lg shadow-lg"
-                              />
-                            )}
-                          </div>
-                        </div>
-                      )}
-
-                      {slide.type === 'VideoSlide' && (
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <div className="text-center">
-                            <h1 className="text-3xl font-bold text-white mb-4">
-                              {slide.title || 'Video Title'}
-                            </h1>
-                            <div className="bg-black/50 p-8 rounded-lg">
-                              <Play className="h-16 w-16 text-white mx-auto" />
-                              <p className="text-slate-300 mt-2">Video Content</p>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-
-                      {slide.type === 'QuickCheckSlide' && (
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <div className="text-center">
-                            <h1 className="text-3xl font-bold text-white mb-4">
-                              {slide.question || 'Question'}
-                            </h1>
-                            <div className="space-y-2">
-                              {slide.options?.map((option, optionIndex) => (
-                                <div key={optionIndex} className="bg-slate-700/50 p-2 rounded">
-                                  {option}
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        </div>
-                      )}
-
-                      {slide.type === 'CustomHTMLSlide' && (
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <div className="text-center">
-                            <h1 className="text-3xl font-bold text-white mb-4">
-                              Custom HTML
-                            </h1>
-                            <div className="bg-slate-700/50 p-4 rounded-lg">
-                              <p className="text-slate-300">{slide.rawHtml || 'Custom HTML Content'}</p>
-                            </div>
-                          </div>
-                        </div>
-                      )}
+                      {/* Use EditableSlideRenderer for real-time editing */}
+                      <EditableSlideRenderer
+                        slide={slide}
+                        onSlideChange={(updatedSlide) => onSlideChange(index, updatedSlide)}
+                      />
                     </div>
                   </CardContent>
                 </Card>
@@ -821,15 +1022,6 @@ export default function VerticalSlideEditor({
         </div>
       </div>
 
-      {/* Slide settings modal */}
-      {settingsSlideIndex !== null && (
-        <SlideSettingsModal
-          isOpen={settingsSlideIndex !== null}
-          onClose={handleSlideSettingsClose}
-          slide={slides[settingsSlideIndex]}
-          onSlideChange={handleSlideSettingsChange}
-        />
-      )}
     </div>
   );
 } 

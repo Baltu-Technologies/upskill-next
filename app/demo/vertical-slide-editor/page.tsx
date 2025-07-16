@@ -15,52 +15,52 @@ export default function VerticalSlideEditorDemo() {
     {
       id: 'slide-1',
       type: 'TitleSlide',
-      title: 'Welcome to Data Center Security',
-      backgroundColor: '#1e293b'
+      title: 'Enhanced Block Editor Demo',
+      backgroundColor: '#1f2937' // Dark Gray - matches COLOR_OPTIONS
     },
     {
       id: 'slide-2',
       type: 'TitleWithSubtext',
-      title: 'Physical Security Fundamentals',
-      subtext: 'Understanding perimeter defense systems',
-      backgroundColor: '#1e293b'
+      title: 'Smart Text Editing',
+      subtext: 'Click to edit - Press Enter for new blocks - Type / for commands',
+      backgroundColor: '#3b82f6' // Blue - matches COLOR_OPTIONS
     },
     {
       id: 'slide-3',
       type: 'TitleWithImage',
-      title: 'Access Control Systems',
-      imageUrl: '/media/semiconductor/cleanroom.jpg',
-      imagePosition: 'right',
-      backgroundColor: '#1e293b'
+      title: 'Intuitive Block Management',
+      imageUrl: '/media/semiconductor/Technician-with-wafer-in-semiconductor-FAB.jpg',
+      imageLayout: 'right',
+      backgroundColor: '#8b5cf6' // Purple - matches COLOR_OPTIONS
     },
     {
       id: 'slide-4',
       type: 'QuickCheckSlide',
-      question: 'What is the primary purpose of a perimeter fence?',
-      correctAnswer: 'To create a physical barrier and deter unauthorized access',
-      backgroundColor: '#1e293b'
+      question: 'What happens when you press Enter in a text block?',
+      correctAnswer: 'Creates a new block below with placeholder text',
+      backgroundColor: '#10b981' // Green - matches COLOR_OPTIONS
     },
     {
       id: 'slide-5',
       type: 'MarkdownSlide',
-      title: 'Security Layers',
-      content: `# Multi-Layer Security Approach
+      title: 'Enhanced Features',
+      content: `Try these features in any text area:
 
-## Physical Barriers
-- **Perimeter Fencing**: First line of defense
-- **Access Gates**: Controlled entry points
-- **Vehicle Barriers**: Prevent unauthorized vehicle access
+## Smart Placeholders
+- Click anywhere on placeholder text
+- Cursor automatically goes to beginning
+- Start typing to replace
 
-## Detection Systems
-- **Motion Sensors**: Monitor movement in restricted areas
-- **Cameras**: Visual surveillance and recording
-- **Alarms**: Immediate alert systems
+## Enter Key Behavior
+- Press **Enter** to create new blocks
+- New blocks show "Type / to add blocks..."
+- Text wrapping stays within blocks
 
-## Access Control
-- **Badge Systems**: Electronic identification
-- **Biometric Scanners**: Fingerprint and facial recognition
-- **Security Personnel**: Human oversight and response`,
-      backgroundColor: '#1e293b'
+## Drag & Drop
+- Hover to see drag handles
+- Drag blocks to reorder content
+- Visual indicators show drop positions`,
+      backgroundColor: '#ef4444' // Red - matches COLOR_OPTIONS
     }
   ]);
 
@@ -79,34 +79,34 @@ export default function VerticalSlideEditorDemo() {
         newSlide = {
           id: `slide-${Date.now()}`,
           type: 'TitleSlide',
-          title: 'New Title Slide',
-          backgroundColor: '#1e293b'
+          title: '',
+          backgroundColor: '#0F172A'
         };
         break;
       case 'TitleWithSubtext':
         newSlide = {
           id: `slide-${Date.now()}`,
           type: 'TitleWithSubtext',
-          title: 'New Title with Subtext',
-          subtext: 'Add your subtext here',
-          backgroundColor: '#1e293b'
+          title: '',
+          subtext: '',
+          backgroundColor: '#0F172A'
         };
         break;
       case 'MarkdownSlide':
         newSlide = {
           id: `slide-${Date.now()}`,
           type: 'MarkdownSlide',
-          title: 'New Markdown Slide',
-          content: '# New Content\n\nAdd your content here...',
-          backgroundColor: '#1e293b'
+          title: '',
+          content: '',
+          backgroundColor: '#0F172A'
         };
         break;
       default:
         newSlide = {
           id: `slide-${Date.now()}`,
           type: 'TitleSlide',
-          title: 'New Slide',
-          backgroundColor: '#1e293b'
+          title: '',
+          backgroundColor: '#0F172A'
         };
     }
     
@@ -161,8 +161,8 @@ export default function VerticalSlideEditorDemo() {
               Back to Demos
             </Button>
             <div>
-              <h1 className="text-lg font-semibold text-white">Vertical Slide Editor</h1>
-              <p className="text-sm text-slate-400">Demo - Data Center Security Course</p>
+              <h1 className="text-lg font-semibold text-white">Enhanced Vertical Slide Editor</h1>
+              <p className="text-sm text-slate-400">Demo - Smart Block Editing with Enter key, Placeholders & Drag/Drop</p>
             </div>
           </div>
           

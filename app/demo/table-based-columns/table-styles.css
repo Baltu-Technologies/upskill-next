@@ -1,0 +1,58 @@
+/* Table resizing handles and custom styles */
+.table-container table {
+  border-collapse: separate;
+  border-spacing: 0;
+  width: 100%;
+  margin: 16px 0;
+}
+
+.table-container .resize-cursor {
+  cursor: col-resize;
+}
+
+.table-container .column-resize-handle {
+  position: absolute;
+  right: -2px;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background-color: #3b82f6;
+  cursor: col-resize;
+  pointer-events: none;
+}
+
+.table-container .column-resize-handle.active {
+  background-color: #1d4ed8;
+}
+
+.table-container table.resize-cursor {
+  cursor: col-resize;
+}
+
+.table-container .ProseMirror-gapcursor {
+  display: none;
+}
+
+/* Ensure proper styling for table content */
+.table-container table h3 {
+  color: #1e293b;
+  margin-top: 0;
+  margin-bottom: 8px;
+}
+
+.table-container table p {
+  color: #475569;
+  margin-bottom: 0;
+}
+
+/* Table cell hover effects */
+.table-container table td:hover {
+  background-color: #f1f5f9;
+}
+
+/* Table header styling if needed */
+.table-container table th {
+  background-color: #e2e8f0;
+  font-weight: 600;
+  color: #1e293b;
+} 

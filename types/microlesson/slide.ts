@@ -1,5 +1,14 @@
 export type ImageLayout = 'none' | 'top' | 'left' | 'right' | 'bottom' | 'background';
 
+// New column layout types
+export type ColumnLayout = 'none' | '2-equal' | '2-left' | '2-right' | '3-columns' | '4-columns';
+
+export interface ColumnContent {
+  id: string;
+  blocks: string[]; // Array of block IDs or HTML content
+  content?: string; // Rich text content for the column
+}
+
 export interface BaseSlide {
   id: string;
   type: string;
@@ -8,6 +17,11 @@ export interface BaseSlide {
   imageLayout?: ImageLayout;
   imageUrl?: string;
   imageCaption?: string;
+  // New column system properties
+  columnLayout?: ColumnLayout;
+  columns?: ColumnContent[];
+  // Table-based column system
+  tableContent?: string; // HTML content for table-based columns
 }
 
 export interface TitleSlide extends BaseSlide {
@@ -31,7 +45,8 @@ export interface TitleWithImage extends BaseSlide {
   title: string;
   subtitle?: string;
   imageUrl: string;
-  imagePosition: 'left' | 'right'; // Keep for backward compatibility
+  imageLayout?: ImageLayout; // Uses the new layout system
+  imagePosition?: 'left' | 'right'; // Keep for backward compatibility
   caption?: string;
 }
 

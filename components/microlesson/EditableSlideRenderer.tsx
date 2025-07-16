@@ -2,9 +2,11 @@
 
 import React from 'react';
 import { SlideType } from '@/types/microlesson/slide';
-import InlineTextEditor from './InlineTextEditor';
-import { ImageLayout } from '@/types/microlesson/slide';
+import EnhancedInlineTextEditor from './EnhancedInlineTextEditor';
+import { ImageLayout, ColumnLayout } from '@/types/microlesson/slide';
 import TipTapSlideEditor from './TipTapSlideEditor';
+import ColumnEditor from './ColumnEditor';
+import TableBasedColumnEditor from './TableBasedColumnEditor';
 
 interface EditableSlideRendererProps {
   slide: SlideType;
@@ -12,6 +14,16 @@ interface EditableSlideRendererProps {
 }
 
 export default function EditableSlideRenderer({ slide, onSlideChange }: EditableSlideRendererProps) {
+  
+  const handleColumnsChange = (columns: any[]) => {
+    const updatedSlide = { ...slide, columns };
+    onSlideChange(updatedSlide);
+  };
+
+  const handleTableContentChange = (content: string) => {
+    const updatedSlide = { ...slide, tableContent: content };
+    onSlideChange(updatedSlide);
+  };
   const handleTextChange = (field: string, content: string) => {
     const updatedSlide = { ...slide };
     const fieldPath = field.split('.');
@@ -40,11 +52,12 @@ export default function EditableSlideRenderer({ slide, onSlideChange }: Editable
 
   const renderEditableText = (field: string, value: string, className: string = '', placeholder: string = 'Click to edit...') => {
     return (
-      <InlineTextEditor
+      <EnhancedInlineTextEditor
         content={value || ''}
-        onChange={(content) => handleTextChange(field, content)}
+        onChange={(content: string) => handleTextChange(field, content)}
         className={className}
         placeholder={placeholder}
+        showToolbar={false}
       />
     );
   };
@@ -70,18 +83,18 @@ export default function EditableSlideRenderer({ slide, onSlideChange }: Editable
     }
 
     return (
-      <div className="relative group">
+      <div className="relative group w-full h-full">
         <img 
           src={imageUrl} 
           alt={caption || 'Slide image'}
-          className="w-full h-auto rounded-lg shadow-md"
+          className="w-full h-full object-cover"
         />
         {caption && (
-          <div className="mt-2 text-sm text-gray-400 text-center">
-            {renderEditableText('imageCaption', caption, 'text-sm text-gray-400', 'Enter caption...')}
+          <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white text-sm p-2">
+            {renderEditableText('imageCaption', caption, 'text-sm text-white', 'Enter caption...')}
           </div>
         )}
-        <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center">
+        <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
           <input
             type="file"
             accept="image/*"
@@ -104,11 +117,11 @@ export default function EditableSlideRenderer({ slide, onSlideChange }: Editable
     switch (layout) {
       case 'top':
         return (
-          <div className="space-y-6">
-            <div className="w-full">
+          <div className="flex flex-col h-full">
+            <div className="w-full h-64 flex-shrink-0">
               {imageComponent}
             </div>
-            <div>
+            <div className="flex-1 flex items-center justify-center px-8">
               {textContent}
             </div>
           </div>
@@ -116,11 +129,11 @@ export default function EditableSlideRenderer({ slide, onSlideChange }: Editable
       
       case 'left':
         return (
-          <div className="flex items-start gap-8">
-            <div className="flex-1">
+          <div className="flex items-stretch h-full">
+            <div className="flex-1 h-full">
               {imageComponent}
             </div>
-            <div className="flex-1">
+            <div className="flex-1 flex items-center justify-center px-8">
               {textContent}
             </div>
           </div>
@@ -128,11 +141,11 @@ export default function EditableSlideRenderer({ slide, onSlideChange }: Editable
       
       case 'right':
         return (
-          <div className="flex items-start gap-8">
-            <div className="flex-1">
+          <div className="flex items-stretch h-full">
+            <div className="flex-1 flex items-center justify-center px-8">
               {textContent}
             </div>
-            <div className="flex-1">
+            <div className="flex-1 h-full">
               {imageComponent}
             </div>
           </div>
@@ -140,11 +153,11 @@ export default function EditableSlideRenderer({ slide, onSlideChange }: Editable
       
       case 'bottom':
         return (
-          <div className="space-y-6">
-            <div>
+          <div className="flex flex-col h-full">
+            <div className="flex-1 flex items-center justify-center px-8">
               {textContent}
             </div>
-            <div className="w-full">
+            <div className="w-full h-64 flex-shrink-0">
               {imageComponent}
             </div>
           </div>
@@ -152,17 +165,8 @@ export default function EditableSlideRenderer({ slide, onSlideChange }: Editable
       
       case 'background':
         return (
-          <div className="relative">
-            <div 
-              className="absolute inset-0 bg-cover bg-center rounded-lg"
-              style={{ 
-                backgroundImage: `url(${imageUrl})`,
-                filter: 'brightness(0.3)'
-              }}
-            />
-            <div className="relative z-10 p-8">
-              {textContent}
-            </div>
+          <div className="w-full h-full flex items-center justify-center">
+            {textContent}
           </div>
         );
       
@@ -172,8 +176,8 @@ export default function EditableSlideRenderer({ slide, onSlideChange }: Editable
   };
 
   const renderSlideContent = () => {
-    const currentLayout = (slide as any).imageLayout || 'none';
-    const imageUrl = (slide as any).imageUrl;
+    const currentLayout = slide.imageLayout || 'none';
+    const imageUrl = slide.imageUrl;
 
     switch (slide.type) {
       case 'TitleSlide':
@@ -183,7 +187,11 @@ export default function EditableSlideRenderer({ slide, onSlideChange }: Editable
             {renderEditableText('subtitle', slide.subtitle || '', 'text-xl text-gray-300', 'Enter subtitle...')}
           </div>
         );
-        return renderContentWithImage(titleContent, imageUrl, currentLayout);
+        return currentLayout === 'none' ? (
+          <div className="flex items-center justify-center h-full px-8">
+            {titleContent}
+          </div>
+        ) : renderContentWithImage(titleContent, imageUrl, currentLayout);
 
       case 'TitleWithSubtext':
         const subtextContent = (
@@ -202,7 +210,11 @@ export default function EditableSlideRenderer({ slide, onSlideChange }: Editable
             )}
           </div>
         );
-        return renderContentWithImage(subtextContent, imageUrl, currentLayout);
+        return currentLayout === 'none' ? (
+          <div className="flex items-center justify-center h-full px-8">
+            {subtextContent}
+          </div>
+        ) : renderContentWithImage(subtextContent, imageUrl, currentLayout);
 
       case 'TitleWithImage':
         const titleImageContent = (
@@ -212,11 +224,15 @@ export default function EditableSlideRenderer({ slide, onSlideChange }: Editable
           </div>
         );
         // Use new layout system but fallback to old imagePosition for backward compatibility
-        const imageLayout = (slide as any).imageLayout || (slide.imagePosition === 'left' ? 'left' : 'right');
-        return renderContentWithImage(titleImageContent, slide.imageUrl, imageLayout);
+        const imageLayout = slide.imageLayout || (slide.imagePosition === 'left' ? 'left' : (slide.imagePosition === 'right' ? 'right' : 'none'));
+        return imageLayout === 'none' ? (
+          <div className="flex items-center justify-center h-full px-8">
+            {titleImageContent}
+          </div>
+        ) : renderContentWithImage(titleImageContent, slide.imageUrl, imageLayout);
 
       case 'VideoSlide':
-        return (
+        const videoContent = (
           <div>
             {renderEditableText('title', slide.title, 'text-3xl font-bold mb-6 text-white', 'Enter title...')}
             {renderEditableText('description', slide.description || '', 'text-lg mb-4 text-gray-300', 'Enter description...')}
@@ -235,9 +251,14 @@ export default function EditableSlideRenderer({ slide, onSlideChange }: Editable
             )}
           </div>
         );
+        return (
+          <div className="flex items-center justify-center h-full px-8">
+            {videoContent}
+          </div>
+        );
 
       case 'QuickCheckSlide':
-        return (
+        const quickCheckContent = (
           <div>
             {slide.title && renderEditableText('title', slide.title, 'text-3xl font-bold mb-6 text-white', 'Enter title...')}
             {renderEditableText('question', slide.question || '', 'text-2xl font-semibold mb-6 text-white', 'Enter question...')}
@@ -251,6 +272,11 @@ export default function EditableSlideRenderer({ slide, onSlideChange }: Editable
             </div>
           </div>
         );
+        return (
+          <div className="flex items-center justify-center h-full px-8">
+            {quickCheckContent}
+          </div>
+        );
 
       case 'MarkdownSlide':
         const markdownContent = (
@@ -259,11 +285,15 @@ export default function EditableSlideRenderer({ slide, onSlideChange }: Editable
             {renderEditableText('content', slide.content || '', 'text-lg prose prose-invert max-w-none text-gray-200', 'Enter content...')}
           </div>
         );
-        return renderContentWithImage(markdownContent, imageUrl, currentLayout);
+        return currentLayout === 'none' ? (
+          <div className="flex items-center justify-center h-full px-8">
+            {markdownContent}
+          </div>
+        ) : renderContentWithImage(markdownContent, imageUrl, currentLayout);
 
       case 'HotspotActivitySlide':
         return (
-          <div>
+          <div className="px-8">
             {renderEditableText('title', slide.title, 'text-3xl font-bold mb-6 text-white', 'Enter title...')}
             {slide.instruction && renderEditableText('instruction', slide.instruction, 'text-lg mb-4 text-gray-300', 'Enter instruction...')}
             <div className="bg-gray-700 rounded-lg p-8 aspect-video flex items-center justify-center">
@@ -274,7 +304,7 @@ export default function EditableSlideRenderer({ slide, onSlideChange }: Editable
 
       case 'AR3DModelSlide':
         return (
-          <div>
+          <div className="px-8">
             {renderEditableText('title', slide.title, 'text-3xl font-bold mb-6 text-white', 'Enter title...')}
             <div className="bg-gray-700 rounded-lg p-8 aspect-video flex items-center justify-center">
               <p className="text-gray-400">3D Model: {slide.modelUrl}</p>
@@ -284,7 +314,7 @@ export default function EditableSlideRenderer({ slide, onSlideChange }: Editable
 
       case 'CustomHTMLSlide':
         return (
-          <div>
+          <div className="px-8">
             <div 
               className="text-gray-200" 
               dangerouslySetInnerHTML={{ __html: slide.rawHtml || '' }}
@@ -307,14 +337,51 @@ export default function EditableSlideRenderer({ slide, onSlideChange }: Editable
     <div className="w-full h-full">
       {/* Main slide content */}
       <div 
-        className="w-full h-full rounded-lg shadow-lg p-8 flex items-center justify-center"
+        className="w-full h-full rounded-lg shadow-lg relative overflow-hidden"
         style={{
-          backgroundColor: slide.backgroundColor || '#0F172A'
+          background: slide.backgroundColor || '#0F172A'
         }}
       >
-        <div className="w-full max-w-4xl">
-          {renderSlideContent()}
-        </div>
+        {/* Background image overlay for background layout */}
+        {slide.imageUrl && slide.imageLayout === 'background' && (
+          <div 
+            className="absolute inset-0 bg-cover bg-center"
+            style={{ 
+              backgroundImage: `url(${slide.imageUrl})`,
+              opacity: 0.3
+            }}
+          />
+        )}
+        
+        {/* Conditional container based on layout */}
+        {(slide as any).tableContent !== undefined ? (
+          // For table-based columns, use table editor
+          <div className="w-full h-full max-w-6xl mx-auto p-8 relative z-10">
+            <TableBasedColumnEditor
+              content={(slide as any).tableContent || ''}
+              onContentChange={handleTableContentChange}
+            />
+          </div>
+        ) : (slide as any).columnLayout && (slide as any).columnLayout !== 'none' ? (
+          // For column layouts, use column editor
+          <div className="w-full h-full max-w-6xl mx-auto p-8 relative z-10">
+            <ColumnEditor
+              layout={(slide as any).columnLayout}
+              columns={(slide as any).columns || []}
+              onColumnsChange={handleColumnsChange}
+            />
+          </div>
+        ) : slide.imageLayout && slide.imageLayout !== 'none' && slide.imageLayout !== 'background' ? (
+          // For image layouts that need to reach edges, don't use padding container
+          <div className="w-full h-full relative z-10">
+            {renderSlideContent()}
+          </div>
+        ) : (
+          // For regular layouts or background, use padding container
+          <div className="w-full h-full max-w-4xl mx-auto p-8 relative z-10">
+            {renderSlideContent()}
+          </div>
+        )}
       </div>
     </div>
   );
