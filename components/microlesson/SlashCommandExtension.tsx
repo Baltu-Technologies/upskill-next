@@ -373,8 +373,24 @@ export interface SlashCommandPluginState {
 
 export const SlashCommandPlugin = new PluginKey('slashCommand');
 
+// Global variable to store the callback
+let slashCommandCallback: ((state: SlashCommandPluginState) => void) | null = null;
+
 export const SlashCommandExtension = Extension.create({
   name: 'slashCommand',
+  
+  addOptions() {
+    return {
+      onSlashCommand: null,
+    }
+  },
+  
+  onBeforeCreate() {
+    // Store the callback when the extension is created
+    if (this.options.onSlashCommand) {
+      slashCommandCallback = this.options.onSlashCommand;
+    }
+  },
   
   addProseMirrorPlugins() {
     return [
@@ -400,36 +416,50 @@ export const SlashCommandExtension = Extension.create({
             const textBefore = doc.textBetween(Math.max(0, from - 20), from, '\n');
             const slashIndex = textBefore.lastIndexOf('/');
             
+            let nextState: SlashCommandPluginState;
+            
             if (slashIndex === -1) {
-              return { ...state, active: false };
+              nextState = { ...state, active: false };
+            } else {
+              const beforeSlash = textBefore.slice(0, slashIndex);
+              const afterSlash = textBefore.slice(slashIndex + 1);
+              
+              // Only activate if slash is at start of line or after whitespace
+              if (beforeSlash.length > 0 && !beforeSlash.match(/\s$/)) {
+                nextState = { ...state, active: false };
+              } else {
+                // Filter commands based on query
+                const query = afterSlash.toLowerCase();
+                const filteredCommands = SLASH_COMMANDS.filter(command =>
+                  command.title.toLowerCase().includes(query) ||
+                  command.description.toLowerCase().includes(query) ||
+                  command.searchTerms?.some(term => term.toLowerCase().includes(query))
+                );
+                
+                nextState = {
+                  active: true,
+                  range: {
+                    from: from - afterSlash.length - 1,
+                    to: from
+                  },
+                  query: afterSlash,
+                  filteredCommands,
+                  selectedIndex: 0
+                };
+              }
             }
             
-            const beforeSlash = textBefore.slice(0, slashIndex);
-            const afterSlash = textBefore.slice(slashIndex + 1);
-            
-            // Only activate if slash is at start of line or after whitespace
-            if (beforeSlash.length > 0 && !beforeSlash.match(/\s$/)) {
-              return { ...state, active: false };
+            // Call the callback if state changed and callback exists
+            if (slashCommandCallback && 
+                (nextState.active !== state.active || 
+                 nextState.query !== state.query || 
+                 nextState.filteredCommands.length !== state.filteredCommands.length)) {
+              // Use setTimeout to avoid calling setState during render
+              const callback = slashCommandCallback;
+              setTimeout(() => callback(nextState), 0);
             }
             
-            // Filter commands based on query
-            const query = afterSlash.toLowerCase();
-            const filteredCommands = SLASH_COMMANDS.filter(command =>
-              command.title.toLowerCase().includes(query) ||
-              command.description.toLowerCase().includes(query) ||
-              command.searchTerms?.some(term => term.toLowerCase().includes(query))
-            );
-            
-            return {
-              active: true,
-              range: {
-                from: from - afterSlash.length - 1,
-                to: from
-              },
-              query: afterSlash,
-              filteredCommands,
-              selectedIndex: 0
-            };
+            return nextState;
           }
         },
         

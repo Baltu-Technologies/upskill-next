@@ -38,10 +38,21 @@ export default function SingleSlideEditorDemo() {
 
   const createEmptySlide = () => {
     setSlide({
-      id: 'test-slide-2',
+      id: 'test-slide-empty',
       type: 'TitleWithSubtext',
       title: '',
       subtext: '',
+      content: '',
+      backgroundColor: '#0F172A'
+    });
+  };
+
+  const createSlashTestSlide = () => {
+    setSlide({
+      id: 'test-slide-slash',
+      type: 'TitleWithSubtext',
+      title: 'Slash Commands Position Test',
+      subtext: 'Click in the content area and type "/" to test positioning',
       content: '',
       backgroundColor: '#0F172A'
     });
@@ -84,7 +95,7 @@ export default function SingleSlideEditorDemo() {
             </Button>
             <div>
               <h1 className="text-lg font-semibold text-white">Single Slide Editor</h1>
-              <p className="text-sm text-slate-400">Focus on perfecting text editing behavior</p>
+              <p className="text-sm text-slate-400">Focus on perfecting text editing behavior + Slash Commands (type "/" in any text area)</p>
             </div>
           </div>
           
@@ -109,6 +120,14 @@ export default function SingleSlideEditorDemo() {
             <Button
               variant="outline"
               size="sm"
+              onClick={createSlashTestSlide}
+              className="text-slate-300 border-slate-600 hover:bg-slate-700"
+            >
+              Slash Commands Test
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
               onClick={createNewTitleSlide}
               className="text-slate-300 border-slate-600 hover:bg-slate-700"
             >
@@ -119,6 +138,16 @@ export default function SingleSlideEditorDemo() {
               className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
             >
               Sample Content
+            </button>
+            <button 
+              onClick={() => {
+                if (typeof window !== 'undefined' && (window as any).testSlashMenu) {
+                  (window as any).testSlashMenu();
+                }
+              }}
+              className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
+            >
+              Test Slash Menu
             </button>
           </div>
         </div>
@@ -138,11 +167,17 @@ export default function SingleSlideEditorDemo() {
                 </p>
               </CardHeader>
               <CardContent>
-                <div className="aspect-video bg-slate-900 rounded-lg overflow-hidden">
+                <div className="aspect-video bg-slate-900 rounded-lg overflow-hidden relative">
                   <EditableSlideRenderer
                     slide={slide}
                     onSlideChange={handleSlideChange}
                   />
+                  {/* Slash Commands Helper */}
+                  {(!(slide as any).content || (slide as any).content.trim() === '') && (
+                    <div className="absolute bottom-4 right-4 bg-slate-800/90 text-slate-300 px-3 py-2 rounded-lg text-xs border border-slate-600">
+                      💡 Try typing "/" in the content area
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -155,39 +190,85 @@ export default function SingleSlideEditorDemo() {
                 <CardTitle className="text-white text-lg">Testing Checklist</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                                  <div className="space-y-3">
-                    <div className="flex items-start gap-3">
-                      <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
-                      <div>
-                        <p className="text-white font-medium">Title Blocks (Empty)</p>
-                        <p className="text-slate-400 text-sm">Empty title blocks show "Untitled Card" as placeholder text.</p>
-                      </div>
+                <div className="space-y-3">
+                  <div className="flex items-start gap-3">
+                    <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
+                    <div>
+                      <p className="text-white font-medium">Title Blocks (Empty)</p>
+                      <p className="text-slate-400 text-sm">Empty title blocks show "Untitled Card" as placeholder text.</p>
                     </div>
-                    
-                    <div className="flex items-start gap-3">
-                      <div className="w-2 h-2 bg-green-500 rounded-full mt-2 flex-shrink-0"></div>
-                      <div>
-                        <p className="text-white font-medium">Content Blocks (Empty)</p>
-                        <p className="text-slate-400 text-sm">Empty content blocks show "Type / to add blocks or 📝 🖼️ 📊" with slash command support.</p>
-                      </div>
+                  </div>
+                  
+                  <div className="flex items-start gap-3">
+                    <div className="w-2 h-2 bg-green-500 rounded-full mt-2 flex-shrink-0"></div>
+                    <div>
+                      <p className="text-white font-medium">Content Blocks (Empty)</p>
+                      <p className="text-slate-400 text-sm">Empty content blocks show "Type / to add blocks or 📝 🖼️ 📊" with slash command support.</p>
                     </div>
-                    
-                    <div className="flex items-start gap-3">
-                      <div className="w-2 h-2 bg-purple-500 rounded-full mt-2 flex-shrink-0"></div>
-                      <div>
-                        <p className="text-white font-medium">Slash Commands</p>
-                        <p className="text-slate-400 text-sm">Type "/" in any block to open the slash command menu for adding different content types.</p>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-start gap-3">
-                      <div className="w-2 h-2 bg-orange-500 rounded-full mt-2 flex-shrink-0"></div>
-                      <div>
-                        <p className="text-white font-medium">Delete to Test</p>
-                        <p className="text-slate-400 text-sm">Click "Sample Content" then delete text to see placeholder behavior.</p>
+                  </div>
+                  
+                  <div className="flex items-start gap-3">
+                    <div className="w-2 h-2 bg-purple-500 rounded-full mt-2 flex-shrink-0"></div>
+                    <div>
+                      <p className="text-white font-medium">🎯 Slash Commands (PRIMARY FEATURE)</p>
+                      <p className="text-slate-400 text-sm">Type "/" in any block to open the slash command menu. Try these commands:</p>
+                      <div className="mt-2 space-y-1">
+                        <p className="text-xs text-slate-300">• <code className="bg-slate-700 px-1 rounded">/heading</code> - Add headings</p>
+                        <p className="text-xs text-slate-300">• <code className="bg-slate-700 px-1 rounded">/image</code> - Upload images</p>
+                        <p className="text-xs text-slate-300">• <code className="bg-slate-700 px-1 rounded">/video</code> - Embed videos</p>
+                        <p className="text-xs text-slate-300">• <code className="bg-slate-700 px-1 rounded">/quiz</code> - Create quizzes</p>
+                        <p className="text-xs text-slate-300">• <code className="bg-slate-700 px-1 rounded">/tip</code> - Add tips</p>
+                        <p className="text-xs text-slate-300">• <code className="bg-slate-700 px-1 rounded">/warning</code> - Add warnings</p>
                       </div>
                     </div>
                   </div>
+                  
+                  <div className="flex items-start gap-3">
+                    <div className="w-2 h-2 bg-orange-500 rounded-full mt-2 flex-shrink-0"></div>
+                    <div>
+                      <p className="text-white font-medium">Delete to Test</p>
+                      <p className="text-slate-400 text-sm">Click "Sample Content" then delete text to see placeholder behavior.</p>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Slash Command Quick Reference */}
+            <Card className="bg-slate-800/50 border-slate-700">
+              <CardHeader>
+                <CardTitle className="text-white text-lg">💡 Slash Command Quick Reference</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <div className="p-3 bg-slate-900 rounded-lg">
+                    <p className="text-sm text-slate-300 mb-2">📝 <strong>Text Formatting:</strong></p>
+                    <p className="text-xs text-slate-400">
+                      /heading, /paragraph, /quote, /code
+                    </p>
+                  </div>
+                  
+                  <div className="p-3 bg-slate-900 rounded-lg">
+                    <p className="text-sm text-slate-300 mb-2">📋 <strong>Lists & Organization:</strong></p>
+                    <p className="text-xs text-slate-400">
+                      /list, /numbered, /task, /divider
+                    </p>
+                  </div>
+                  
+                  <div className="p-3 bg-slate-900 rounded-lg">
+                    <p className="text-sm text-slate-300 mb-2">🎨 <strong>Media & Interactive:</strong></p>
+                    <p className="text-xs text-slate-400">
+                      /image, /video, /quiz, /hotspot, /chart
+                    </p>
+                  </div>
+                  
+                  <div className="p-3 bg-slate-900 rounded-lg">
+                    <p className="text-sm text-slate-300 mb-2">💡 <strong>Callouts:</strong></p>
+                    <p className="text-xs text-slate-400">
+                      /tip, /warning, /callout, /bookmark
+                    </p>
+                  </div>
+                </div>
               </CardContent>
             </Card>
 

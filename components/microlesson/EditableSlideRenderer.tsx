@@ -50,14 +50,13 @@ export default function EditableSlideRenderer({ slide, onSlideChange }: Editable
     }
   };
 
-  const renderEditableText = (field: string, value: string, className: string = '', placeholder: string = 'Click to edit...', blockType: 'title' | 'content' | 'subtitle' | 'other' = 'other') => {
+  const renderEditableText = (field: string, value: string, className: string = '', placeholder: string = 'Click to edit...', blockType: 'title' | 'content' | 'text' = 'content') => {
     return (
       <EnhancedInlineTextEditor
         content={value || ''}
-        onChange={(content: string) => handleTextChange(field, content)}
+        onUpdate={(content: string) => handleTextChange(field, content)}
         className={className}
         placeholder={placeholder}
-        showToolbar={false}
         blockType={blockType}
       />
     );
@@ -92,7 +91,7 @@ export default function EditableSlideRenderer({ slide, onSlideChange }: Editable
         />
         {caption && (
           <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white text-sm p-2">
-            {renderEditableText('imageCaption', caption, 'text-sm text-white', 'Enter caption...', 'other')}
+                          {renderEditableText('imageCaption', caption, 'text-sm text-white', 'Enter caption...', 'text')}
           </div>
         )}
         <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
@@ -193,7 +192,7 @@ export default function EditableSlideRenderer({ slide, onSlideChange }: Editable
         const titleContent = (
           <div className="text-center">
             {renderEditableText('title', slide.title, 'text-4xl font-bold mb-4 text-white', 'Enter slide title...', 'title')}
-            {renderEditableText('subtitle', slide.subtitle || '', 'text-xl text-gray-300', 'Enter subtitle...', 'subtitle')}
+            {renderEditableText('subtitle', slide.subtitle || '', 'text-xl text-gray-300', 'Enter subtitle...', 'text')}
           </div>
         );
         return currentLayout === 'none' ? (
@@ -208,7 +207,7 @@ export default function EditableSlideRenderer({ slide, onSlideChange }: Editable
         const subtextContent = (
           <div>
             {renderEditableText('title', slide.title, 'text-3xl font-bold mb-6 text-white', 'Enter title...', 'title')}
-            {renderEditableText('subtext', slide.subtext || '', 'text-lg mb-4 text-gray-300', 'Enter subtext...', 'subtitle')}
+            {renderEditableText('subtext', slide.subtext || '', 'text-lg mb-4 text-gray-300', 'Enter subtext...', 'text')}
             {renderEditableText('content', slide.content || '', 'text-lg text-gray-200', 'Enter content...', 'content')}
             {slide.bullets && slide.bullets.length > 0 && (
               <ul className="list-disc list-inside text-lg text-gray-200 space-y-2 mt-4">
@@ -233,7 +232,7 @@ export default function EditableSlideRenderer({ slide, onSlideChange }: Editable
         const titleImageContent = (
           <div>
             {renderEditableText('title', slide.title, 'text-3xl font-bold mb-4 text-white', 'Enter title...', 'title')}
-            {renderEditableText('subtitle', slide.subtitle || '', 'text-lg text-gray-300', 'Enter subtitle...', 'subtitle')}
+            {renderEditableText('subtitle', slide.subtitle || '', 'text-lg text-gray-300', 'Enter subtitle...', 'text')}
           </div>
         );
         // Use new layout system but fallback to old imagePosition for backward compatibility

@@ -57,14 +57,20 @@ export const SlashCommandMenu: React.FC<SlashCommandMenuProps> = ({
     return null;
   }
 
+  console.log('SlashCommandMenu rendering:', {
+    itemCount: items.length,
+    position: position,
+    left: position?.x || 0,
+    top: (position?.y || 0) + 25
+  });
+
   return (
     <div
       ref={menuRef}
       className="fixed z-50 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg dark:shadow-gray-900 min-w-[280px] max-w-[400px] max-h-[300px] overflow-y-auto"
       style={{
         left: position?.x || 0,
-        top: position?.y || 0,
-        transform: 'translateY(-100%)',
+        top: (position?.y || 0) + 25,
       }}
     >
       {/* Header */}

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Underline from '@tiptap/extension-underline';
@@ -8,70 +8,139 @@ import TextAlign from '@tiptap/extension-text-align';
 import Color from '@tiptap/extension-color';
 import { TextStyle } from '@tiptap/extension-text-style';
 import Link from '@tiptap/extension-link';
+import Image from '@tiptap/extension-image';
+import TaskList from '@tiptap/extension-task-list';
+import TaskItem from '@tiptap/extension-task-item';
 import { FontSize } from './FontSizeExtension';
 import { SlashCommandExtension, SlashCommandPlugin } from './SlashCommandExtension';
 import SlashCommandMenu from './SlashCommandMenu';
+import { SLASH_COMMANDS } from './SlashCommandExtension';
 import './enhanced-tiptap-styles.css';
 
 interface EnhancedInlineTextEditorProps {
   content: string;
-  onChange: (content: string) => void;
-  className?: string;
+  onUpdate: (content: string) => void;
   placeholder?: string;
-  showToolbar?: boolean;
-  blockType?: 'title' | 'content' | 'subtitle' | 'other';
+  className?: string;
+  blockType?: 'title' | 'content' | 'text';
+  isReadOnly?: boolean;
+  onFocus?: () => void;
+  onBlur?: () => void;
+  debugMode?: boolean;
 }
 
-export default function EnhancedInlineTextEditor({ 
-  content, 
-  onChange, 
-  className = '', 
-  placeholder = 'Click to edit...',
-  showToolbar = true,
-  blockType = 'other'
-}: EnhancedInlineTextEditorProps) {
+const EnhancedInlineTextEditor: React.FC<EnhancedInlineTextEditorProps> = ({
+  content,
+  onUpdate,
+  placeholder,
+  className = '',
+  blockType = 'content',
+  isReadOnly = false,
+  onFocus,
+  onBlur,
+  debugMode = false,
+}) => {
   const [slashCommandState, setSlashCommandState] = useState<any>(null);
   const [menuPosition, setMenuPosition] = useState<{ x: number; y: number } | null>(null);
   const [isInitialized, setIsInitialized] = useState(false);
+  const editorRef = useRef<HTMLDivElement>(null);
+  const slashCommandStateRef = useRef<any>(null);
 
-  // Helper function to determine if content should be treated as placeholder
-  const isPlaceholderContent = useCallback((text: string): boolean => {
-    if (!text || text.trim() === '') return false;
-    
-    const placeholderPatterns = [
-      /^Click to edit/i,
-      /^New Title Slide$/i,
-      /^New Title/i,
-      /^Enter /i,
-      /^Add /i,
-      /^Type /i,
-      /^Untitled/i,
-      /^New Slide$/i,
-      /^New Markdown Slide$/i,
-      /^New Title with Subtext$/i,
-      /^Add your/i,
-      /^enter content here/i
-    ];
-    
-    return placeholderPatterns.some(pattern => pattern.test(text.trim()));
+  // Update ref whenever state changes
+  useEffect(() => {
+    slashCommandStateRef.current = slashCommandState;
+  }, [slashCommandState]);
+
+  // Helper function to get cursor position - NO dependencies on editor
+  const getCursorPosition = useCallback((editorInstance: any) => {
+    try {
+      if (!editorInstance || !editorRef.current) {
+        return { x: 100, y: 100 }; // Fallback position
+      }
+
+      const { selection } = editorInstance.state;
+      const pos = selection.from;
+      
+      // Method 1: Use TipTap's coordsAtPos
+      try {
+        const coords = editorInstance.view.coordsAtPos(pos);
+        const editorContainer = editorRef.current;
+        const containerRect = editorContainer.getBoundingClientRect();
+        
+        const relativeX = coords.left - containerRect.left;
+        const relativeY = coords.top - containerRect.top;
+        
+        // Validate position
+        if (relativeX > 0 && relativeY > 0 && relativeX < containerRect.width && relativeY < containerRect.height) {
+          return { x: relativeX, y: relativeY };
+        }
+      } catch (error) {
+        // Continue to fallback methods
+      }
+      
+      // Method 2: Use browser selection API
+      try {
+        const selection = window.getSelection();
+        if (selection && selection.rangeCount > 0) {
+          const range = selection.getRangeAt(0);
+          const rect = range.getBoundingClientRect();
+          const editorContainer = editorRef.current;
+          const containerRect = editorContainer.getBoundingClientRect();
+          
+          const relativeX = rect.left - containerRect.left;
+          const relativeY = rect.top - containerRect.top;
+          
+          if (relativeX > 0 && relativeY > 0) {
+            return { x: relativeX, y: relativeY };
+          }
+        }
+      } catch (error) {
+        // Continue to fallback methods
+      }
+      
+      // Method 3: Fallback - use container position
+      return { x: 100, y: 100 };
+      
+    } catch (error) {
+      console.error('Error getting cursor position:', error);
+      return { x: 100, y: 100 }; // Safe fallback
+    }
+  }, []); // No dependencies
+
+  // Handle slash command execution - NO dependencies on editor or state
+  const handleSlashCommand = useCallback((command: any, editorInstance: any, state?: any) => {
+    try {
+      if (editorInstance && state) {
+        const { range } = state;
+        
+        // Execute the command with both editor and range
+        if (command.command) {
+          command.command(editorInstance, range);
+        }
+        
+        // Clear state
+        setSlashCommandState(null);
+        setMenuPosition(null);
+      }
+    } catch (error) {
+      console.error('Error handling slash command:', error);
+    }
+  }, []); // No dependencies
+
+  // Test function for debugging
+  const testSlashMenu = useCallback(() => {
+    setMenuPosition({ x: 200, y: 200 });
+    setSlashCommandState({
+      active: true,
+      query: '',
+      range: { from: 0, to: 0 },
+      filteredCommands: SLASH_COMMANDS.slice(0, 5),
+      selectedIndex: 0
+    });
   }, []);
 
-  const shouldTreatAsPlaceholder = isPlaceholderContent(content);
-
-  // Get the appropriate placeholder text based on blockType
-  const getPlaceholderText = useCallback(() => {
-    if (blockType === 'title') {
-      return 'Untitled Card';
-    } else if (blockType === 'content') {
-      return 'Type / to add blocks or 📝 🖼️ 📊';
-    } else if (blockType === 'subtitle') {
-      return 'Add subtitle...';
-    } else {
-      return placeholder;
-    }
-  }, [blockType, placeholder]);
-
   const editor = useEditor({
+    immediatelyRender: false, // Fix SSR hydration mismatch
     extensions: [
       StarterKit.configure({
         bulletList: {
@@ -85,108 +154,117 @@ export default function EnhancedInlineTextEditor({
         heading: {
           levels: [1, 2, 3, 4, 5, 6],
         },
-        paragraph: {
-          HTMLAttributes: {
-            class: 'my-2',
-          },
-        },
       }),
       Underline,
       TextAlign.configure({
         types: ['heading', 'paragraph'],
       }),
-      Color.configure({
-        types: ['textStyle'],
-      }),
+      Color.configure({ types: [TextStyle.name] }),
       TextStyle,
-      FontSize,
       Link.configure({
         openOnClick: false,
+        HTMLAttributes: {
+          class: 'text-blue-600 underline hover:text-blue-800',
+        },
       }),
-      SlashCommandExtension,
+      Image.configure({
+        HTMLAttributes: {
+          class: 'max-w-full h-auto rounded-lg',
+        },
+      }),
+      TaskList,
+      TaskItem.configure({
+        nested: true,
+      }),
+      FontSize,
+      SlashCommandExtension.configure({
+        onSlashCommand: (state: any) => {
+          setSlashCommandState(state);
+          
+          if (state.active) {
+            // Use a timeout to ensure editor is ready
+            setTimeout(() => {
+              const currentEditor = editor;
+              if (currentEditor) {
+                const position = getCursorPosition(currentEditor);
+                setMenuPosition(position);
+              } else {
+                setMenuPosition({ x: 200, y: 200 }); // Fallback position
+              }
+            }, 10);
+          } else {
+            setMenuPosition(null);
+          }
+        },
+      }),
     ],
     content: content || '',
-    immediatelyRender: false,
-    editorProps: {
-      attributes: {
-        class: `enhanced-editor prose prose-lg prose-invert max-w-none focus:outline-none min-h-[40px] p-2 ${className}`,
-      },
-      // Handle click events to implement placeholder behavior
-      handleClickOn: (view, pos, node, nodePos, event, direct) => {
-        try {
-          if (shouldTreatAsPlaceholder && direct) {
-            // For placeholder content, always position cursor at beginning and select all
-            event.preventDefault();
-            // Use the editor commands to select all content
-            setTimeout(() => {
-              if (editor) {
-                editor.commands.selectAll();
-                editor.commands.focus();
-              }
-            }, 0);
-            return true;
-          }
-          return false;
-        } catch (error) {
-          console.error('Error in handleClickOn:', error);
-          return false;
-        }
-      },
+    editable: !isReadOnly,
+    onUpdate: ({ editor: editorInstance }) => {
+      if (isInitialized) {
+        const html = editorInstance.getHTML();
+        onUpdate(html);
+      }
     },
-    onUpdate: ({ editor }) => {
-      try {
-        onChange(editor.getHTML());
-        
-        // Handle slash command state updates
-        const pluginState = SlashCommandPlugin.getState(editor.state);
-        if (pluginState?.active && pluginState.filteredCommands.length > 0) {
-          setSlashCommandState(pluginState);
-          
-          // Calculate menu position
-          const { from } = pluginState.range;
-          const coords = editor.view.coordsAtPos(from);
-          setMenuPosition({ x: coords.left, y: coords.top });
-        } else {
+    onCreate: ({ editor: editorInstance }) => {
+      setIsInitialized(true);
+    },
+    onFocus: () => {
+      if (onFocus) onFocus();
+    },
+    onBlur: () => {
+      if (onBlur) onBlur();
+    },
+  });
+
+  // Add keyboard event handling for slash command menu - AFTER editor is created
+  useEffect(() => {
+    if (!editor) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      // Use a ref to get the latest state without adding it to dependencies
+      const currentState = slashCommandStateRef.current;
+      
+      if (currentState && currentState.active && currentState.filteredCommands.length > 0) {
+        if (event.key === 'ArrowDown') {
+          event.preventDefault();
+          setSlashCommandState((prev: any) => ({
+            ...prev,
+            selectedIndex: (prev.selectedIndex + 1) % prev.filteredCommands.length
+          }));
+        } else if (event.key === 'ArrowUp') {
+          event.preventDefault();
+          setSlashCommandState((prev: any) => ({
+            ...prev,
+            selectedIndex: prev.selectedIndex === 0 
+              ? prev.filteredCommands.length - 1 
+              : prev.selectedIndex - 1
+          }));
+        } else if (event.key === 'Enter') {
+          event.preventDefault();
+          const selectedCommand = currentState.filteredCommands[currentState.selectedIndex];
+          if (selectedCommand) {
+            // Call handleSlashCommand directly with current state
+            handleSlashCommand(selectedCommand, editor, currentState);
+          }
+        } else if (event.key === 'Escape') {
+          event.preventDefault();
           setSlashCommandState(null);
           setMenuPosition(null);
         }
-      } catch (error) {
-        console.error('Error in onUpdate:', error);
       }
-    },
-    onFocus: ({ editor }) => {
-      try {
-        // When focusing on placeholder content, select all text
-        if (shouldTreatAsPlaceholder) {
-          setTimeout(() => {
-            editor.commands.selectAll();
-          }, 0);
-        }
-      } catch (error) {
-        console.error('Error in onFocus:', error);
-      }
-    },
-    onCreate: ({ editor }) => {
-      try {
-        console.log('EnhancedInlineTextEditor onCreate called', {
-          isEmpty: editor.isEmpty,
-          content: content,
-          blockType: blockType
-        });
-        
-        setIsInitialized(true);
-        
-        // Focus the editor to make it ready for input
-        setTimeout(() => {
-          if (editor) {
-            editor.commands.focus();
-          }
-        }, 0);
-      } catch (error) {
-        console.error('Error in onCreate:', error);
-      }
-    },
-  });
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [editor]); // Only depend on editor, not on state or handleSlashCommand
+
+  // Add test function to window for debugging
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      (window as any).testSlashMenu = testSlashMenu;
+    }
+  }, []); // No dependencies needed
 
   // Update content when prop changes
   useEffect(() => {
@@ -194,114 +272,114 @@ export default function EnhancedInlineTextEditor({
       try {
         const currentContent = editor.getHTML();
         
-        console.log('Content useEffect triggered', {
-          content: content,
-          currentContent: currentContent,
-          blockType: blockType,
-          isInitialized: isInitialized
-        });
-        
         // Only update if content is different and editor is initialized
         if (content !== currentContent) {
           if (content && content.trim() !== '') {
-            console.log('Setting editor content to:', content);
             // If content is provided, set it normally
             editor.commands.setContent(content);
           } else if (content === '' && currentContent !== '') {
-            console.log('Clearing editor content');
             // If content is explicitly set to empty, clear the editor
             editor.commands.clearContent();
           }
         }
       } catch (error) {
-        console.error('Error in content useEffect:', error);
+        console.error('Error updating editor content:', error);
       }
     }
-  }, [content, editor, blockType, isInitialized]);
+  }, [content, editor, isInitialized]);
 
-  const handleSlashCommand = useCallback((command: any) => {
-    try {
-      if (editor && slashCommandState) {
-        const { range } = slashCommandState;
-        
-        // Delete the slash and query text
-        editor.chain()
-          .focus()
-          .deleteRange({ from: range.from, to: range.to })
-          .run();
-        
-        // Execute the command
-        if (command.command) {
-          command.command(editor, range);
-        } else if (command.action) {
-          command.action(editor);
-        }
-        
-        // Clear slash command state
-        setSlashCommandState(null);
-        setMenuPosition(null);
-      }
-    } catch (error) {
-      console.error('Error executing slash command:', error);
+  // Helper function to determine if content should be treated as placeholder
+  const shouldTreatAsPlaceholder = useCallback(() => {
+    if (!content) return true;
+    
+    const trimmedContent = content.trim();
+    
+    // Check if content is empty or contains only HTML tags
+    if (!trimmedContent || trimmedContent === '<p></p>' || trimmedContent === '<br>') {
+      return true;
     }
-  }, [editor, slashCommandState]);
-
-  if (!editor) {
-    return (
-      <div 
-        className={`enhanced-editor prose prose-lg prose-invert max-w-none min-h-[40px] p-2 ${className} text-gray-400`}
-      >
-        {getPlaceholderText()}
-      </div>
+    
+    // List of common placeholder patterns
+    const placeholderPatterns = [
+      'Click to edit',
+      'New Title',
+      'Enter content',
+      'Add your',
+      'Untitled',
+      'Type here',
+      'Enter text',
+      'Your content',
+      'Click to add',
+      'Add content',
+      'Enter title',
+      'Add title'
+    ];
+    
+    return placeholderPatterns.some(pattern => 
+      trimmedContent.toLowerCase().includes(pattern.toLowerCase())
     );
+  }, [content]);
+
+  // Get contextual placeholder text
+  const getPlaceholderText = useCallback(() => {
+    if (placeholder) return placeholder;
+    
+    switch (blockType) {
+      case 'title':
+        return 'Untitled Card';
+      case 'content':
+        return 'Click to add content...';
+      case 'text':
+        return 'Enter text...';
+      default:
+        return 'Start typing...';
+    }
+  }, [placeholder, blockType]);
+
+  // Return null if editor is not initialized
+  if (!editor) {
+    return <div className="h-10 animate-pulse bg-gray-200 rounded"></div>;
   }
 
-  // Check if editor is truly empty (no content at all)
-  const isEmpty = editor.isEmpty;
-
   return (
-    <div className="relative w-full">
-      {/* Show placeholder overlay ONLY when editor is truly empty */}
-      {isEmpty && (
-        <div 
-          className={`absolute inset-0 pointer-events-none flex items-start justify-start p-2 ${
-            blockType === 'title' 
-              ? 'text-2xl font-bold' 
-              : blockType === 'subtitle' 
-                ? 'text-lg font-semibold' 
-                : ''
-          }`}
-          style={{ 
-            color: 'rgba(255, 255, 255, 0.5)',
-            fontStyle: 'italic',
-            fontSize: blockType === 'title' ? '2rem' : blockType === 'subtitle' ? '1.125rem' : 'inherit',
-            lineHeight: blockType === 'title' ? '2.5rem' : blockType === 'subtitle' ? '1.75rem' : 'inherit',
-            fontWeight: blockType === 'title' ? '700' : blockType === 'subtitle' ? '600' : 'inherit'
-          }}
-        >
-          {getPlaceholderText()}
-        </div>
-      )}
+    <div className="enhanced-inline-text-editor-container relative" ref={editorRef}>
+      <div className="editor-wrapper">
+        <EditorContent 
+          editor={editor}
+          className={`enhanced-editor-content ${className} ${shouldTreatAsPlaceholder() ? 'ghost-text' : ''}`}
+          placeholder={getPlaceholderText()}
+        />
+      </div>
       
-      <EditorContent 
-        editor={editor} 
-        className={`enhanced-inline-editor w-full ${className} ${shouldTreatAsPlaceholder ? 'placeholder-content cursor-text opacity-70 italic' : ''}`}
-      />
-
       {/* Slash Command Menu */}
-      {slashCommandState && menuPosition && slashCommandState.filteredCommands && (
-        <div style={{ position: 'fixed', left: menuPosition.x, top: menuPosition.y + 20, zIndex: 1000 }}>
+      {slashCommandState && slashCommandState.active && menuPosition && (() => {
+        return (
           <SlashCommandMenu
             items={slashCommandState.filteredCommands}
-            selectedIndex={slashCommandState.selectedIndex || 0}
-            onSelect={handleSlashCommand}
+            onSelect={(command) => handleSlashCommand(command, editor, slashCommandState)}
+            selectedIndex={slashCommandState.selectedIndex}
+            position={menuPosition}
             onClose={() => {
               setSlashCommandState(null);
               setMenuPosition(null);
             }}
           />
+        );
+      })()}
+      
+      {/* Debug Info */}
+      {debugMode && (
+        <div className="debug-info mt-2 p-2 bg-gray-100 rounded text-xs">
+          <div>Ghost Text: {shouldTreatAsPlaceholder() ? 'YES' : 'NO'}</div>
+          <div>Content: {content}</div>
+          <div>Block Type: {blockType}</div>
+          <div>Placeholder: {getPlaceholderText()}</div>
+          <div>Slash State: {slashCommandState?.active ? 'ACTIVE' : 'INACTIVE'}</div>
+          <div>Menu Position: {menuPosition ? `${menuPosition.x}, ${menuPosition.y}` : 'NONE'}</div>
         </div>
       )}
     </div>
   );
-} 
+};
+
+export default EnhancedInlineTextEditor; 
