@@ -10,9 +10,16 @@ import TableBasedColumnEditor from './TableBasedColumnEditor';
 interface EditableSlideRendererProps {
   slide: SlideType;
   onSlideChange: (updatedSlide: SlideType) => void;
+  isEditing?: boolean;
+  isGenerating?: boolean;
 }
 
-export default function EditableSlideRenderer({ slide, onSlideChange }: EditableSlideRendererProps) {
+export default function EditableSlideRenderer({ 
+  slide, 
+  onSlideChange, 
+  isEditing = false, 
+  isGenerating = false 
+}: EditableSlideRendererProps) {
   
   const handleColumnsChange = (columns: any[]) => {
     const updatedSlide = { ...slide, columns };

@@ -127,6 +127,8 @@ interface VerticalSlideEditorProps {
   onDeleteSlide: (index: number) => void;
   onDuplicateSlide: (index: number) => void;
   onMoveSlide: (fromIndex: number, toIndex: number) => void;
+  isStreaming?: boolean;
+  currentStreamingSlide?: number | null;
 }
 
 // Helper function to get slide display information
@@ -885,7 +887,9 @@ export default function VerticalSlideEditor({
   onAddSlide, 
   onDeleteSlide, 
   onDuplicateSlide, 
-  onMoveSlide 
+  onMoveSlide,
+  isStreaming = false,
+  currentStreamingSlide = null
 }: VerticalSlideEditorProps) {
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
   const slideRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -986,6 +990,12 @@ export default function VerticalSlideEditor({
                     <span className="text-slate-400 text-sm">
                       Slide {index + 1}
                     </span>
+                    {isStreaming && currentStreamingSlide === index && (
+                      <div className="flex items-center gap-1 bg-blue-500/20 text-blue-400 px-2 py-1 rounded-full text-xs">
+                        <div className="w-1.5 h-1.5 bg-blue-400 rounded-full animate-pulse"></div>
+                        AI Writing...
+                      </div>
+                    )}
                     <div className="h-4 w-px bg-slate-600" />
                     <span className="text-slate-300 text-sm">
                       {getSlideDisplayInfo(slide).type}

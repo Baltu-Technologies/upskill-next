@@ -99,6 +99,17 @@ export default function CourseOutlinePage({ params }: { params: { courseId: stri
     router.push(`/course-creator/microlesson-slides/${microlessonId}?courseId=${params.courseId}&lessonId=${lessonId}`);
   };
 
+  // Function to handle slide editing navigation
+  const handleEditSlides = (lessonId: string, microlessonId: string) => {
+    if (!permissions.canAccessCourseCreator) {
+      alert('You do not have permission to edit slides. Please contact your administrator.');
+      return;
+    }
+    
+    // Navigate to slide editor page with edit mode parameter
+    router.push(`/course-creator/microlesson-slides/${microlessonId}?courseId=${params.courseId}&lessonId=${lessonId}&mode=edit`);
+  };
+
   useEffect(() => {
     // Load course data from localStorage
     const savedData = localStorage.getItem('courseData');
@@ -1469,7 +1480,10 @@ export default function CourseOutlinePage({ params }: { params: { courseId: stri
                                       <Button
                                         variant="outline"
                                         size="sm"
-                                        onClick={() => handleCreateSlides(lesson.id, microlesson.id)}
+                                        onClick={() => (microlesson as any).hasSlides 
+                                          ? handleEditSlides(lesson.id, microlesson.id)
+                                          : handleCreateSlides(lesson.id, microlesson.id)
+                                        }
                                         disabled={isGenerating}
                                         className={`px-2 py-1.5 transition-all duration-300 rounded-lg text-xs disabled:opacity-50 disabled:cursor-not-allowed ${
                                           (microlesson as any).hasSlides 

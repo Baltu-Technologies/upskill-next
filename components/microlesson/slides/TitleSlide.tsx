@@ -4,14 +4,57 @@ import React from 'react';
 import { TitleSlide as TitleSlideType } from '@/types/microlesson/slide';
 import { motion } from 'framer-motion';
 import { SlideContainer } from '../SlideContainer';
+import EnhancedInlineTextEditor from '../EnhancedInlineTextEditor';
 
 interface TitleSlideProps {
   slide: TitleSlideType;
   onNext?: () => void;
   onPrevious?: () => void;
+  onSlideChange?: (updatedSlide: TitleSlideType) => void;
+  isEditing?: boolean;
+  isGenerating?: boolean;
 }
 
-export const TitleSlide: React.FC<TitleSlideProps> = ({ slide, onNext }) => {
+export const TitleSlide: React.FC<TitleSlideProps> = ({ 
+  slide, 
+  onNext, 
+  onSlideChange, 
+  isEditing = false,
+  isGenerating = false 
+}) => {
+  
+  const handleTextChange = (field: string, content: string) => {
+    if (onSlideChange) {
+      const updatedSlide = { ...slide, [field]: content };
+      onSlideChange(updatedSlide);
+    }
+  };
+
+  const renderEditableText = (field: string, value: string, className: string = '', placeholder: string = 'Click to edit...') => {
+    if (isEditing) {
+      return (
+        <EnhancedInlineTextEditor
+          content={value || ''}
+          onUpdate={(content: string) => handleTextChange(field, content)}
+          className={className}
+          placeholder={placeholder}
+          blockType="title"
+        />
+      );
+    }
+    
+    // Show typing indicator when generating
+    if (isGenerating && !value) {
+      return (
+        <span className={`${className} relative`}>
+          <span className="opacity-50">{placeholder}</span>
+          <span className="animate-pulse ml-1 text-blue-400">|</span>
+        </span>
+      );
+    }
+    
+    return <span className={className}>{value || (isGenerating ? '' : placeholder)}</span>;
+  };
   return (
     <SlideContainer
       backgroundColor={slide.backgroundColor || '#0F172A'}
@@ -27,8 +70,19 @@ export const TitleSlide: React.FC<TitleSlideProps> = ({ slide, onNext }) => {
           transition={{ duration: 1, ease: "easeOut" }}
           className="text-6xl md:text-8xl font-bold bg-gradient-to-r from-white via-blue-100 to-blue-200 bg-clip-text text-transparent mb-8"
         >
-          {slide.title}
+          {renderEditableText('title', slide.title, 'text-6xl md:text-8xl font-bold bg-gradient-to-r from-white via-blue-100 to-blue-200 bg-clip-text text-transparent', 'Enter slide title...')}
         </motion.h1>
+        
+        {(slide.subtitle || isEditing) && (
+          <motion.h2
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, delay: 0.3, ease: "easeOut" }}
+            className="text-2xl md:text-3xl text-blue-200 mb-8"
+          >
+            {renderEditableText('subtitle', slide.subtitle || '', 'text-2xl md:text-3xl text-blue-200', 'Enter subtitle...')}
+          </motion.h2>
+        )}
         
         <motion.div
           initial={{ opacity: 0, y: 30 }}

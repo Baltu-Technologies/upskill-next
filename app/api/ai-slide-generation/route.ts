@@ -64,93 +64,123 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Build the context prompt
+    // Build the learning storybook context prompt
     const contextPrompt = `
-You are an expert instructional designer creating engaging microlesson slides for industrial training programs.
+You are creating microlesson slides for YOUNGER, LESS-EXPERIENCED workers in industrial training. 
+
+Think like writing a "children's book" for adults - simple, clear, impactful content that helps learners connect the dots between what they're learning and why it matters in their real job.
+
+TARGET AUDIENCE:
+- Younger workers (often first job in industry)
+- Need help connecting concepts to real work
+- Learn best with clear examples and "why this matters" explanations
+- Prefer bite-sized, digestible information
+
+CONTENT GUIDELINES:
+- Maximum 2 paragraphs per slide
+- Always explain WHY they need to know this
+- Connect every concept to real workplace scenarios
+- Use simple language, avoid unnecessary jargon
+- One main idea per slide
+- Include specific, relatable examples
+
+SLIDE COUNT: Generate 7-12 slides depending on topic complexity
 
 COURSE CONTEXT:
-- Course Title: ${courseContext.title}
 - Industry: ${courseContext.industry}
-- Skill Level: ${courseContext.skillLevel}
+- Skill Level: ${courseContext.skillLevel} 
+- Course: ${courseContext.title}
 - Course Description: ${courseContext.description}
 
-MICROLESSON CONTEXT:
-- Title: ${microlesson.title}
-- Description: ${microlesson.content}
+MICROLESSON DETAILS:
+- Topic: ${microlesson.title}
+- Content: ${microlesson.content}
 - Duration: ${microlesson.duration}
-- Type: ${microlesson.type}
-- Learning Objectives: ${microlesson.objectives.map(obj => `• ${obj}`).join('\n')}
+- Learning Objectives: ${microlesson.objectives.map((obj, index) => `${index + 1}. ${obj}`).join('\n')}
 
-ADDITIONAL CONTEXT:
-${additionalContext || 'No additional context provided'}
-
-INDUSTRY GUIDELINES:
-Follow these industry-specific guidelines for ${courseContext.industry}:
+INDUSTRY CONTEXT:
 ${getIndustryGuidelines(courseContext.industry)}
 
-SLIDE CREATION INSTRUCTIONS:
-1. Create 5-8 slides that effectively teach the learning objectives
-2. Use a variety of slide types for engagement (Title, Content, Interactive, Quiz)
-3. Include practical examples relevant to ${courseContext.industry}
-4. Ensure content is appropriate for ${courseContext.skillLevel} level learners
-5. Make slides interactive and engaging for ${microlesson.duration} duration
-6. Include real-world applications and scenarios
-7. Add knowledge checks and quick assessments
+ADDITIONAL REQUIREMENTS:
+${additionalContext || 'Focus on practical workplace applications'}
 
-AVAILABLE SLIDE TYPES:
-- TitleSlide: Main title slide with optional subtitle
-- TitleWithSubtext: Title with bullet points or detailed content
-- TitleWithImage: Title with accompanying image
-- VideoSlide: Video content with description
-- QuickCheckSlide: Interactive quiz questions
-- MarkdownSlide: Rich text content with formatting
-- HotspotActivitySlide: Interactive image with clickable hotspots
+SLIDE STRUCTURE TEMPLATE:
+Create slides following this story flow:
+1. "Why This Matters to You" - Connect to their real job
+2. "What We're Learning Today" - Simple overview  
+3-4. Core concepts (one per slide) with workplace examples
+5-6. "In Your Job, This Looks Like..." - Specific applications
+7. Quick knowledge check
+8. "What You Do Next" - Clear action steps
 
-IMAGE LAYOUT OPTIONS:
-For slides that include images, you can specify an imageLayout field with one of these values:
-- "none": No image (text only)
-- "top": Image positioned above the text content
-- "left": Image positioned on the left side with text on the right
-- "right": Image positioned on the right side with text on the left
-- "bottom": Image positioned below the text content
-- "background": Image used as a background with text overlay
+AVAILABLE SLIDE FORMATS:
+Choose the best format for each piece of content:
 
-When including images, also provide:
-- imageUrl: A descriptive placeholder URL or description for the image needed
-- imageCaption: Optional caption for the image
+**1. SPLIT TEXT-IMAGE SLIDE (TitleWithImage)**
+- Use when concepts need visual support
+- Left side: Simple explanation (1-2 paragraphs max)
+- Right side: Description of workplace visual they'd see
+- Example: "Here's what proper PPE looks like in a cleanroom"
 
-Return a JSON array of slide objects. Each slide must have:
-- id: unique identifier
-- type: one of the available slide types
-- imageLayout: (optional) one of the layout options above
-- imageUrl: (optional) description of needed image
-- imageCaption: (optional) caption for the image
-- appropriate fields for that slide type
+**2. QUICK-CHECK SLIDE (QuickCheckSlide)**
+- Use to reinforce key learning points
+- Simple multiple choice question
+- Focus on critical knowledge they MUST remember
+- Include "why this matters" in the explanation
 
-Example structure:
+**3. BULLET POINT SLIDE (TitleWithSubtext)**
+- Use for step-by-step processes or key points
+- 3-5 bullets maximum
+- Each bullet connects to real work scenario
+- Start each bullet with action words
+
+**4. DEFINITION SLIDE (TitleWithSubtext)**  
+- Use when introducing important terms
+- Simple definition in plain English
+- Include: "You'll encounter this when..."
+- Give specific workplace example
+
+**5. REAL-WORLD EXAMPLE SLIDE (TitleWithSubtext or TitleWithImage)**
+- Use to connect concepts to actual work
+- Start with: "Imagine you're working at [Company]..."
+- Describe specific scenario they'd face
+- Show how the concept applies
+
+**6. FORMATTED CONTENT SLIDE (MarkdownSlide)**
+- Use for comparisons, procedures, or structured info
+- Tables for side-by-side comparisons
+- Formatted blocks for before/after scenarios
+- Visual organization of complex information
+
+CONTENT CREATION RULES:
+1. **Connect Every Slide to Real Work**: Always answer "Why does this matter in my job?"
+2. **Use Specific Examples**: Name actual companies, equipment, or scenarios when possible
+3. **Simple Language**: Write for someone learning this for the first time
+4. **One Idea Per Slide**: Don't overwhelm with multiple concepts
+5. **Include Consequences**: Show what happens when done wrong
+
+EXAMPLE SLIDE STRUCTURE:
 [
   {
     "id": "slide-1",
-    "type": "TitleSlide",
-    "title": "Introduction to ${microlesson.title}",
-    "subtitle": "Key concepts for ${courseContext.industry}",
-    "imageLayout": "background",
-    "imageUrl": "Industrial facility showing ${courseContext.industry} operations",
-    "backgroundColor": "#1E40AF"
+    "type": "TitleWithImage",
+    "title": "Why Cleanroom Protocols Matter to YOU",
+    "content": "When you work in semiconductor manufacturing, even tiny particles can ruin expensive chips. One contaminated wafer can cost your company $50,000. Your job is to keep these particles out.",
+    "imageLayout": "right",
+    "imageUrl": "Semiconductor technician in full cleanroom gear working with wafers",
+    "workplaceRelevance": "This is what you'll do every day at work"
   },
   {
-    "id": "slide-2",
-    "type": "TitleWithSubtext",
-    "title": "Key Learning Objectives",
-    "content": "What you'll learn in this lesson",
-    "imageLayout": "right",
-    "imageUrl": "Diagram showing ${microlesson.title} process",
-    "imageCaption": "Process overview diagram",
-    "bullets": ["Objective 1", "Objective 2", "Objective 3"]
+    "id": "slide-2", 
+    "type": "QuickCheckSlide",
+    "question": "What can happen if you don't follow cleanroom protocols?",
+    "choices": ["Nothing serious", "Expensive chip damage", "Just a warning from supervisor"],
+    "correctAnswer": "Expensive chip damage",
+    "explanation": "Even one particle can ruin a $50,000 wafer. That's why these protocols exist."
   }
 ]
 
-Focus on creating practical, industry-relevant content that directly addresses the learning objectives.
+REMEMBER: Write like you're explaining to someone's younger sibling who just started their first job. Make it clear, simple, and show them exactly why it matters.
 `;
 
     const completion = await openai.chat.completions.create({

@@ -22,6 +22,13 @@ export interface BaseSlide {
   columns?: ColumnContent[];
   // Table-based column system
   tableContent?: string; // HTML content for table-based columns
+  
+  // Learning-focused properties
+  learningObjective?: string; // Which learning objective this slide addresses
+  cognitiveLoad?: 'low' | 'medium' | 'high'; // Complexity level for learners
+  industryContext?: string; // Specific workplace application context
+  interactionRequired?: boolean; // Does this slide need learner engagement?
+  workplaceRelevance?: string; // How this applies in real work situations
 }
 
 export interface TitleSlide extends BaseSlide {
@@ -121,6 +128,164 @@ export interface MarkdownSlide extends BaseSlide {
   maxWidth?: string;
 }
 
+// New Learning-Focused Slide Types
+
+export interface LearningObjectivesSlide extends BaseSlide {
+  type: 'LearningObjectivesSlide';
+  title: string;
+  objectives: string[];
+  successCriteria?: string[];
+  estimatedTime?: string;
+  workplaceApplication?: string;
+}
+
+export interface ContextSetterSlide extends BaseSlide {
+  type: 'ContextSetterSlide';
+  title: string;
+  workplaceScenario: string;
+  consequences?: string;
+  industryRelevance: string;
+  motivationalHook?: string;
+}
+
+export interface ConceptExplanationSlide extends BaseSlide {
+  type: 'ConceptExplanationSlide';
+  concept: string;
+  explanation: string;
+  industryExample: string;
+  visualAid?: string;
+  keyTerms?: string[];
+  commonMisconceptions?: string[];
+}
+
+export interface StepByStepProcedure extends BaseSlide {
+  type: 'StepByStepProcedure';
+  title: string;
+  procedure: string;
+  steps: Array<{
+    step: number;
+    instruction: string;
+    visualAid?: string;
+    safetyNote?: string;
+    commonError?: string;
+  }>;
+  tools?: string[];
+  safetyPrecautions?: string[];
+}
+
+export interface ComparisonSlide extends BaseSlide {
+  type: 'ComparisonSlide';
+  title: string;
+  comparisonType: 'tools' | 'methods' | 'safety' | 'procedures' | 'materials';
+  leftSide: {
+    title: string;
+    items: string[];
+    image?: string;
+    pros?: string[];
+    cons?: string[];
+  };
+  rightSide: {
+    title: string;
+    items: string[];
+    image?: string;
+    pros?: string[];
+    cons?: string[];
+  };
+  conclusion?: string;
+}
+
+export interface CaseStudySlide extends BaseSlide {
+  type: 'CaseStudySlide';
+  title: string;
+  scenario: string;
+  challenge: string;
+  solution?: string;
+  outcome?: string;
+  lessonsLearned: string[];
+  discussionPoints?: string[];
+}
+
+export interface SafetyProtocolSlide extends BaseSlide {
+  type: 'SafetyProtocolSlide';
+  title: string;
+  hazardType: string;
+  warningLevel: 'notice' | 'caution' | 'warning' | 'danger';
+  protocols: Array<{
+    step: string;
+    explanation: string;
+    visualAid?: string;
+  }>;
+  consequences?: string;
+  emergencyProcedures?: string[];
+}
+
+export interface PracticeScenarioSlide extends BaseSlide {
+  type: 'PracticeScenarioSlide';
+  title: string;
+  scenario: string;
+  challenge: string;
+  options?: Array<{
+    choice: string;
+    consequence: string;
+    correct: boolean;
+  }>;
+  feedback?: string;
+  coachingTips?: string[];
+}
+
+export interface ReflectionSlide extends BaseSlide {
+  type: 'ReflectionSlide';
+  title: string;
+  prompt: string;
+  guidingQuestions: string[];
+  discussionPoints?: string[];
+  actionItems?: string[];
+}
+
+export interface RealWorldApplicationSlide extends BaseSlide {
+  type: 'RealWorldApplicationSlide';
+  title: string;
+  workplaceContext: string;
+  applications: Array<{
+    situation: string;
+    application: string;
+    example?: string;
+    tips?: string[];
+  }>;
+  transferTasks?: string[];
+}
+
+export interface TroubleshootingSlide extends BaseSlide {
+  type: 'TroubleshootingSlide';
+  title: string;
+  problem: string;
+  symptoms: string[];
+  diagnosticSteps: Array<{
+    step: string;
+    whatToLookFor: string;
+    possibleCauses?: string[];
+  }>;
+  solutions: Array<{
+    cause: string;
+    solution: string;
+    prevention?: string;
+  }>;
+}
+
+export interface SummarySlide extends BaseSlide {
+  type: 'SummarySlide';
+  title: string;
+  keyTakeaways: string[];
+  actionItems: string[];
+  nextSteps?: string[];
+  resources?: Array<{
+    title: string;
+    description: string;
+    link?: string;
+  }>;
+  reviewQuestions?: string[];
+}
+
 export type SlideType = 
   | TitleSlide 
   | TitleWithSubtext 
@@ -130,7 +295,20 @@ export type SlideType =
   | QuickCheckSlide 
   | CustomHTMLSlide
   | HotspotActivitySlide
-  | MarkdownSlide;
+  | MarkdownSlide
+  // New Learning-Focused Slides
+  | LearningObjectivesSlide
+  | ContextSetterSlide
+  | ConceptExplanationSlide
+  | StepByStepProcedure
+  | ComparisonSlide
+  | CaseStudySlide
+  | SafetyProtocolSlide
+  | PracticeScenarioSlide
+  | ReflectionSlide
+  | RealWorldApplicationSlide
+  | TroubleshootingSlide
+  | SummarySlide;
 
 export interface LessonConfig {
   id: string;

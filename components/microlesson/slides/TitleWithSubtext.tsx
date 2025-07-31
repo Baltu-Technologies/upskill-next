@@ -4,6 +4,7 @@ import React from 'react';
 import { TitleWithSubtext as TitleWithSubtextType } from '@/types/microlesson/slide';
 import { motion } from 'framer-motion';
 import { SlideContainer } from '../SlideContainer';
+import EnhancedInlineTextEditor from '../EnhancedInlineTextEditor';
 
 interface TitleWithSubtextProps {
   slide: TitleWithSubtextType;
@@ -11,9 +12,53 @@ interface TitleWithSubtextProps {
   onPrevious?: () => void;
   onContextMenu?: (event: React.MouseEvent) => void;
   style?: React.CSSProperties;
+  onSlideChange?: (updatedSlide: TitleWithSubtextType) => void;
+  isEditing?: boolean;
+  isGenerating?: boolean;
 }
 
-export const TitleWithSubtext: React.FC<TitleWithSubtextProps> = ({ slide, onNext, onContextMenu, style }) => {
+export const TitleWithSubtext: React.FC<TitleWithSubtextProps> = ({ 
+  slide, 
+  onNext, 
+  onContextMenu, 
+  style,
+  onSlideChange,
+  isEditing = false,
+  isGenerating = false 
+}) => {
+  
+  const handleTextChange = (field: string, content: string) => {
+    if (onSlideChange) {
+      const updatedSlide = { ...slide, [field]: content };
+      onSlideChange(updatedSlide);
+    }
+  };
+
+  const renderEditableText = (field: string, value: string, className: string = '', placeholder: string = 'Click to edit...', blockType: 'title' | 'content' | 'text' = 'content') => {
+    if (isEditing) {
+      return (
+        <EnhancedInlineTextEditor
+          content={value || ''}
+          onUpdate={(content: string) => handleTextChange(field, content)}
+          className={className}
+          placeholder={placeholder}
+          blockType={blockType}
+        />
+      );
+    }
+    
+    // Show typing indicator when generating
+    if (isGenerating && !value) {
+      return (
+        <span className={`${className} relative`}>
+          <span className="opacity-50">{placeholder}</span>
+          <span className="animate-pulse ml-1 text-blue-400">|</span>
+        </span>
+      );
+    }
+    
+    return <span className={className} style={style}>{value || (isGenerating ? '' : placeholder)}</span>;
+  };
   return (
     <SlideContainer
       backgroundColor="#0F172A"
@@ -42,22 +87,21 @@ export const TitleWithSubtext: React.FC<TitleWithSubtextProps> = ({ slide, onNex
             ...style
           }}
         >
-          {slide.title}
+          {renderEditableText('title', slide.title, 'text-5xl md:text-6xl font-bold text-white', 'Enter slide title...', 'title')}
         </motion.h1>
         
-        <motion.p
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.3, ease: "easeOut" }}
-          className="text-xl md:text-2xl text-slate-300 leading-relaxed mb-12 max-w-4xl mx-auto"
-          onContextMenu={onContextMenu}
-          style={{ 
-            userSelect: 'text' as const,
-            ...style
-          }}
-        >
-          {slide.subtext}
-        </motion.p>
+        {(slide.subtext || slide.content || isEditing) && (
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.3, ease: "easeOut" }}
+            className="text-xl md:text-2xl text-slate-300 leading-relaxed mb-12 max-w-4xl mx-auto"
+            onContextMenu={onContextMenu}
+          >
+            {slide.subtext && renderEditableText('subtext', slide.subtext, 'text-xl md:text-2xl text-slate-300 leading-relaxed block mb-4', 'Enter subtext...', 'text')}
+            {(slide.content || isEditing) && renderEditableText('content', slide.content || '', 'text-xl md:text-2xl text-slate-300 leading-relaxed block', 'Enter content...', 'content')}
+          </motion.div>
+        )}
         
         <motion.div
           initial={{ opacity: 0, y: 20 }}
