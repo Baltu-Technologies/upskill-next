@@ -30,18 +30,16 @@ export const TitleWithImage: React.FC<TitleWithImageProps> = ({ slide, onNext })
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8 }}
               className="text-4xl md:text-5xl font-bold text-white leading-tight"
-            >
-              {slide.title}
-            </motion.h1>
+              dangerouslySetInnerHTML={{ __html: slide.title || '' }}
+            />
             
             <motion.p
               initial={{ opacity: 0, x: isImageLeft ? 50 : -50 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
               className="text-xl text-slate-300 leading-relaxed"
-            >
-              {slide.caption}
-            </motion.p>
+              dangerouslySetInnerHTML={{ __html: slide.caption || '' }}
+            />
             
             {onNext && (
               <motion.div

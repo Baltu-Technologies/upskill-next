@@ -57,7 +57,21 @@ export const TitleWithSubtext: React.FC<TitleWithSubtextProps> = ({
       );
     }
     
-    return <span className={className} style={style}>{value || (isGenerating ? '' : placeholder)}</span>;
+    // In preview mode, render HTML content properly
+    const content = value || (isGenerating ? '' : placeholder);
+    if (!isEditing && content && content.includes('<')) {
+      // Content appears to contain HTML tags, render as HTML
+      return (
+        <span 
+          className={className} 
+          style={style}
+          dangerouslySetInnerHTML={{ __html: content }}
+        />
+      );
+    }
+    
+    // Fallback to plain text rendering
+    return <span className={className} style={style}>{content}</span>;
   };
   return (
     <SlideContainer

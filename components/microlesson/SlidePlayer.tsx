@@ -6,7 +6,7 @@ import { LessonConfig } from '@/types/microlesson/slide';
 import { SlideRenderer } from './SlideRenderer';
 import { StudyModal } from './StudyModal';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, ChevronRight, Home, RotateCcw, Play, MessageSquare, Search, Flame, Zap, BookOpen } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ArrowLeft, Home, RotateCcw, Play, MessageSquare, Search, Flame, Zap, BookOpen } from 'lucide-react';
 import { useMessages } from '@/app/contexts/MessagesContext';
 
 interface SlidePlayerProps {
@@ -133,10 +133,11 @@ export const SlidePlayer: React.FC<SlidePlayerProps> = ({
         <div className="flex items-center space-x-4 flex-1">
           <button
             onClick={onExit}
-            className="p-2 hover:bg-slate-700 rounded-lg transition-colors"
-            title="Exit Lesson"
+            className="flex items-center gap-2 px-3 py-2 hover:bg-slate-700 rounded-lg transition-colors text-slate-400 hover:text-white"
+            title="Back to Slide Editor"
           >
-            <Home className="w-5 h-5 text-slate-400" />
+            <ArrowLeft className="w-4 h-4" />
+            <span className="text-sm font-medium">Back to Editor</span>
           </button>
           
           {/* Progress Info */}

@@ -71,9 +71,10 @@ export const QuickCheckSlide: React.FC<QuickCheckSlideProps> = ({
           transition={{ duration: 0.8, delay: 0.2 }}
           className="bg-slate-800 rounded-2xl p-8 shadow-2xl"
         >
-          <h3 className="text-2xl font-semibold text-white mb-8 text-center">
-            {slide.question}
-          </h3>
+          <h3 
+            className="text-2xl font-semibold text-white mb-8 text-center"
+            dangerouslySetInnerHTML={{ __html: slide.question || '' }}
+          />
 
           {slide.questionType === 'multiple-choice' && slide.choices && (
             <div className="space-y-4">
@@ -98,7 +99,7 @@ export const QuickCheckSlide: React.FC<QuickCheckSlideProps> = ({
                   }`}
                 >
                   <div className="flex items-center justify-between">
-                    <span>{choice}</span>
+                    <span dangerouslySetInnerHTML={{ __html: choice || '' }} />
                     {showResult && choice === slide.correctAnswer && (
                       <Check className="w-5 h-5 text-green-400" />
                     )}
@@ -133,7 +134,12 @@ export const QuickCheckSlide: React.FC<QuickCheckSlideProps> = ({
                   </div>
                   {!isCorrect() && (
                     <p className="text-slate-400 mt-2">
-                      Correct answer: {Array.isArray(slide.correctAnswer) ? slide.correctAnswer.join(', ') : slide.correctAnswer}
+                      <span>Correct answer: </span>
+                      <span dangerouslySetInnerHTML={{ 
+                        __html: Array.isArray(slide.correctAnswer) 
+                          ? slide.correctAnswer.join(', ') 
+                          : (slide.correctAnswer || '')
+                      }} />
                     </p>
                   )}
                 </div>
@@ -183,7 +189,10 @@ export const QuickCheckSlide: React.FC<QuickCheckSlideProps> = ({
               animate={{ opacity: 1, height: 'auto' }}
               className="mt-4 p-4 bg-yellow-500/10 border border-yellow-500/30 rounded-lg"
             >
-              <p className="text-yellow-300 text-sm">💡 {slide.hint}</p>
+              <p className="text-yellow-300 text-sm">
+                <span>💡 </span>
+                <span dangerouslySetInnerHTML={{ __html: slide.hint || '' }} />
+              </p>
             </motion.div>
           )}
         </motion.div>

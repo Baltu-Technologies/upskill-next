@@ -53,7 +53,20 @@ export const TitleSlide: React.FC<TitleSlideProps> = ({
       );
     }
     
-    return <span className={className}>{value || (isGenerating ? '' : placeholder)}</span>;
+    // In preview mode, render HTML content properly
+    const content = value || (isGenerating ? '' : placeholder);
+    if (!isEditing && content && content.includes('<')) {
+      // Content appears to contain HTML tags, render as HTML
+      return (
+        <span 
+          className={className}
+          dangerouslySetInnerHTML={{ __html: content }}
+        />
+      );
+    }
+    
+    // Fallback to plain text rendering
+    return <span className={className}>{content}</span>;
   };
   return (
     <SlideContainer
