@@ -105,8 +105,52 @@ const EnhancedTipTapSlideEditor: React.FC<EnhancedTipTapSlideEditorProps> = ({
   const [linkUrl, setLinkUrl] = useState('');
   const [slashCommandState, setSlashCommandState] = useState<any>(null);
   const [menuPosition, setMenuPosition] = useState<{ x: number; y: number } | null>(null);
+  const slashCommandStateRef = useRef<any>(null);
   const toolbarRef = useRef<HTMLDivElement>(null);
   const editorRef = useRef<HTMLDivElement>(null);
+
+  // Keep slashCommandStateRef updated
+  useEffect(() => {
+    slashCommandStateRef.current = slashCommandState;
+  }, [slashCommandState]);
+
+  // Get cursor position for menu placement
+  const getCursorPosition = useCallback((editorInstance: any) => {
+    try {
+      if (!editorInstance?.view) return { x: 100, y: 100 };
+
+      const { state, view } = editorInstance;
+      const { selection } = state;
+      const { from } = selection;
+
+      // Method 1: TipTap's coordsAtPos
+      const coords = view.coordsAtPos(from);
+      if (coords && coords.left > 0 && coords.top > 0) {
+        return { x: coords.left, y: coords.top };
+      }
+
+      // Method 2: Browser Selection API
+      const domSelection = window.getSelection();
+      if (domSelection && domSelection.rangeCount > 0) {
+        const range = domSelection.getRangeAt(0);
+        const rect = range.getBoundingClientRect();
+        if (rect.left > 0 && rect.top > 0) {
+          return { x: rect.left, y: rect.top };
+        }
+      }
+
+      // Method 3: Editor container fallback
+      if (editorRef.current) {
+        const editorRect = editorRef.current.getBoundingClientRect();
+        return { x: editorRect.left + 20, y: editorRect.top + 40 };
+      }
+
+      return { x: 100, y: 100 }; // Final fallback
+    } catch (error) {
+      console.error('Error getting cursor position:', error);
+      return { x: 100, y: 100 };
+    }
+  }, []);
 
   const editor = useEditor({
     extensions: [
@@ -141,7 +185,25 @@ const EnhancedTipTapSlideEditor: React.FC<EnhancedTipTapSlideEditorProps> = ({
       Link.configure({
         openOnClick: false,
       }),
-      SlashCommandExtension,
+      SlashCommandExtension.configure({
+        onSlashCommand: (state: any) => {
+          setSlashCommandState(state);
+          
+          if (state.active) {
+            // Use a timeout to ensure editor is ready
+            setTimeout(() => {
+              if (editor) {
+                const position = getCursorPosition(editor);
+                setMenuPosition(position);
+              } else {
+                setMenuPosition({ x: 200, y: 200 }); // Fallback position
+              }
+            }, 10);
+          } else {
+            setMenuPosition(null);
+          }
+        }
+      }),
       ...ALL_EXTENSIONS,
     ],
     content: content || '',
@@ -239,11 +301,43 @@ const EnhancedTipTapSlideEditor: React.FC<EnhancedTipTapSlideEditorProps> = ({
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        onCancel();
-      } else if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
-        e.preventDefault();
-        onSave();
+      // Use a ref to get the latest state without adding it to dependencies
+      const currentState = slashCommandStateRef.current;
+      
+      if (currentState && currentState.active && currentState.filteredCommands.length > 0) {
+        if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          setSlashCommandState((prev: any) => ({
+            ...prev,
+            selectedIndex: (prev.selectedIndex + 1) % prev.filteredCommands.length
+          }));
+        } else if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          setSlashCommandState((prev: any) => ({
+            ...prev,
+            selectedIndex: prev.selectedIndex === 0 
+              ? prev.filteredCommands.length - 1 
+              : prev.selectedIndex - 1
+          }));
+        } else if (e.key === 'Enter') {
+          e.preventDefault();
+          const selectedCommand = currentState.filteredCommands[currentState.selectedIndex];
+          if (selectedCommand) {
+            handleSlashCommandSelect(selectedCommand);
+          }
+        } else if (e.key === 'Escape') {
+          e.preventDefault();
+          setSlashCommandState(null);
+          setMenuPosition(null);
+        }
+      } else {
+        // Regular editor shortcuts when slash menu is not active
+        if (e.key === 'Escape') {
+          onCancel();
+        } else if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+          e.preventDefault();
+          onSave();
+        }
       }
     };
 

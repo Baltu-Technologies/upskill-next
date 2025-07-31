@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
+import Underline from '@tiptap/extension-underline';
 import { Table } from '@tiptap/extension-table';
 import { TableRow } from '@tiptap/extension-table-row';
 import { TableHeader } from '@tiptap/extension-table-header';
@@ -26,7 +27,11 @@ export default function TableBasedColumnEditor({
 
   const editor = useEditor({
     extensions: [
-      StarterKit,
+      StarterKit.configure({
+        // Disable extensions that we configure separately to prevent duplicates
+        underline: false,
+      }),
+      Underline,
       Table.configure({
         resizable: true,
         HTMLAttributes: {
@@ -49,6 +54,12 @@ export default function TableBasedColumnEditor({
       attributes: {
         class: 'prose prose-slate max-w-none focus:outline-none',
       },
+    },
+    onCreate: ({ editor }) => {
+      // Debug: Log extension configuration to verify no duplicates
+      console.log('🔧 TableBasedColumnEditor created with extensions:', 
+        editor.extensionManager.extensions.map(ext => ext.name).join(', '));
+      setIsInitialized(true);
     },
     onUpdate: ({ editor }) => {
       const html = editor.getHTML();

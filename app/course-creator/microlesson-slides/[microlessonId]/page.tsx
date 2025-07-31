@@ -83,38 +83,84 @@ export default function MicrolessonSlideCreator({ params }: { params: { microles
   useEffect(() => {
     const loadContext = async () => {
       try {
-        // This would typically come from your API/database
-        // For now, using mock data structure
-        const mockMicrolesson: MicrolessonContext = {
-          id: params.microlessonId,
-          title: 'Introduction to Semiconductor Manufacturing',
-          content: 'Learn the fundamental processes involved in semiconductor manufacturing, including wafer processing, photolithography, and quality control measures.',
-          objectives: [
-            'Understand the basic steps in semiconductor manufacturing',
-            'Identify key equipment used in the fabrication process'
-          ],
-          duration: '10 minutes',
-          type: 'interactive'
-        };
+        // Load course data from localStorage
+        const savedData = localStorage.getItem('courseData');
+        if (!savedData) {
+          console.error('No course data found in localStorage');
+          return;
+        }
+
+        const parsedCourseData = JSON.parse(savedData);
         
-        const mockCourse: CourseContext = {
-          id: courseId || 'temp-course',
-          title: 'Semiconductor Manufacturing Fundamentals',
-          description: 'A comprehensive course covering the basics of semiconductor manufacturing processes and equipment.',
-          industry: 'Semiconductor & Microelectronics',
-          skillLevel: 'entry',
-          lessons: [
-            {
-              id: lessonId || 'temp-lesson',
-              title: 'Manufacturing Process Overview',
-              description: 'Overview of the semiconductor manufacturing process',
-              microlessons: [mockMicrolesson]
+        // Find the specific lesson and microlesson
+        let foundMicrolesson: MicrolessonContext | null = null;
+        let foundLesson: any = null;
+        
+        for (const lesson of parsedCourseData.lessons || []) {
+          for (const microlesson of lesson.microlessons || []) {
+            if (microlesson.id === params.microlessonId) {
+              foundMicrolesson = {
+                id: microlesson.id,
+                title: microlesson.title,
+                content: microlesson.content || microlesson.description || '',
+                objectives: microlesson.objectives || [],
+                duration: microlesson.duration || '10 minutes',
+                type: microlesson.type || 'interactive'
+              };
+              foundLesson = lesson;
+              break;
             }
-          ]
+          }
+          if (foundMicrolesson) break;
+        }
+
+        if (!foundMicrolesson) {
+          console.error('Microlesson not found:', params.microlessonId);
+          return;
+        }
+
+        // Create course context from real data
+        const realCourseContext: CourseContext = {
+          id: courseId || parsedCourseData.id || 'course',
+          title: parsedCourseData.title || 'Untitled Course',
+          description: parsedCourseData.description || '',
+          industry: parsedCourseData.industry || 'General',
+          skillLevel: parsedCourseData.courseLevel || parsedCourseData.skillLevel || 'intermediate',
+          lessons: parsedCourseData.lessons?.map((lesson: any) => ({
+            id: lesson.id,
+            title: lesson.title,
+            description: lesson.description || '',
+            microlessons: lesson.microlessons || []
+          })) || []
         };
         
-        setCurrentMicrolesson(mockMicrolesson);
-        setCourseContext(mockCourse);
+        // Extract additional context from course data
+        let additionalContextText = '';
+        if (parsedCourseData.context) {
+          const contextParts = [];
+          
+          if (parsedCourseData.context.jobDescription?.text) {
+            contextParts.push(`**Job Description/Requirements:**\n${parsedCourseData.context.jobDescription.text}`);
+          }
+          
+          if (parsedCourseData.context.courseStructure?.text) {
+            contextParts.push(`**Course Structure Guidelines:**\n${parsedCourseData.context.courseStructure.text}`);
+          }
+          
+          additionalContextText = contextParts.join('\n\n');
+        }
+
+        console.log('🔍 Loading real course context:', {
+          courseTitle: realCourseContext.title,
+          microlessonTitle: foundMicrolesson.title,
+          industry: realCourseContext.industry,
+          skillLevel: realCourseContext.skillLevel,
+          hasAdditionalContext: !!additionalContextText
+        });
+        
+        setCurrentMicrolesson(foundMicrolesson);
+        setCourseContext(realCourseContext);
+        setAdditionalContext(additionalContextText);
       } catch (error) {
         console.error('Error loading context:', error);
       }

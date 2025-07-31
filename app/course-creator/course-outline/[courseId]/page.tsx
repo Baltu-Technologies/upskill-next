@@ -1485,7 +1485,7 @@ export default function CourseOutlinePage({ params }: { params: { courseId: stri
                                         ) : (
                                           <>
                                             <BookOpen className="w-3 h-3 mr-1" />
-                                            Add Slides
+                                            Generate Slides
                                           </>
                                         )}
                                       </Button>

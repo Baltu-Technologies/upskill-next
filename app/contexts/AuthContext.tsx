@@ -35,18 +35,37 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setIsLoading(true);
       setError(null);
       
-      // Get current session from Better Auth
-      const session = await authClient.getSession();
+      // Skip auth check in development mode if database is not available
+      if (process.env.NODE_ENV === 'development' && process.env.NEXT_PUBLIC_DEV_MODE === 'true') {
+        console.log('Dev mode: Skipping auth check');
+        setUser(null);
+        setIsLoading(false);
+        return;
+      }
       
-      if (session.data) {
+      // Get current session from Better Auth with timeout
+      const session = await Promise.race([
+        authClient.getSession(),
+        new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Auth check timeout')), 5000)
+        )
+      ]) as any; // Type assertion for auth session
+      
+      if (session?.data) {
         setUser(session.data.user);
       } else {
         setUser(null);
       }
     } catch (error: any) {
-      console.error('Error checking user session:', error);
-      setError(error.message || 'Failed to check authentication status');
-      setUser(null);
+      console.warn('Auth check failed (continuing in dev mode):', error.message);
+      // In development, don't treat auth failures as critical errors
+      if (process.env.NODE_ENV === 'development') {
+        setError(null);
+        setUser(null);
+      } else {
+        setError(error.message || 'Failed to check authentication status');
+        setUser(null);
+      }
     } finally {
       setIsLoading(false);
     }

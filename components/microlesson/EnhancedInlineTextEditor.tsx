@@ -15,6 +15,7 @@ import { FontSize } from './FontSizeExtension';
 import { SlashCommandExtension, SlashCommandPlugin } from './SlashCommandExtension';
 import SlashCommandMenu from './SlashCommandMenu';
 import { SLASH_COMMANDS } from './SlashCommandExtension';
+import FloatingToolbar from './FloatingToolbar';
 import './enhanced-tiptap-styles.css';
 
 interface EnhancedInlineTextEditorProps {
@@ -43,8 +44,19 @@ const EnhancedInlineTextEditor: React.FC<EnhancedInlineTextEditorProps> = ({
   const [slashCommandState, setSlashCommandState] = useState<any>(null);
   const [menuPosition, setMenuPosition] = useState<{ x: number; y: number } | null>(null);
   const [isInitialized, setIsInitialized] = useState(false);
+  const [showFloatingToolbar, setShowFloatingToolbar] = useState(false);
+  const [floatingToolbarPosition, setFloatingToolbarPosition] = useState<{ x: number; y: number } | null>(null);
   const editorRef = useRef<HTMLDivElement>(null);
   const slashCommandStateRef = useRef<any>(null);
+  const positionDebounceRef = useRef<NodeJS.Timeout | null>(null);
+  const lastSelectionRef = useRef<{ from: number; to: number } | null>(null);
+  const formattingInProgressRef = useRef<boolean>(false);
+
+  // Memoize the toolbar close callback to prevent unnecessary re-renders
+  const handleToolbarClose = useCallback(() => {
+    setShowFloatingToolbar(false);
+    setFloatingToolbarPosition(null);
+  }, []);
 
   // Update ref whenever state changes
   useEffect(() => {
@@ -127,17 +139,74 @@ const EnhancedInlineTextEditor: React.FC<EnhancedInlineTextEditorProps> = ({
     }
   }, []); // No dependencies
 
-  // Test function for debugging
-  const testSlashMenu = useCallback(() => {
-    setMenuPosition({ x: 200, y: 200 });
-    setSlashCommandState({
-      active: true,
-      query: '',
-      range: { from: 0, to: 0 },
-      filteredCommands: SLASH_COMMANDS.slice(0, 5),
-      selectedIndex: 0
-    });
-  }, []);
+
+
+  // Handle text selection and floating toolbar positioning with debouncing
+  const handleSelectionChange = useCallback((editorInstance: any) => {
+    try {
+      if (!editorInstance || !editorRef.current) {
+        return;
+      }
+
+      const { selection } = editorInstance.state;
+      const { from, to } = selection;
+      
+      // Clear any existing debounce timer
+      if (positionDebounceRef.current) {
+        clearTimeout(positionDebounceRef.current);
+      }
+      
+      // Only show toolbar if there's actual text selected (not just cursor position)
+      if (from !== to && !selection.empty) {
+        // Check if this is a significant selection change (avoid micro-movements)
+        const lastSelection = lastSelectionRef.current;
+        const isSignificantChange = !lastSelection || 
+          Math.abs(lastSelection.from - from) > 2 || 
+          Math.abs(lastSelection.to - to) > 2 ||
+          (to - from) >= 5; // Always show for selections of 5+ characters
+        
+        if (isSignificantChange || !showFloatingToolbar) {
+          // Debounce position updates to avoid excessive repositioning
+          positionDebounceRef.current = setTimeout(() => {
+            try {
+              // Get selection coordinates
+              const startCoords = editorInstance.view.coordsAtPos(from);
+              const endCoords = editorInstance.view.coordsAtPos(to);
+              
+              // Use a more stable positioning strategy
+              // Position at the start of selection rather than center to reduce movement
+              const stableX = startCoords.left;
+              const stableY = Math.min(startCoords.top, endCoords.top);
+              
+              // Stable toolbar positioned at selection start
+              
+              setFloatingToolbarPosition({ x: stableX, y: stableY });
+              setShowFloatingToolbar(true);
+              
+              // Update last selection reference
+              lastSelectionRef.current = { from, to };
+            } catch (error) {
+              console.error('Error calculating toolbar position:', error);
+            }
+          }, 150); // 150ms debounce delay
+        } else {
+          // Selection is too small or not significant enough, just ensure toolbar is visible
+          if (!showFloatingToolbar) {
+            setShowFloatingToolbar(true);
+          }
+        }
+      } else {
+        // Hide toolbar when no text is selected
+        setShowFloatingToolbar(false);
+        setFloatingToolbarPosition(null);
+        lastSelectionRef.current = null;
+      }
+    } catch (error) {
+      console.error('Error handling selection change:', error);
+      setShowFloatingToolbar(false);
+      setFloatingToolbarPosition(null);
+    }
+  }, [showFloatingToolbar]);
 
   const editor = useEditor({
     immediatelyRender: false, // Fix SSR hydration mismatch
@@ -154,6 +223,9 @@ const EnhancedInlineTextEditor: React.FC<EnhancedInlineTextEditorProps> = ({
         heading: {
           levels: [1, 2, 3, 4, 5, 6],
         },
+        // Disable Link and Underline in StarterKit since we configure them separately
+        link: false,
+        underline: false,
       }),
       Underline,
       TextAlign.configure({
@@ -207,6 +279,9 @@ const EnhancedInlineTextEditor: React.FC<EnhancedInlineTextEditorProps> = ({
       }
     },
     onCreate: ({ editor: editorInstance }) => {
+      // Debug: Log extension configuration to verify no duplicates
+      console.log('🔧 EnhancedInlineTextEditor created with extensions:', 
+        editorInstance.extensionManager.extensions.map(ext => ext.name).join(', '));
       setIsInitialized(true);
     },
     onFocus: () => {
@@ -214,6 +289,13 @@ const EnhancedInlineTextEditor: React.FC<EnhancedInlineTextEditorProps> = ({
     },
     onBlur: () => {
       if (onBlur) onBlur();
+      // Hide floating toolbar when editor loses focus
+      setShowFloatingToolbar(false);
+      setFloatingToolbarPosition(null);
+    },
+    onSelectionUpdate: ({ editor: editorInstance }) => {
+      // Handle text selection for floating toolbar
+      handleSelectionChange(editorInstance);
     },
   });
 
@@ -259,12 +341,8 @@ const EnhancedInlineTextEditor: React.FC<EnhancedInlineTextEditorProps> = ({
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [editor]); // Only depend on editor, not on state or handleSlashCommand
 
-  // Add test function to window for debugging
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      (window as any).testSlashMenu = testSlashMenu;
-    }
-  }, []); // No dependencies needed
+
+
 
   // Update content when prop changes
   useEffect(() => {
@@ -287,6 +365,48 @@ const EnhancedInlineTextEditor: React.FC<EnhancedInlineTextEditorProps> = ({
       }
     }
   }, [content, editor, isInitialized]);
+
+  // Handle clicks outside editor to hide floating toolbar
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      // Don't close toolbar if formatting is in progress
+      if (formattingInProgressRef.current) {
+        console.log('🔒 Preventing toolbar close - formatting in progress');
+        return;
+      }
+      
+      if (editorRef.current && !editorRef.current.contains(event.target as Node)) {
+        setShowFloatingToolbar(false);
+        setFloatingToolbarPosition(null);
+      }
+    };
+
+    const handleEscapeKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setShowFloatingToolbar(false);
+        setFloatingToolbarPosition(null);
+      }
+    };
+
+    if (showFloatingToolbar) {
+      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('keydown', handleEscapeKey);
+      
+      return () => {
+        document.removeEventListener('mousedown', handleClickOutside);
+        document.removeEventListener('keydown', handleEscapeKey);
+      };
+    }
+  }, [showFloatingToolbar]);
+
+  // Cleanup debounce timer on unmount
+  useEffect(() => {
+    return () => {
+      if (positionDebounceRef.current) {
+        clearTimeout(positionDebounceRef.current);
+      }
+    };
+  }, []);
 
   // Helper function to determine if content should be treated as placeholder
   const shouldTreatAsPlaceholder = useCallback(() => {
@@ -342,11 +462,11 @@ const EnhancedInlineTextEditor: React.FC<EnhancedInlineTextEditorProps> = ({
   }
 
   return (
-    <div className="enhanced-inline-text-editor-container relative" ref={editorRef}>
+    <div className="enhanced-inline-text-editor-container enhanced-editor relative" ref={editorRef}>
       <div className="editor-wrapper">
         <EditorContent 
           editor={editor}
-          className={`enhanced-editor-content ${className} ${shouldTreatAsPlaceholder() ? 'ghost-text' : ''}`}
+          className={`enhanced-editor-content ProseMirror-container ${className} ${shouldTreatAsPlaceholder() ? 'ghost-text' : ''}`}
           placeholder={getPlaceholderText()}
         />
       </div>
@@ -367,6 +487,15 @@ const EnhancedInlineTextEditor: React.FC<EnhancedInlineTextEditorProps> = ({
         );
       })()}
       
+      {/* Floating Toolbar - Always mounted to preserve state */}
+      <FloatingToolbar
+        editor={editor}
+        position={floatingToolbarPosition || { x: 0, y: 0 }}
+        formattingInProgressRef={formattingInProgressRef}
+        isVisible={showFloatingToolbar && floatingToolbarPosition !== null}
+        onClose={handleToolbarClose}
+      />
+      
       {/* Debug Info */}
       {debugMode && (
         <div className="debug-info mt-2 p-2 bg-gray-100 rounded text-xs">
@@ -376,8 +505,13 @@ const EnhancedInlineTextEditor: React.FC<EnhancedInlineTextEditorProps> = ({
           <div>Placeholder: {getPlaceholderText()}</div>
           <div>Slash State: {slashCommandState?.active ? 'ACTIVE' : 'INACTIVE'}</div>
           <div>Menu Position: {menuPosition ? `${menuPosition.x}, ${menuPosition.y}` : 'NONE'}</div>
+          <div>Floating Toolbar: {showFloatingToolbar ? 'VISIBLE' : 'HIDDEN'}</div>
+          <div>Toolbar Position: {floatingToolbarPosition ? `${floatingToolbarPosition.x}, ${floatingToolbarPosition.y}` : 'NONE'}</div>
+
         </div>
       )}
+
+
     </div>
   );
 };

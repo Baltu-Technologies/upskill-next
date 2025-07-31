@@ -350,47 +350,71 @@
   color: #93c5fd;
 }
 
-/* Heading Styles */
-.enhanced-editor h1 {
-  font-size: 2.25rem;
-  font-weight: 700;
-  line-height: 1.2;
-  margin: 0.5rem 0;
+/* Heading Styles - High specificity to override other styles */
+.enhanced-editor h1,
+.enhanced-editor-content h1,
+.ProseMirror h1,
+.enhanced-inline-text-editor-container h1 {
+  font-size: 2.25rem !important;
+  font-weight: 700 !important;
+  line-height: 1.2 !important;
+  margin: 0.5rem 0 !important;
+  color: inherit !important;
 }
 
-.enhanced-editor h2 {
-  font-size: 1.875rem;
-  font-weight: 700;
-  line-height: 1.2;
-  margin: 0.5rem 0;
+.enhanced-editor h2,
+.enhanced-editor-content h2,
+.ProseMirror h2,
+.enhanced-inline-text-editor-container h2 {
+  font-size: 1.875rem !important;
+  font-weight: 700 !important;
+  line-height: 1.2 !important;
+  margin: 0.5rem 0 !important;
+  color: inherit !important;
 }
 
-.enhanced-editor h3 {
-  font-size: 1.5rem;
-  font-weight: 700;
-  line-height: 1.2;
-  margin: 0.5rem 0;
+.enhanced-editor h3,
+.enhanced-editor-content h3,
+.ProseMirror h3,
+.enhanced-inline-text-editor-container h3 {
+  font-size: 1.5rem !important;
+  font-weight: 700 !important;
+  line-height: 1.2 !important;
+  margin: 0.5rem 0 !important;
+  color: inherit !important;
 }
 
-.enhanced-editor h4 {
-  font-size: 1.25rem;
-  font-weight: 700;
-  line-height: 1.2;
-  margin: 0.5rem 0;
+.enhanced-editor h4,
+.enhanced-editor-content h4,
+.ProseMirror h4,
+.enhanced-inline-text-editor-container h4 {
+  font-size: 1.25rem !important;
+  font-weight: 700 !important;
+  line-height: 1.2 !important;
+  margin: 0.5rem 0 !important;
+  color: inherit !important;
 }
 
-.enhanced-editor h5 {
-  font-size: 1.125rem;
-  font-weight: 700;
-  line-height: 1.2;
-  margin: 0.5rem 0;
+.enhanced-editor h5,
+.enhanced-editor-content h5,
+.ProseMirror h5,
+.enhanced-inline-text-editor-container h5 {
+  font-size: 1.125rem !important;
+  font-weight: 700 !important;
+  line-height: 1.2 !important;
+  margin: 0.5rem 0 !important;
+  color: inherit !important;
 }
 
-.enhanced-editor h6 {
-  font-size: 1rem;
-  font-weight: 700;
-  line-height: 1.2;
-  margin: 0.5rem 0;
+.enhanced-editor h6,
+.enhanced-editor-content h6,
+.ProseMirror h6,
+.enhanced-inline-text-editor-container h6 {
+  font-size: 1rem !important;
+  font-weight: 700 !important;
+  line-height: 1.2 !important;
+  margin: 0.5rem 0 !important;
+  color: inherit !important;
 }
 
 /* List Styles */

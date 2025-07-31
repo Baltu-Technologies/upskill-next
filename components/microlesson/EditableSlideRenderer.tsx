@@ -4,7 +4,6 @@ import React from 'react';
 import { SlideType } from '@/types/microlesson/slide';
 import EnhancedInlineTextEditor from './EnhancedInlineTextEditor';
 import { ImageLayout, ColumnLayout } from '@/types/microlesson/slide';
-import TipTapSlideEditor from './TipTapSlideEditor';
 import ColumnEditor from './ColumnEditor';
 import TableBasedColumnEditor from './TableBasedColumnEditor';
 

@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { ColumnContent, ColumnLayout } from '@/types/microlesson/slide';
-import TipTapSlideEditor from './TipTapSlideEditor';
+import EnhancedInlineTextEditor from './EnhancedInlineTextEditor';
 import { Button } from '@/components/ui/button';
 import { Plus, Trash2 } from 'lucide-react';
 
@@ -144,13 +144,13 @@ export default function ColumnEditor({
             <div className="min-h-[200px] relative">
               {editingColumn === column.id ? (
                 <div className="space-y-2">
-                  <TipTapSlideEditor
+                  <EnhancedInlineTextEditor
                     content={column.content || ''}
-                    onChange={(content) => handleColumnContentChange(column.id, content)}
-                    onSave={handleFinishEditing}
-                    onCancel={handleFinishEditing}
+                    onUpdate={(content) => handleColumnContentChange(column.id, content)}
                     placeholder="Start typing in this column..."
                     className="min-h-[150px]"
+                    blockType="content"
+                    onBlur={handleFinishEditing}
                   />
                   <div className="flex gap-2">
                     <Button

@@ -28,16 +28,53 @@
   font-size: 12px !important;
 }
 
+.ProseMirror [style*="font-size: 14px"],
+.ProseMirror span[style*="font-size: 14px"],
+.ProseMirror p[style*="font-size: 14px"] {
+  font-size: 14px !important;
+}
+
 .ProseMirror [style*="font-size: 16px"],
 .ProseMirror span[style*="font-size: 16px"],
 .ProseMirror p[style*="font-size: 16px"] {
   font-size: 16px !important;
 }
 
+.ProseMirror [style*="font-size: 18px"],
+.ProseMirror span[style*="font-size: 18px"],
+.ProseMirror p[style*="font-size: 18px"] {
+  font-size: 18px !important;
+}
+
 .ProseMirror [style*="font-size: 20px"],
 .ProseMirror span[style*="font-size: 20px"],
 .ProseMirror p[style*="font-size: 20px"] {
   font-size: 20px !important;
+}
+
+/* Title text sizes for display purposes */
+.ProseMirror [style*="font-size: 32px"],
+.ProseMirror span[style*="font-size: 32px"],
+.ProseMirror p[style*="font-size: 32px"] {
+  font-size: 32px !important;
+  line-height: 1.1 !important;
+  font-weight: 600 !important;
+}
+
+.ProseMirror [style*="font-size: 48px"],
+.ProseMirror span[style*="font-size: 48px"],
+.ProseMirror p[style*="font-size: 48px"] {
+  font-size: 48px !important;
+  line-height: 1.05 !important;
+  font-weight: 700 !important;
+}
+
+.ProseMirror [style*="font-size: 64px"],
+.ProseMirror span[style*="font-size: 64px"],
+.ProseMirror p[style*="font-size: 64px"] {
+  font-size: 64px !important;
+  line-height: 1 !important;
+  font-weight: 800 !important;
 }
 
 .ProseMirror [style*="font-size: 96px"],
